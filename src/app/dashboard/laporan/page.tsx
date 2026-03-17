@@ -200,11 +200,11 @@ export default function LaporanKegiatanPage() {
 
                 <div className="space-y-4">
                   <h4 className="text-xs font-bold text-primary uppercase tracking-widest flex items-center gap-2">
-                    <FileCheck className="h-4 w-4" /> Lampiran Berkas & Dokumentasi
+                    <FileCheck className="h-4 w-4" /> Lampiran Dokumentasi
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {[
-                      { label: "Absensi Kegiatan", file: selectedReport.absensiFile, type: "PDF" },
+                      { label: "Foto Absensi", file: selectedReport.absensiFile, type: "IMG" },
                       { label: "Foto Spanduk", file: selectedReport.spandukFile, type: "IMG" },
                       { label: "Foto Bersama", file: selectedReport.fotoBersamaFile, type: "IMG" },
                       { label: "Dokumentasi Pendukung", file: selectedReport.fotoPendukungFile, type: "IMG" }
@@ -215,7 +215,7 @@ export default function LaporanKegiatanPage() {
                       )}>
                         <div className="flex items-center gap-3">
                           <div className={cn("p-2 rounded-lg", item.file ? "bg-green-100 text-green-600" : "bg-muted text-muted-foreground")}>
-                            {item.type === "PDF" ? <FileText className="h-4 w-4" /> : <ImageIcon className="h-4 w-4" />}
+                            <ImageIcon className="h-4 w-4" />
                           </div>
                           <div className="flex flex-col">
                             <span className="text-xs font-bold text-primary leading-tight">{item.label}</span>
@@ -257,7 +257,7 @@ export default function LaporanKegiatanPage() {
           <form onSubmit={handleSubmit}>
             <DialogHeader>
               <DialogTitle>Buat Laporan Kegiatan</DialogTitle>
-              <DialogDescription>Input rincian kegiatan dan unggah dokumentasi yang diperlukan.</DialogDescription>
+              <DialogDescription>Input rincian kegiatan dan unggah dokumentasi foto yang diperlukan.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-6 py-6">
               <div className="grid grid-cols-2 gap-4">
@@ -283,11 +283,11 @@ export default function LaporanKegiatanPage() {
 
               <div className="grid gap-4 p-4 bg-muted/20 rounded-2xl border border-dashed">
                 <h4 className="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2">
-                  <FileUp className="h-4 w-4" /> Unggah Berkas (PDF / Gambar)
+                  <FileUp className="h-4 w-4" /> Unggah Foto Dokumentasi (Hanya Gambar)
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[
-                    { id: "absensi", label: "1. Absensi (PDF)", field: "absensi" as const },
+                    { id: "absensi", label: "1. Foto Absensi", field: "absensi" as const },
                     { id: "spanduk", label: "2. Foto Spanduk", field: "spanduk" as const },
                     { id: "fotoBersama", label: "3. Foto Bersama", field: "fotoBersama" as const },
                     { id: "fotoPendukung", label: "4. Dokumentasi Pendukung", field: "fotoPendukung" as const }
@@ -302,7 +302,7 @@ export default function LaporanKegiatanPage() {
                         name={item.id} 
                         type="file" 
                         className={cn("h-10 text-[11px] py-2 cursor-pointer rounded-xl", fileStatus[item.field] && "border-green-500 bg-green-50")}
-                        accept={item.id === 'absensi' ? '.pdf' : 'image/*, .pdf'}
+                        accept="image/*"
                         onChange={(e) => handleFileChange(e, item.field)}
                       />
                     </div>
