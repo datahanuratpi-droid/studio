@@ -39,6 +39,7 @@ import { Separator } from "@/components/ui/separator"
 export default function DashboardPage() {
   const firestore = useFirestore()
   const [isReniDetailOpen, setIsReniDetailOpen] = React.useState(false)
+  const [isBeriDetailOpen, setIsBeriDetailOpen] = React.useState(false)
 
   const lettersRef = useMemoFirebase(() => collection(firestore, "correspondences"), [firestore])
   const reportsRef = useMemoFirebase(() => collection(firestore, "activity_reports"), [firestore])
@@ -146,13 +147,17 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <div className="flex flex-col items-center text-center space-y-4 p-6 rounded-3xl bg-muted/10 border border-border/50 group hover:border-primary transition-all hover:bg-white hover:shadow-xl">
+              <div 
+                className="flex flex-col items-center text-center space-y-4 p-6 rounded-3xl bg-muted/10 border border-border/50 group hover:border-primary transition-all hover:bg-white hover:shadow-xl cursor-pointer"
+                onClick={() => setIsBeriDetailOpen(true)}
+              >
                 <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
                   <UserIcon className="h-10 w-10" />
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Sekretaris</p>
                   <p className="text-sm font-black text-primary uppercase">BERI KURNIAWAN</p>
+                  <p className="text-[9px] text-accent font-bold uppercase tracking-tighter opacity-0 group-hover:opacity-100 transition-opacity">Klik untuk detail</p>
                 </div>
               </div>
 
@@ -307,6 +312,100 @@ export default function DashboardPage() {
             </div>
             <button 
               onClick={() => setIsReniDetailOpen(false)}
+              className="px-6 py-2 bg-primary text-white rounded-full text-xs font-bold hover:bg-primary/90 transition-colors shadow-lg"
+            >
+              Tutup
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Detail BERI KURNIAWAN */}
+      <Dialog open={isBeriDetailOpen} onOpenChange={setIsBeriDetailOpen}>
+        <DialogContent className="sm:max-w-[500px] p-0 border-none rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in duration-300">
+          <DialogHeader className="p-8 bg-primary text-white text-left relative overflow-hidden">
+            <div className="relative z-10 flex items-center gap-4">
+              <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
+                <UserIcon className="h-8 w-8 text-white" />
+              </div>
+              <div className="space-y-1">
+                <DialogTitle className="text-2xl font-headline font-bold uppercase">BERI KURNIAWAN</DialogTitle>
+                <DialogDescription className="text-white/80 font-bold uppercase text-[10px] tracking-widest">
+                  Sekretaris DPC Hanura Kota Tanjungpinang
+                </DialogDescription>
+              </div>
+            </div>
+            <div className="absolute top-0 right-0 p-8 opacity-10">
+              <ShieldCheck className="w-32 h-32" />
+            </div>
+          </DialogHeader>
+
+          <div className="p-8 space-y-6 max-h-[60vh] overflow-y-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Nama Lengkap</p>
+                <p className="font-bold text-primary uppercase">Beri Kurniawan</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Jenis Kelamin</p>
+                <p className="font-bold text-primary">Laki-Laki</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">No KTA</p>
+                <div className="flex items-center gap-2">
+                  <CreditCard className="h-3.5 w-3.5 text-accent" />
+                  <p className="font-mono text-sm font-bold text-primary">21.72.04.1005.000071</p>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">NIK</p>
+                <p className="font-mono text-sm font-bold text-primary">217203230188001</p>
+              </div>
+              <div className="space-y-1 md:col-span-2">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Tempat / Tgl Lahir</p>
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-3.5 w-3.5 text-accent" />
+                  <p className="font-bold text-primary">Tanjungpinang, 23 Januari 1988</p>
+                </div>
+              </div>
+            </div>
+
+            <Separator className="bg-muted" />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Agama</p>
+                <p className="font-bold text-primary">Islam</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Status Perkawinan</p>
+                <p className="font-bold text-primary">Belum Menikah</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Penerbit KTA</p>
+                <p className="font-bold text-primary">Kota Tanjungpinang</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Tanggal Disahkan</p>
+                <p className="font-bold text-primary">07 April 2023</p>
+              </div>
+              <div className="space-y-1 md:col-span-2">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Alamat</p>
+                <div className="flex items-start gap-2">
+                  <MapPin className="h-3.5 w-3.5 text-accent mt-0.5" />
+                  <p className="font-bold text-primary leading-relaxed text-sm">Kampung Bugis</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 bg-muted/20 border-t flex items-center justify-between">
+            <div className="flex items-center gap-2 text-green-600">
+              <UserCheck className="h-4 w-4" />
+              <span className="text-[10px] font-bold uppercase tracking-widest">Data Terverifikasi SITU</span>
+            </div>
+            <button 
+              onClick={() => setIsBeriDetailOpen(false)}
               className="px-6 py-2 bg-primary text-white rounded-full text-xs font-bold hover:bg-primary/90 transition-colors shadow-lg"
             >
               Tutup
