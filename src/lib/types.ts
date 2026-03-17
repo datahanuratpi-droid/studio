@@ -76,7 +76,7 @@ export interface UserProfile {
   id: string;
   email: string;
   fullName: string;
-  role: 'Admin' | 'Officer' | 'Employee';
+  role: 'Admin' | 'KSB' | 'Staff';
   status: 'Pending Verification' | 'Active' | 'Inactive';
   createdAt: string;
   updatedAt: string;

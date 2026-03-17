@@ -2,7 +2,7 @@
 'use client'
 
 import * as React from "react"
-import { Search, Shield, User, Mail, MoreVertical, Loader2, UserCheck, UserX } from "lucide-react"
+import { Search, Shield, User, Mail, MoreVertical, Loader2, UserCheck, UserX, Briefcase } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { 
@@ -35,10 +35,10 @@ export default function UserManagementPage() {
 
   const { data: users, isLoading } = useCollection<UserProfile>(usersRef)
 
-  const handleVerify = (userId: string, role: 'Admin' | 'Officer' | 'Employee') => {
+  const handleVerify = (userId: string, role: 'Admin' | 'KSB' | 'Staff') => {
     if (!firestore) return
 
-    // Update main profile status
+    // Update main profile status and role
     updateDocumentNonBlocking(doc(firestore, 'users', userId), {
       status: 'Active',
       role: role,
@@ -48,8 +48,10 @@ export default function UserManagementPage() {
     // Create marker documents for security rules checks
     if (role === 'Admin') {
       setDocumentNonBlocking(doc(firestore, 'roles_admin', userId), { active: true }, { merge: true })
-    } else if (role === 'Officer') {
-      setDocumentNonBlocking(doc(firestore, 'roles_officer', userId), { active: true }, { merge: true })
+    } else if (role === 'KSB') {
+      setDocumentNonBlocking(doc(firestore, 'roles_ksb', userId), { active: true }, { merge: true })
+    } else if (role === 'Staff') {
+      setDocumentNonBlocking(doc(firestore, 'roles_staff', userId), { active: true }, { merge: true })
     }
   }
 
@@ -65,7 +67,7 @@ export default function UserManagementPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-headline font-bold text-primary">Manajemen User</h1>
-        <p className="text-muted-foreground">Kelola akses dan verifikasi pendaftar aplikasi.</p>
+        <p className="text-muted-foreground">Kelola akses dan verifikasi pendaftar aplikasi SITU HANURA.</p>
       </div>
 
       <div className="flex items-center gap-4 bg-white p-4 rounded-xl border shadow-sm">
@@ -109,7 +111,7 @@ export default function UserManagementPage() {
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Shield className="h-3 w-3 text-muted-foreground" />
+                    {user.role === 'Admin' ? <Shield className="h-3 w-3 text-primary" /> : <User className="h-3 w-3 text-muted-foreground" />}
                     <span className="text-sm">{user.role}</span>
                   </div>
                 </TableCell>
@@ -126,11 +128,14 @@ export default function UserManagementPage() {
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon"><MoreVertical className="h-4 w-4" /></Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuContent align="end" className="w-56">
                       {user.status === 'Pending Verification' && (
                         <>
-                          <DropdownMenuItem onClick={() => handleVerify(user.id, 'Officer')} className="text-green-600">
-                            <UserCheck className="mr-2 h-4 w-4" /> Verifikasi (Officer)
+                          <DropdownMenuItem onClick={() => handleVerify(user.id, 'Staff')} className="text-green-600">
+                            <UserCheck className="mr-2 h-4 w-4" /> Verifikasi (Staff)
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleVerify(user.id, 'KSB')} className="text-amber-600">
+                            <Briefcase className="mr-2 h-4 w-4" /> Verifikasi (KSB)
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleVerify(user.id, 'Admin')} className="text-blue-600">
                             <Shield className="mr-2 h-4 w-4" /> Verifikasi (Admin)

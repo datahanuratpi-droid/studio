@@ -173,24 +173,26 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     )
   }
 
+  // Filter menu items based on roles
   const menuItems = [
-    { href: "/dashboard", icon: <LayoutDashboard className="h-5 w-5" />, label: "Dashboard" },
+    { href: "/dashboard", icon: <LayoutDashboard className="h-5 w-5" />, label: "Dashboard", roles: ["Admin", "KSB", "Staff"] },
     { 
       href: "/dashboard/surat", 
       icon: <Mail className="h-5 w-5" />, 
       label: "Surat Menyurat",
+      roles: ["Admin", "KSB", "Staff"],
       subItems: [
         { href: "/dashboard/surat/masuk", label: "Surat Masuk", icon: <Inbox className="h-4 w-4" /> },
         { href: "/dashboard/surat/keluar", label: "Surat Keluar", icon: <Send className="h-4 w-4" /> },
       ]
     },
-    { href: "/dashboard/laporan", icon: <FileText className="h-5 w-5" />, label: "Laporan Kegiatan" },
-    { href: "/dashboard/arsip", icon: <Archive className="h-5 w-5" />, label: "Arsip" },
-    { href: "/dashboard/kas", icon: <Wallet className="h-5 w-5" />, label: "Kas Office" },
-    { href: "/dashboard/users", icon: <Users className="h-5 w-5" />, label: "Manajemen User" },
-    { href: "/dashboard/pengaturan", icon: <Settings className="h-5 w-5" />, label: "Pengaturan" },
-    { href: "/dashboard/about", icon: <Info className="h-5 w-5" />, label: "About" },
-  ]
+    { href: "/dashboard/laporan", icon: <FileText className="h-5 w-5" />, label: "Laporan Kegiatan", roles: ["Admin", "KSB", "Staff"] },
+    { href: "/dashboard/arsip", icon: <Archive className="h-5 w-5" />, label: "Arsip", roles: ["Admin", "KSB", "Staff"] },
+    { href: "/dashboard/kas", icon: <Wallet className="h-5 w-5" />, label: "Kas Office", roles: ["Admin", "KSB", "Staff"] },
+    { href: "/dashboard/users", icon: <Users className="h-5 w-5" />, label: "Manajemen User", roles: ["Admin"] },
+    { href: "/dashboard/pengaturan", icon: <Settings className="h-5 w-5" />, label: "Pengaturan", roles: ["Admin", "KSB"] },
+    { href: "/dashboard/about", icon: <Info className="h-5 w-5" />, label: "About", roles: ["Admin", "KSB", "Staff"] },
+  ].filter(item => profile && item.roles.includes(profile.role))
 
   return (
     <div className="flex min-h-screen bg-background">

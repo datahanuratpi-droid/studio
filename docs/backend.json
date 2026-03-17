@@ -9,7 +9,7 @@
         "id": { "type": "string" },
         "email": { "type": "string", "format": "email" },
         "fullName": { "type": "string" },
-        "role": { "type": "string", "enum": ["Admin", "Officer", "Employee"] },
+        "role": { "type": "string", "enum": ["Admin", "KSB", "Staff"] },
         "status": { "type": "string", "enum": ["Pending Verification", "Active", "Inactive"] },
         "createdAt": { "type": "string", "format": "date-time" },
         "updatedAt": { "type": "string", "format": "date-time" }
@@ -94,9 +94,13 @@
       "schema": { "type": "object", "properties": { "active": { "type": "boolean" } } },
       "description": "Marker for admin role."
     },
-    "/roles_officer/{userId}": {
+    "/roles_ksb/{userId}": {
       "schema": { "type": "object", "properties": { "active": { "type": "boolean" } } },
-      "description": "Marker for officer role."
+      "description": "Marker for KSB (Ketua, Sekretaris, Bendahara) role."
+    },
+    "/roles_staff/{userId}": {
+      "schema": { "type": "object", "properties": { "active": { "type": "boolean" } } },
+      "description": "Marker for Staff role."
     }
   }
 }

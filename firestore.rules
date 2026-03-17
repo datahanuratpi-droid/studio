@@ -16,8 +16,12 @@ service cloud.firestore {
       return isSignedIn() && (exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid)) || isAgus());
     }
 
-    function isOfficer() {
-      return isSignedIn() && (exists(/databases/$(database)/documents/roles_officer/$(request.auth.uid)) || isAdmin());
+    function isKSB() {
+      return isSignedIn() && (exists(/databases/$(database)/documents/roles_ksb/$(request.auth.uid)) || isAdmin());
+    }
+
+    function isStaff() {
+      return isSignedIn() && (exists(/databases/$(database)/documents/roles_staff/$(request.auth.uid)) || isKSB());
     }
 
     function isActive() {
@@ -38,27 +42,28 @@ service cloud.firestore {
       allow write: if isAdmin() || isAgus();
     }
 
-    match /roles_officer/{userId} {
+    match /roles_ksb/{userId} {
       allow read: if isSignedIn();
       allow write: if isAdmin();
     }
 
-    // --- Correspondences (Surat) ---
+    match /roles_staff/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // --- Common Access (Surat, Laporan, Kas, Arsip) ---
+    // Staff, KSB, and Admin can access these if active.
     match /correspondences/{id} {
-      allow read: if isOfficer() && isActive();
-      allow write: if isOfficer() && isActive();
+      allow read, write: if isStaff() && isActive();
     }
 
-    // --- Activity Reports ---
     match /activity_reports/{id} {
-      allow read: if isOfficer() && isActive();
-      allow write: if isOfficer() && isActive();
+      allow read, write: if isStaff() && isActive();
     }
 
-    // --- Financial Transactions (Kas) ---
     match /financial_transactions/{id} {
-      allow read: if isOfficer() && isActive();
-      allow write: if isOfficer() && isActive();
+      allow read, write: if isStaff() && isActive();
     }
   }
 }

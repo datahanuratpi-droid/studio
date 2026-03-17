@@ -60,11 +60,7 @@ export default function LoginPage() {
     } catch (err: any) {
       console.error("Login error:", err);
       let message = "Username atau password salah.";
-      if (err.code === 'auth/user-not-found') {
-        message = "Akun tidak ditemukan. Silakan Daftar terlebih dahulu.";
-      } else if (err.code === 'auth/wrong-password') {
-        message = "Password yang Anda masukkan salah.";
-      } else if (err.code === 'auth/invalid-credential') {
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
         message = "Kredensial tidak valid. Periksa kembali username/password.";
       }
       
@@ -110,7 +106,7 @@ export default function LoginPage() {
         id: newUser.uid,
         email: newUser.email,
         fullName: isAdminAgus ? 'AGUS (Super Admin)' : emailInput,
-        role: isAdminAgus ? 'Admin' : 'Employee',
+        role: isAdminAgus ? 'Admin' : 'Staff',
         status: isAdminAgus ? 'Active' : 'Pending Verification',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
