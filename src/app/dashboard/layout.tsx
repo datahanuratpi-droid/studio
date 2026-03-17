@@ -206,9 +206,9 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-screen bg-background text-foreground transition-colors duration-300">
       <aside className="w-64 border-r bg-card hidden lg:flex flex-col sticky top-0 h-screen z-40">
         <div className="p-6">
-          <Link href="/dashboard" className="flex items-center gap-2 mb-8">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center mr-2 shadow-lg">
-              <FileText className="h-5 w-5 text-white" />
+          <Link href="/dashboard" className="flex flex-col items-center justify-center gap-2 mb-10 text-center">
+            <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-xl mb-1">
+              <FileText className="h-7 w-7 text-white" />
             </div>
             <span className="text-xl font-headline font-bold text-primary tracking-tight">SITU HANURA</span>
           </Link>
