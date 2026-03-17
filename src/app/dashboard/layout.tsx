@@ -57,7 +57,6 @@ import {
 import { useUser, useAuth, useDoc, useFirestore, useMemoFirebase } from "@/firebase"
 import { signOut } from "firebase/auth"
 import { doc } from "firebase/firestore"
-import { Card, CardContent } from "@/components/ui/card"
 
 interface SidebarItemProps {
   href?: string
@@ -362,6 +361,10 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       {/* About Pop-out Dialog */}
       <Dialog open={isAboutOpen} onOpenChange={setIsAboutOpen}>
         <DialogContent className="max-w-4xl p-0 border-none rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in duration-300">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Tentang SITU HANURA</DialogTitle>
+            <DialogDescription>Informasi mengenai Sistem Informasi Terpadu Partai Hanura Kota Tanjungpinang</DialogDescription>
+          </DialogHeader>
           <div className="max-h-[85vh] overflow-y-auto">
             <div className="space-y-8 py-8 px-6">
               <div className="text-center space-y-4">
@@ -372,7 +375,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                   Selamat datang di SITU HANURA
                 </h1>
                 <p className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-widest font-bold">
-                  Sistem Informasi Terpadu Hanura Kota Tanjungpinang
+                  Sistem Informasi Terpadu Partai Hanura Kota Tanjungpinang
                 </p>
               </div>
 

@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -140,6 +139,10 @@ export default function LaporanKegiatanPage() {
       {/* Dialog Detail Laporan */}
       <Dialog open={!!selectedReport} onOpenChange={() => setSelectedReport(null)}>
         <DialogContent className="sm:max-w-[650px] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Detail Laporan Kegiatan</DialogTitle>
+            <DialogDescription>Rincian lengkap mengenai laporan kegiatan operasional.</DialogDescription>
+          </DialogHeader>
           {selectedReport && (
             <>
               <div className="bg-primary p-8 text-white relative">

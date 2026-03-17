@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -344,6 +343,10 @@ export default function KasOfficePage() {
       {/* Dialog Preview Slip Gaji - Responsive */}
       <Dialog open={!!viewingSlip} onOpenChange={() => setViewingSlip(null)}>
         <DialogContent className="sm:max-w-[650px] p-0 border-none rounded-3xl overflow-hidden print:shadow-none animate-in zoom-in duration-300">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Pratinjau Slip Gaji</DialogTitle>
+            <DialogDescription>Rincian slip gaji karyawan untuk dicetak.</DialogDescription>
+          </DialogHeader>
           {viewingSlip && (
             <div className="bg-white overflow-y-auto max-h-[90vh]">
               <div className="p-4 md:p-8 space-y-6 md:space-y-8 print:p-0">
