@@ -52,10 +52,9 @@ import {
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useFirestore, useUser, addDocumentNonBlocking, useCollection, useMemoFirebase, deleteDocumentNonBlocking, updateDocumentNonBlocking } from "@/firebase"
-import { collection, doc, query, where, getDocs, writeBatch } from "firebase/firestore"
-import { FinancialTransaction, StaffMember } from "@/lib/types"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { useFirestore, useUser, addDocumentNonBlocking, useCollection, useMemoFirebase, deleteDocumentNonBlocking } from "@/firebase"
+import { collection, doc, writeBatch } from "firebase/firestore"
+import { FinancialTransaction } from "@/lib/types"
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 
@@ -63,8 +62,6 @@ export default function KasOfficePage() {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
   const [selectedType, setSelectedType] = React.useState<string>("Payment")
   const [activeTab, setActiveTab] = React.useState("all")
-  const [selectedStaffId, setSelectedStaffId] = React.useState<string>("")
-  const [viewingSlip, setViewingSlip] = React.useState<FinancialTransaction | null>(null)
   const [viewingTransaction, setViewingTransaction] = React.useState<FinancialTransaction | null>(null)
   const [searchQuery, setSearchQuery] = React.useState("")
   const [isClosingBook, setIsClosingBook] = React.useState(false)
@@ -76,18 +73,6 @@ export default function KasOfficePage() {
   const transRef = useMemoFirebase(() => collection(firestore, "financial_transactions"), [firestore])
   const { data: transactions, isLoading } = useCollection<FinancialTransaction>(transRef)
 
-  const staffRef = useMemoFirebase(() => collection(firestore, "staff_members"), [firestore])
-  const { data: staffList } = useCollection<StaffMember>(staffRef)
-
-  const selectedStaff = staffList?.find(s => s.id === selectedStaffId)
-
-  const outstandingKasbon = React.useMemo(() => {
-    if (!selectedStaffId || !transactions) return 0
-    return transactions
-      .filter(t => t.type === 'CashAdvance' && t.involvedStaffId === selectedStaffId && !t.isClosed)
-      .reduce((acc, curr) => acc + curr.amount, 0)
-  }, [selectedStaffId, transactions])
-
   const isFirstDayOfMonth = new Date().getDate() === 1;
 
   const handleTutupBuku = async () => {
@@ -95,11 +80,6 @@ export default function KasOfficePage() {
     setIsClosingBook(true)
     
     const batch = writeBatch(firestore)
-    const now = new Date()
-    const lastMonth = now.getMonth() === 0 ? 11 : now.getMonth() - 1
-    const year = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear()
-    
-    // Cari transaksi bulan sebelumnya yang belum ditutup
     const openTransactions = transactions.filter(t => !t.isClosed)
     
     openTransactions.forEach(t => {
@@ -120,33 +100,15 @@ export default function KasOfficePage() {
     if (!user || !firestore) return
 
     const formData = new FormData(e.currentTarget)
-    const amountInput = parseFloat(formData.get("amount") as string)
-    const baseDescription = formData.get("description") as string
+    const amount = parseFloat(formData.get("amount") as string)
+    const description = formData.get("description") as string
     
-    let finalDescription = baseDescription
-    let finalAmount = amountInput
-    let involvedId = selectedStaffId
-
-    if (selectedType === 'SalarySlip' && selectedStaff) {
-      if (outstandingKasbon > 0) {
-        finalAmount = selectedStaff.baseSalary - outstandingKasbon
-        finalDescription = `Slip Gaji: ${selectedStaff.fullName} (Potongan Kasbon: Rp ${outstandingKasbon.toLocaleString('id-ID')}) - ${baseDescription}`
-      } else {
-        finalAmount = selectedStaff.baseSalary
-        finalDescription = `Slip Gaji: ${selectedStaff.fullName} - ${baseDescription}`
-      }
-    } else if (selectedType === 'CashAdvance' && selectedStaff) {
-      finalDescription = `Kasbon: ${selectedStaff.fullName} - ${baseDescription}`
-    }
-
     const data = {
-      amount: finalAmount,
+      amount: amount,
       transactionDate: new Date().toISOString(),
-      description: finalDescription,
+      description: description,
       type: selectedType as any,
-      categoryId: "Routine",
       recordedByUserId: user.uid,
-      involvedStaffId: involvedId,
       isClosed: false,
       attachmentIds: [],
       createdAt: new Date().toISOString(),
@@ -155,8 +117,7 @@ export default function KasOfficePage() {
 
     addDocumentNonBlocking(collection(firestore, "financial_transactions"), data)
     setIsDialogOpen(false)
-    setSelectedStaffId("")
-    toast({ title: "Berhasil", description: "Transaksi telah dicatat." })
+    toast({ title: "Berhasil", description: "Transaksi kantor telah dicatat." })
   }
 
   const handleDelete = (id: string) => {
@@ -194,7 +155,7 @@ export default function KasOfficePage() {
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
         <div className="space-y-1">
           <h1 className="text-3xl font-headline font-bold text-primary">Kas Office</h1>
-          <p className="text-sm text-muted-foreground">Otomasi Slip Gaji, Kasbon, dan Tutup Buku Bulanan.</p>
+          <p className="text-sm text-muted-foreground">Catat Pemasukan dan Pengeluaran Operasional Kantor.</p>
         </div>
         <div className="flex flex-wrap gap-2 w-full lg:w-auto">
            {isFirstDayOfMonth && (
@@ -212,11 +173,10 @@ export default function KasOfficePage() {
             className="bg-accent hover:bg-accent/90 text-white rounded-full px-6 shadow-lg h-11 flex-1 lg:flex-none"
             onClick={() => {
               setSelectedType("Payment")
-              setSelectedStaffId("")
               setIsDialogOpen(true)
             }}
            >
-            <Plus className="mr-2 h-4 w-4" /> Transaksi Baru
+            <Plus className="mr-2 h-4 w-4" /> Transaksi Kantor
            </Button>
         </div>
       </div>
@@ -237,7 +197,7 @@ export default function KasOfficePage() {
           <CardContent className="p-6">
             <div className="flex items-center gap-4 mb-4">
               <div className="p-3 bg-green-50 rounded-2xl text-green-600"><TrendingUp className="h-6 w-6" /></div>
-              <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Pemasukan</span>
+              <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Total Pemasukan</span>
             </div>
             <p className="text-2xl font-bold text-primary">
               Rp {transactions?.filter(t => t.type === 'Receipt').reduce((a, b) => a + b.amount, 0).toLocaleString('id-ID') || 0}
@@ -249,7 +209,7 @@ export default function KasOfficePage() {
           <CardContent className="p-6">
             <div className="flex items-center gap-4 mb-4">
               <div className="p-3 bg-red-50 rounded-2xl text-red-600"><TrendingDown className="h-6 w-6" /></div>
-              <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Pengeluaran</span>
+              <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Total Pengeluaran</span>
             </div>
             <p className="text-2xl font-bold text-primary">
               Rp {transactions?.filter(t => t.type !== 'Receipt').reduce((a, b) => a + b.amount, 0).toLocaleString('id-ID') || 0}
@@ -261,10 +221,10 @@ export default function KasOfficePage() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
           <TabsList className="bg-white border p-1 rounded-2xl shadow-sm h-12 w-full sm:w-auto">
-            <TabsTrigger value="all" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-white">Semua</TabsTrigger>
-            <TabsTrigger value="rutin" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-white">Operasional</TabsTrigger>
-            <TabsTrigger value="kasbon" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-white">Kasbon</TabsTrigger>
-            <TabsTrigger value="gaji" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-white">Gaji</TabsTrigger>
+            <TabsTrigger value="all" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-white text-xs">Semua</TabsTrigger>
+            <TabsTrigger value="rutin" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-white text-xs">Operasional</TabsTrigger>
+            <TabsTrigger value="kasbon" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-white text-xs">Kasbon</TabsTrigger>
+            <TabsTrigger value="gaji" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-white text-xs">Gaji</TabsTrigger>
           </TabsList>
           <div className="relative w-full sm:max-w-xs">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -284,7 +244,7 @@ export default function KasOfficePage() {
                 <TableHead className="font-bold text-[10px] uppercase py-5">Tanggal</TableHead>
                 <TableHead className="font-bold text-[10px] uppercase py-5">Keterangan</TableHead>
                 <TableHead className="font-bold text-[10px] uppercase py-5">Jumlah</TableHead>
-                <TableHead className="font-bold text-[10px] uppercase py-5">Status</TableHead>
+                <TableHead className="font-bold text-[10px] uppercase py-5">Jenis</TableHead>
                 <TableHead className="text-right font-bold text-[10px] uppercase py-5">Aksi</TableHead>
               </TableRow>
             </TableHeader>
@@ -320,9 +280,6 @@ export default function KasOfficePage() {
                       <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="rounded-full h-8 w-8"><MoreVertical className="h-4 w-4" /></Button></DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48 rounded-xl p-2">
                         <DropdownMenuItem onClick={() => setViewingTransaction(t)} className="cursor-pointer rounded-lg"><Eye className="mr-2 h-4 w-4" /> Detail</DropdownMenuItem>
-                        {t.type === 'SalarySlip' && (
-                          <DropdownMenuItem onClick={() => setViewingSlip(t)} className="cursor-pointer rounded-lg"><Printer className="mr-2 h-4 w-4" /> Cetak Slip</DropdownMenuItem>
-                        )}
                         {!t.isClosed && (
                           <DropdownMenuItem onClick={() => handleDelete(t.id)} className="text-red-600 cursor-pointer rounded-lg"><Trash2 className="mr-2 h-4 w-4" /> Hapus</DropdownMenuItem>
                         )}
@@ -336,13 +293,13 @@ export default function KasOfficePage() {
         </div>
       </Tabs>
 
-      {/* Input Dialog */}
+      {/* Input Dialog Kantor */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[480px] rounded-3xl p-0 overflow-hidden">
           <form onSubmit={handleSubmit}>
             <DialogHeader className="p-6 bg-primary text-white">
-              <DialogTitle className="text-2xl font-headline font-bold">Catat Transaksi</DialogTitle>
-              <DialogDescription className="text-white/80">Otomasi sistem kasbon dan penggajian.</DialogDescription>
+              <DialogTitle className="text-2xl font-headline font-bold">Catat Transaksi Kantor</DialogTitle>
+              <DialogDescription className="text-white/80">Input data pemasukan atau pengeluaran operasional.</DialogDescription>
             </DialogHeader>
             <div className="p-6 space-y-4">
               <div className="space-y-2">
@@ -350,42 +307,14 @@ export default function KasOfficePage() {
                 <Select onValueChange={setSelectedType} value={selectedType}>
                   <SelectTrigger className="h-11 rounded-xl"><SelectValue /></SelectTrigger>
                   <SelectContent className="rounded-xl">
-                    <SelectItem value="Receipt">Pemasukan (Donasi/Dana)</SelectItem>
-                    <SelectItem value="Payment">Pengeluaran Kantor</SelectItem>
-                    <SelectItem value="CashAdvance">Pinjaman Karyawan (Kasbon)</SelectItem>
-                    <SelectItem value="SalarySlip">Slip Gaji Karyawan</SelectItem>
+                    <SelectItem value="Receipt">Pemasukan (Dana/Donasi)</SelectItem>
+                    <SelectItem value="Payment">Pengeluaran Operasional</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-
-              {(selectedType === 'SalarySlip' || selectedType === 'CashAdvance') && (
-                <div className="space-y-2 animate-in fade-in zoom-in duration-300">
-                  <Label className="font-bold text-xs uppercase text-muted-foreground">Pilih Karyawan</Label>
-                  <Select onValueChange={setSelectedStaffId} value={selectedStaffId}>
-                    <SelectTrigger className="h-11 rounded-xl"><SelectValue placeholder="Pilih Nama..." /></SelectTrigger>
-                    <SelectContent className="rounded-xl">
-                      {staffList?.map(s => <SelectItem key={s.id} value={s.id}>{s.fullName} - {s.position}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-
-              {selectedType === 'SalarySlip' && selectedStaff && (
-                <Alert className="bg-purple-50 border-purple-200">
-                  <Banknote className="h-4 w-4 text-purple-600" />
-                  <AlertDescription className="text-xs font-bold text-purple-800">
-                    Gaji Pokok: Rp {selectedStaff.baseSalary.toLocaleString('id-ID')}
-                    {outstandingKasbon > 0 && <span className="block text-red-600">Terdeteksi Kasbon: - Rp {outstandingKasbon.toLocaleString('id-ID')}</span>}
-                    {outstandingKasbon > 0 && <span className="block border-t mt-1 pt-1">Total Bersih: Rp {(selectedStaff.baseSalary - outstandingKasbon).toLocaleString('id-ID')}</span>}
-                  </AlertDescription>
-                </Alert>
-              )}
-
               <div className="space-y-2">
                 <Label className="font-bold text-xs uppercase text-muted-foreground">Jumlah (Rp)</Label>
-                <Input name="amount" type="number" placeholder="0" required className="h-11 rounded-xl font-bold" 
-                  defaultValue={selectedType === 'SalarySlip' && selectedStaff ? (selectedStaff.baseSalary - outstandingKasbon) : ""}
-                />
+                <Input name="amount" type="number" placeholder="0" required className="h-11 rounded-xl font-bold" />
               </div>
               <div className="space-y-2">
                 <Label className="font-bold text-xs uppercase text-muted-foreground">Keterangan</Label>
@@ -394,7 +323,7 @@ export default function KasOfficePage() {
             </div>
             <DialogFooter className="p-6 bg-muted/20 gap-2">
               <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)} className="flex-1 rounded-full">Batal</Button>
-              <Button type="submit" className="flex-1 bg-primary text-white rounded-full font-bold h-11">Simpan Transaksi</Button>
+              <Button type="submit" className="flex-1 bg-primary text-white rounded-full font-bold h-11">Simpan</Button>
             </DialogFooter>
           </form>
         </DialogContent>
