@@ -25,7 +25,7 @@ service cloud.firestore {
     }
 
     function isActive() {
-      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'Active';
+      return isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'Active';
     }
 
     // --- User Profiles ---
@@ -54,21 +54,21 @@ service cloud.firestore {
 
     // --- Master Data Karyawan ---
     match /staff_members/{id} {
-      allow read: if isStaff() && isActive();
+      allow read: if (isStaff() || isAdmin()) && isActive();
       allow write: if isAdmin() && isActive();
     }
 
     // --- Common Access (Surat, Laporan, Kas) ---
     match /correspondences/{id} {
-      allow read, write: if isStaff() && isActive();
+      allow read, write: if (isStaff() || isAdmin()) && isActive();
     }
 
     match /activity_reports/{id} {
-      allow read, write: if isStaff() && isActive();
+      allow read, write: if (isStaff() || isAdmin()) && isActive();
     }
 
     match /financial_transactions/{id} {
-      allow read, write: if isStaff() && isActive();
+      allow read, write: if (isStaff() || isAdmin()) && isActive();
     }
 
     // --- Pustaka Hanura (Library) ---
