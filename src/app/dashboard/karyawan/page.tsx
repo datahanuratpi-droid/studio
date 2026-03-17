@@ -577,8 +577,7 @@ export default function KaryawanPage() {
                   {/* Header Teks */}
                   <div className="text-center space-y-1 mb-6 border-b pb-4">
                     <h1 className="text-xl font-black uppercase tracking-tight">HANURA KOTA TANJUNGPINANG</h1>
-                    <p className="text-[10px] font-medium text-slate-600">Jl. Gatot Subroto No. 12, Tanjungpinang, Kepulauan Riau</p>
-                    <p className="text-[10px] font-medium text-slate-600">0817-319-885</p>
+                    <p className="text-[10px] font-medium text-slate-600">Jl Gatot Subroto ( Depan Gerbang Rawasari ) , Tanjungpinang</p>
                   </div>
 
                   {/* Judul Dokumen */}
