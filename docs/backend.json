@@ -68,6 +68,19 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["amount", "transactionDate", "description", "type", "recordedByUserId", "createdAt"]
+    },
+    "DigitalArchive": {
+      "title": "DigitalArchive",
+      "description": "Represents a generic digital document archived in the system.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "archiveTitle": { "type": "string" },
+        "fileName": { "type": "string" },
+        "uploadedByUserId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["archiveTitle", "fileName", "uploadedByUserId", "createdAt"]
     }
   },
   "auth": {
@@ -89,6 +102,10 @@
     "/financial_transactions/{id}": {
       "schema": "FinancialTransaction",
       "description": "Cash flow records."
+    },
+    "/digital_archives/{id}": {
+      "schema": "DigitalArchive",
+      "description": "General digital archives."
     },
     "/roles_admin/{userId}": {
       "schema": { "type": "object", "properties": { "active": { "type": "boolean" } } },

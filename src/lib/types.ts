@@ -72,6 +72,14 @@ export interface FinancialTransaction {
   updatedAt: string;
 }
 
+export interface DigitalArchive {
+  id: string;
+  archiveTitle: string;
+  fileName: string;
+  uploadedByUserId: string;
+  createdAt: string;
+}
+
 export interface UserProfile {
   id: string;
   email: string;
