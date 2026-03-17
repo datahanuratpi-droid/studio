@@ -78,6 +78,7 @@ export interface StaffMember {
   fullName: string;
   position: string;
   baseSalary: number;
+  dailyRate?: number;
   bankName?: string;
   accountNumber?: string;
   phoneNumber?: string;

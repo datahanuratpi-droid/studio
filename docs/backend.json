@@ -25,6 +25,7 @@
         "fullName": { "type": "string" },
         "position": { "type": "string" },
         "baseSalary": { "type": "number" },
+        "dailyRate": { "type": "number" },
         "bankName": { "type": "string" },
         "accountNumber": { "type": "string" },
         "phoneNumber": { "type": "string" },
