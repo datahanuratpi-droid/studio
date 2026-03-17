@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -56,11 +55,10 @@ export default function LoginPage() {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const newUser = userCredential.user;
 
-      // Create initial profile in Firestore
       const userProfile = {
         id: newUser.uid,
         email: newUser.email,
-        fullName: email.split('@')[0], // Default name
+        fullName: email.split('@')[0],
         role: 'Employee',
         status: 'Pending Verification',
         createdAt: new Date().toISOString(),
@@ -73,6 +71,7 @@ export default function LoginPage() {
         title: 'Akun Berhasil Dibuat', 
         description: 'Mohon tunggu admin memverifikasi akun Anda sebelum bisa masuk.' 
       });
+      setLoading(false);
     } catch (err: any) {
       toast({ variant: 'destructive', title: 'Pendaftaran Gagal', description: err.message });
       setLoading(false);
@@ -94,8 +93,8 @@ export default function LoginPage() {
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary shadow-lg">
             <FileText className="h-6 w-6 text-white" />
           </div>
-          <h1 className="mt-6 text-3xl font-headline font-bold text-primary">OfficeFlow</h1>
-          <p className="mt-2 text-muted-foreground">Sistem Manajemen Kantor Terintegrasi</p>
+          <h1 className="mt-6 text-3xl font-headline font-bold text-primary">SITU HANURA</h1>
+          <p className="mt-2 text-muted-foreground">Sistem Informasi Terpadu</p>
         </div>
 
         <Tabs defaultValue="login" className="w-full">
@@ -116,7 +115,7 @@ export default function LoginPage() {
                     <Label htmlFor="email">Email</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input id="email" name="email" type="email" placeholder="nama@kantor.com" className="pl-10" required />
+                      <Input id="email" name="email" type="email" placeholder="nama@situ.com" className="pl-10" required />
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -149,7 +148,7 @@ export default function LoginPage() {
                     <Label htmlFor="reg-email">Email</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input id="reg-email" name="email" type="email" placeholder="nama@kantor.com" className="pl-10" required />
+                      <Input id="reg-email" name="email" type="email" placeholder="nama@situ.com" className="pl-10" required />
                     </div>
                   </div>
                   <div className="space-y-2">

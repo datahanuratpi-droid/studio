@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -13,15 +12,15 @@ export default function AboutPage() {
         <div className="inline-flex items-center justify-center p-4 bg-primary/10 rounded-2xl mb-4">
           <Info className="h-12 w-12 text-primary" />
         </div>
-        <h1 className="text-4xl font-headline font-bold text-primary">Tentang OfficeFlow</h1>
-        <p className="text-xl text-muted-foreground">Sistem Manajemen Kantor Terintegrasi v1.0.0</p>
+        <h1 className="text-4xl font-headline font-bold text-primary">Tentang SITU HANURA</h1>
+        <p className="text-xl text-muted-foreground">Sistem Informasi Terpadu v1.0.0</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="space-y-6">
           <h2 className="text-2xl font-headline font-bold text-primary">Visi Kami</h2>
           <p className="text-muted-foreground leading-relaxed">
-            OfficeFlow dirancang untuk memodernisasi alur kerja perkantoran tradisional. Kami percaya bahwa setiap kantor berhak memiliki sistem yang efisien, transparan, dan mudah digunakan tanpa kerumitan teknologi yang berlebihan.
+            SITU HANURA dirancang untuk mengintegrasikan berbagai alur kerja operasional dalam satu platform digital yang efisien. Kami berkomitmen untuk menyediakan sistem yang transparan, aman, dan mudah diakses untuk meningkatkan produktivitas organisasi.
           </p>
           <div className="flex gap-4">
             <div className="p-3 bg-accent/10 rounded-xl text-accent">
@@ -29,7 +28,7 @@ export default function AboutPage() {
             </div>
             <div>
               <h4 className="font-bold">Keamanan Data</h4>
-              <p className="text-sm text-muted-foreground">Data tersimpan aman di cloud dengan enkripsi tingkat lanjut.</p>
+              <p className="text-sm text-muted-foreground">Sistem keamanan terintegrasi untuk melindungi data penting Anda.</p>
             </div>
           </div>
           <div className="flex gap-4">
@@ -37,8 +36,8 @@ export default function AboutPage() {
               <Zap className="h-6 w-6" />
             </div>
             <div>
-              <h4 className="font-bold">Performa Cepat</h4>
-              <p className="text-sm text-muted-foreground">Akses data instan dengan teknologi caching modern.</p>
+              <h4 className="font-bold">Integrasi Cepat</h4>
+              <p className="text-sm text-muted-foreground">Data terhubung secara real-time antar berbagai modul aplikasi.</p>
             </div>
           </div>
         </div>
@@ -46,7 +45,7 @@ export default function AboutPage() {
         <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-primary/80 text-white">
           <CardContent className="p-8 space-y-6">
             <h3 className="text-xl font-bold">Informasi Pengembang</h3>
-            <p className="text-primary-foreground/80">Aplikasi ini dikembangkan oleh tim internal IT Support untuk meningkatkan produktivitas operasional kantor.</p>
+            <p className="text-primary-foreground/80">Aplikasi ini dikembangkan untuk memodernisasi sistem informasi tradisional menjadi ekosistem digital yang terpadu.</p>
             <div className="pt-4 space-y-3">
               <div className="flex items-center gap-2">
                 <Code className="h-4 w-4" />
@@ -54,7 +53,7 @@ export default function AboutPage() {
               </div>
               <div className="flex items-center gap-2">
                 <Heart className="h-4 w-4 fill-white" />
-                <span className="text-sm">Made with passion for efficiency</span>
+                <span className="text-sm">Made with passion for integration</span>
               </div>
             </div>
             <Button variant="secondary" className="w-full mt-4">
@@ -65,7 +64,7 @@ export default function AboutPage() {
       </div>
 
       <footer className="text-center pt-12 text-sm text-muted-foreground">
-        © 2024 OfficeFlow Management System. All rights reserved.
+        © 2024 SITU HANURA - Sistem Informasi Terpadu. All rights reserved.
       </footer>
     </div>
   )

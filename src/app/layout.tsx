@@ -3,8 +3,8 @@ import './globals.css';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 export const metadata: Metadata = {
-  title: 'OfficeFlow | Integrated Office Management',
-  description: 'Sistem Manajemen Kantor Terintegrasi untuk efisiensi alur kerja Anda.',
+  title: 'SITU HANURA | Sistem Informasi Terpadu',
+  description: 'Sistem Informasi Terpadu untuk efisiensi alur kerja operasional Anda.',
 };
 
 export default function RootLayout({

@@ -1,4 +1,3 @@
-
 'use client'
 
 import * as React from "react"
@@ -41,7 +40,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+} from "@/collapsible"
 import { useUser, useAuth, useDoc, useFirestore, useMemoFirebase } from "@/firebase"
 import { signOut } from "firebase/auth"
 import { doc } from "firebase/firestore"
@@ -123,13 +122,11 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const { firestore } = useFirestore()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
 
-  // Memoize user doc reference
   const userDocRef = useMemoFirebase(() => {
     if (!firestore || !user?.uid) return null
     return doc(firestore, 'users', user.uid)
   }, [firestore, user?.uid])
 
-  // Fetch profile to check status
   const { data: profile, isLoading: isProfileLoading } = useDoc(userDocRef)
 
   React.useEffect(() => {
@@ -153,7 +150,6 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     )
   }
 
-  // Handle case where user is logged in but profile is not verified
   if (user && profile && profile.status !== 'Active') {
     return (
       <div className="flex h-screen flex-col items-center justify-center bg-background p-6 text-center space-y-6">
@@ -166,7 +162,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             Terima kasih telah mendaftar, <strong>{user.email}</strong>. Saat ini akun Anda sedang dalam proses verifikasi oleh Admin.
           </p>
           <p className="text-sm text-muted-foreground pt-4">
-            Anda akan bisa mengakses fitur aplikasi setelah Admin memberikan peran (Role) pada akun Anda.
+            Anda akan bisa mengakses fitur aplikasi SITU HANURA setelah Admin memberikan peran (Role) pada akun Anda.
           </p>
         </div>
         <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2">
@@ -197,14 +193,13 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-background">
-      {/* Sidebar Desktop */}
       <aside className="w-64 border-r bg-white hidden lg:flex flex-col sticky top-0 h-screen z-40">
         <div className="p-6">
           <Link href="/dashboard" className="flex items-center gap-2 mb-8">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center mr-2">
               <FileText className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-headline font-bold text-primary">OfficeFlow</span>
+            <span className="text-xl font-headline font-bold text-primary">SITU HANURA</span>
           </Link>
 
           <nav className="space-y-1">
@@ -232,12 +227,11 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 lg:hidden" onClick={() => setIsMobileMenuOpen(false)}>
           <div className="w-64 h-full bg-white p-6 animate-in slide-in-from-left duration-300" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-8">
-              <span className="text-xl font-headline font-bold text-primary">OfficeFlow</span>
+              <span className="text-xl font-headline font-bold text-primary">SITU HANURA</span>
               <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)}>
                 <X className="h-5 w-5" />
               </Button>
@@ -258,9 +252,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col min-h-screen relative">
-        {/* Header */}
         <header className="h-16 border-b bg-white flex items-center justify-between px-6 sticky top-0 z-30">
           <div className="flex items-center gap-4 flex-1">
             <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setIsMobileMenuOpen(true)}>
@@ -284,7 +276,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="p-1 rounded-full border border-border">
                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold uppercase">
-                     {user.email?.charAt(0) || 'U'}
+                     {user?.email?.charAt(0) || 'U'}
                    </div>
                 </Button>
               </DropdownMenuTrigger>
@@ -292,7 +284,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 <DropdownMenuLabel>
                   <div className="flex flex-col">
                     <span>Akun Saya</span>
-                    <span className="text-xs text-muted-foreground font-normal">{user.email}</span>
+                    <span className="text-xs text-muted-foreground font-normal">{user?.email}</span>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -307,7 +299,6 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        {/* Page Content */}
         <main className="flex-1 p-4 md:p-8 animate-in fade-in duration-500">
           {children}
         </main>
