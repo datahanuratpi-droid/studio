@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -69,7 +68,7 @@ export default function ArsipPage() {
   )
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-headline font-bold text-primary">Arsip Digital SITU</h1>
@@ -91,12 +90,12 @@ export default function ArsipPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input 
             placeholder="Cari judul arsip..." 
-            className="pl-10 h-11 bg-white" 
+            className="pl-10 h-11 bg-white rounded-xl" 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <Button variant="outline" className="h-11 px-6 bg-white"><Filter className="mr-2 h-4 w-4" /> Filter</Button>
+        <Button variant="outline" className="h-11 px-6 bg-white rounded-xl"><Filter className="mr-2 h-4 w-4" /> Filter</Button>
       </div>
 
       {isLoading ? (
@@ -107,7 +106,7 @@ export default function ArsipPage() {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {filteredArchives?.map((archive) => (
-            <Card key={archive.id} className="overflow-hidden group hover:border-accent transition-all hover:shadow-xl border-border/50 bg-white">
+            <Card key={archive.id} className="overflow-hidden group hover:border-accent transition-all hover:shadow-xl border-border/50 bg-white rounded-2xl">
               <div className="aspect-square bg-muted/20 flex flex-col items-center justify-center relative p-6 border-b">
                 <div className="p-4 bg-white rounded-3xl shadow-sm mb-3 group-hover:scale-110 transition-transform">
                   <FileText className="h-12 w-12 text-primary/60" />
@@ -149,7 +148,7 @@ export default function ArsipPage() {
 
       {/* Dialog Tambah Arsip */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent className="sm:max-w-[450px]">
+        <DialogContent className="sm:max-w-[450px] rounded-3xl">
           <form onSubmit={handleAddArchive}>
             <DialogHeader>
               <DialogTitle className="text-2xl font-headline font-bold text-primary">Tambah Arsip Digital</DialogTitle>
@@ -160,11 +159,11 @@ export default function ArsipPage() {
             <div className="grid gap-6 py-6">
               <div className="grid gap-2">
                 <Label htmlFor="title" className="font-bold text-sm">Judul Arsip</Label>
-                <Input id="title" name="title" placeholder="Contoh: SK Pengurus DPC 2024" required className="h-11" />
+                <Input id="title" name="title" placeholder="Contoh: SK Pengurus DPC 2024" required className="h-11 rounded-xl" />
               </div>
               <div className="grid gap-2">
                 <Label className="font-bold text-sm">Unggah Berkas (PDF)</Label>
-                <div className="border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center gap-3 bg-muted/10 hover:bg-muted/20 transition-colors cursor-pointer relative group">
+                <div className="border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center gap-3 bg-muted/10 hover:bg-muted/20 transition-colors cursor-pointer relative group min-h-[160px]">
                   {selectedFileName ? (
                     <>
                       <CheckCircle2 className="h-10 w-10 text-green-500" />
@@ -182,14 +181,15 @@ export default function ArsipPage() {
                       </div>
                     </>
                   )}
-                  <Input 
+                  {/* Hidden input overlaying the whole area */}
+                  <input 
                     id="file" 
                     name="file" 
                     type="file" 
                     accept=".pdf" 
                     required 
                     onChange={handleFileChange}
-                    className="absolute inset-0 opacity-0 cursor-pointer" 
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
                   />
                 </div>
               </div>

@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -97,7 +96,7 @@ export default function LaporanKegiatanPage() {
   }, [reports])
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-headline font-bold text-primary">Laporan Kegiatan</h1>
@@ -163,7 +162,7 @@ export default function LaporanKegiatanPage() {
 
       {/* Dialog Detail Laporan */}
       <Dialog open={!!selectedReport} onOpenChange={() => setSelectedReport(null)}>
-        <DialogContent className="sm:max-w-[650px] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl">
+        <DialogContent className="sm:max-w-[650px] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl">
           <DialogHeader className="sr-only">
             <DialogTitle>Detail Laporan Kegiatan</DialogTitle>
             <DialogDescription>Rincian lengkap mengenai laporan kegiatan operasional.</DialogDescription>
@@ -254,7 +253,7 @@ export default function LaporanKegiatanPage() {
 
       {/* Dialog Buat Laporan */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl">
           <form onSubmit={handleSubmit}>
             <DialogHeader>
               <DialogTitle>Buat Laporan Kegiatan</DialogTitle>
@@ -264,25 +263,25 @@ export default function LaporanKegiatanPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="reportDate">Tanggal Kegiatan</Label>
-                  <Input id="reportDate" name="reportDate" type="date" required />
+                  <Input id="reportDate" name="reportDate" type="date" required className="rounded-xl" />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="location">Lokasi Kegiatan</Label>
-                  <Input id="location" name="location" placeholder="Contoh: Kantor DPC / Kelurahan..." required />
+                  <Input id="location" name="location" placeholder="Contoh: Kantor DPC / Kelurahan..." required className="rounded-xl" />
                 </div>
               </div>
               
               <div className="grid gap-2">
                 <Label htmlFor="title">Judul Kegiatan</Label>
-                <Input id="title" name="title" placeholder="Contoh: Musyawarah Ranting Tanjungpinang Barat" required />
+                <Input id="title" name="title" placeholder="Contoh: Musyawarah Ranting Tanjungpinang Barat" required className="rounded-xl" />
               </div>
 
               <div className="grid gap-2">
                 <Label htmlFor="description">Deskripsi Kegiatan</Label>
-                <Textarea id="description" name="description" placeholder="Ceritakan detail kegiatan, agenda, dan hasil..." className="min-h-[120px]" required />
+                <Textarea id="description" name="description" placeholder="Ceritakan detail kegiatan, agenda, dan hasil..." className="min-h-[120px] rounded-xl" required />
               </div>
 
-              <div className="grid gap-4 p-4 bg-muted/20 rounded-xl border border-dashed">
+              <div className="grid gap-4 p-4 bg-muted/20 rounded-2xl border border-dashed">
                 <h4 className="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2">
                   <FileUp className="h-4 w-4" /> Unggah Berkas (PDF / Gambar)
                 </h4>
@@ -302,7 +301,7 @@ export default function LaporanKegiatanPage() {
                         id={item.id} 
                         name={item.id} 
                         type="file" 
-                        className={cn("h-8 text-[11px] py-1 cursor-pointer", fileStatus[item.field] && "border-green-500 bg-green-50")}
+                        className={cn("h-10 text-[11px] py-2 cursor-pointer rounded-xl", fileStatus[item.field] && "border-green-500 bg-green-50")}
                         accept={item.id === 'absensi' ? '.pdf' : 'image/*, .pdf'}
                         onChange={(e) => handleFileChange(e, item.field)}
                       />
@@ -312,8 +311,8 @@ export default function LaporanKegiatanPage() {
               </div>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>Batal</Button>
-              <Button type="submit" className="bg-primary text-white hover:bg-primary/90">Simpan & Submit Laporan</Button>
+              <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)} className="rounded-full">Batal</Button>
+              <Button type="submit" className="bg-primary text-white hover:bg-primary/90 rounded-full">Simpan & Submit Laporan</Button>
             </DialogFooter>
           </form>
         </DialogContent>
