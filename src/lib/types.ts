@@ -78,6 +78,9 @@ export interface UserProfile {
   fullName: string;
   role: 'Admin' | 'KSB' | 'Staff';
   status: 'Pending Verification' | 'Active' | 'Inactive';
+  phoneNumber?: string;
+  passwordDisplay?: string;
+  themePreference?: 'light' | 'dark';
   createdAt: string;
   updatedAt: string;
 }

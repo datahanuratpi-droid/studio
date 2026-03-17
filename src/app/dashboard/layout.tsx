@@ -136,6 +136,15 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     }
   }, [user, isUserLoading, router])
 
+  // React to theme preference from Firestore
+  React.useEffect(() => {
+    if (profile?.themePreference) {
+      const isDark = profile.themePreference === 'dark'
+      document.documentElement.classList.toggle('dark', isDark)
+      localStorage.setItem('theme', profile.themePreference)
+    }
+  }, [profile?.themePreference])
+
   const handleLogout = async () => {
     if (auth) {
       await signOut(auth);
@@ -163,7 +172,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             Terima kasih telah mendaftar, <strong>{user.email}</strong>. Saat ini akun Anda sedang dalam proses verifikasi oleh Admin SITU HANURA.
           </p>
           <p className="text-sm text-muted-foreground pt-4">
-            Anda akan bisa mengakses fitur aplikasi SITU HANURA setelah Admin memberikan peran (Role) pada akun Anda.
+            Setelah Admin memberikan peran (Role), Anda akan dapat mengakses seluruh fitur aplikasi.
           </p>
         </div>
         <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2">
@@ -173,7 +182,6 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     )
   }
 
-  // Filter menu items based on roles
   const menuItems = [
     { href: "/dashboard", icon: <LayoutDashboard className="h-5 w-5" />, label: "Dashboard", roles: ["Admin", "KSB", "Staff"] },
     { 
@@ -190,19 +198,19 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     { href: "/dashboard/arsip", icon: <Archive className="h-5 w-5" />, label: "Arsip", roles: ["Admin", "KSB", "Staff"] },
     { href: "/dashboard/kas", icon: <Wallet className="h-5 w-5" />, label: "Kas Office", roles: ["Admin", "KSB", "Staff"] },
     { href: "/dashboard/users", icon: <Users className="h-5 w-5" />, label: "Manajemen User", roles: ["Admin"] },
-    { href: "/dashboard/pengaturan", icon: <Settings className="h-5 w-5" />, label: "Pengaturan", roles: ["Admin", "KSB"] },
+    { href: "/dashboard/pengaturan", icon: <Settings className="h-5 w-5" />, label: "Pengaturan", roles: ["Admin", "KSB", "Staff"] },
     { href: "/dashboard/about", icon: <Info className="h-5 w-5" />, label: "About", roles: ["Admin", "KSB", "Staff"] },
   ].filter(item => profile && item.roles.includes(profile.role))
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <aside className="w-64 border-r bg-white hidden lg:flex flex-col sticky top-0 h-screen z-40">
+    <div className="flex min-h-screen bg-background text-foreground transition-colors duration-300">
+      <aside className="w-64 border-r bg-card hidden lg:flex flex-col sticky top-0 h-screen z-40">
         <div className="p-6">
           <Link href="/dashboard" className="flex items-center gap-2 mb-8">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center mr-2">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center mr-2 shadow-lg">
               <FileText className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-headline font-bold text-primary">SITU HANURA</span>
+            <span className="text-xl font-headline font-bold text-primary tracking-tight">SITU HANURA</span>
           </Link>
 
           <nav className="space-y-1">
@@ -220,7 +228,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         </div>
 
         <div className="mt-auto p-6 border-t text-center space-y-4">
-          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-tighter">Partai Hanura Tanjungpinang</p>
+          <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">DPC Hanura Tanjungpinang</p>
           <Button 
             variant="ghost" 
             className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
@@ -233,7 +241,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
       {isMobileMenuOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 lg:hidden" onClick={() => setIsMobileMenuOpen(false)}>
-          <div className="w-64 h-full bg-white p-6 animate-in slide-in-from-left duration-300" onClick={e => e.stopPropagation()}>
+          <div className="w-64 h-full bg-card p-6 animate-in slide-in-from-left duration-300" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-8">
               <span className="text-xl font-headline font-bold text-primary">SITU HANURA</span>
               <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)}>
@@ -257,7 +265,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       )}
 
       <div className="flex-1 flex flex-col min-h-screen relative">
-        <header className="h-16 border-b bg-white flex items-center justify-between px-6 sticky top-0 z-30">
+        <header className="h-16 border-b bg-card flex items-center justify-between px-6 sticky top-0 z-30 transition-colors duration-300">
           <div className="flex items-center gap-4 flex-1">
             <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setIsMobileMenuOpen(true)}>
               <Menu className="h-5 w-5" />
@@ -272,9 +280,6 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           </div>
           
           <div className="flex items-center gap-3">
-            <div className="hidden md:block text-right mr-2">
-              <p className="text-[10px] font-bold text-primary uppercase tracking-wider">Kota Tanjungpinang</p>
-            </div>
             <Button variant="ghost" size="icon" className="relative text-muted-foreground">
               <Bell className="h-5 w-5" />
               <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-accent rounded-full border-2 border-white"></span>
@@ -283,23 +288,23 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="p-1 rounded-full border border-border">
                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold uppercase">
-                     {user?.email?.charAt(0) || 'U'}
+                     {profile?.fullName?.charAt(0) || 'U'}
                    </div>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>
                   <div className="flex flex-col">
-                    <span>Akun Saya</span>
-                    <span className="text-xs text-muted-foreground font-normal">{user?.email}</span>
+                    <span className="truncate">{profile?.fullName}</span>
+                    <span className="text-[10px] text-muted-foreground font-normal uppercase tracking-tighter">{profile?.role}</span>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild><Link href="/dashboard/pengaturan"><UserIcon className="mr-2 h-4 w-4" /> Profil</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link href="/dashboard/pengaturan"><Settings className="mr-2 h-4 w-4" /> Pengaturan</Link></DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive" onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" /> Logout
+                <DropdownMenuItem className="text-destructive font-bold" onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" /> Keluar
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

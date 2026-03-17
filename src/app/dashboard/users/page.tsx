@@ -2,7 +2,7 @@
 'use client'
 
 import * as React from "react"
-import { Search, Shield, User, Mail, MoreVertical, Loader2, UserCheck, UserX, Briefcase } from "lucide-react"
+import { Search, Shield, User, Mail, MoreVertical, Loader2, UserCheck, UserX, Briefcase, Key } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { 
@@ -24,9 +24,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { UserProfile } from "@/lib/types"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 export default function UserManagementPage() {
   const firestore = useFirestore()
+  const [searchQuery, setSearchQuery] = React.useState("")
   
   const usersRef = useMemoFirebase(() => {
     if (!firestore) return null
@@ -38,14 +45,12 @@ export default function UserManagementPage() {
   const handleVerify = (userId: string, role: 'Admin' | 'KSB' | 'Staff') => {
     if (!firestore) return
 
-    // Update main profile status and role
     updateDocumentNonBlocking(doc(firestore, 'users', userId), {
       status: 'Active',
       role: role,
       updatedAt: new Date().toISOString()
     })
 
-    // Create marker documents for security rules checks
     if (role === 'Admin') {
       setDocumentNonBlocking(doc(firestore, 'roles_admin', userId), { active: true }, { merge: true })
     } else if (role === 'KSB') {
@@ -63,17 +68,27 @@ export default function UserManagementPage() {
     })
   }
 
+  const filteredUsers = users?.filter(u => 
+    u.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    u.email?.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-headline font-bold text-primary">Manajemen User</h1>
-        <p className="text-muted-foreground">Kelola akses dan verifikasi pendaftar aplikasi SITU HANURA.</p>
+        <p className="text-muted-foreground">Kelola akses, verifikasi, dan pantau kata sandi pengguna.</p>
       </div>
 
       <div className="flex items-center gap-4 bg-white p-4 rounded-xl border shadow-sm">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Cari nama atau email..." className="pl-10" />
+          <Input 
+            placeholder="Cari nama atau email..." 
+            className="pl-10" 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
       </div>
 
@@ -82,7 +97,8 @@ export default function UserManagementPage() {
           <TableHeader>
             <TableRow>
               <TableHead>User</TableHead>
-              <TableHead>Role</TableHead>
+              <TableHead>Role & Kontak</TableHead>
+              <TableHead>Kata Sandi (Admin Only)</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Aksi</TableHead>
             </TableRow>
@@ -90,37 +106,57 @@ export default function UserManagementPage() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-12">
+                <TableCell colSpan={5} className="text-center py-12">
                   <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
                 </TableCell>
               </TableRow>
-            ) : users?.map((user) => (
-              <TableRow key={user.id}>
+            ) : filteredUsers?.map((u) => (
+              <TableRow key={u.id}>
                 <TableCell>
                   <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10">
+                    <Avatar className="h-10 w-10 border">
                       <AvatarFallback className="bg-primary/10 text-primary font-bold">
-                        {user.fullName?.charAt(0) || user.email?.charAt(0)}
+                        {u.fullName?.charAt(0) || u.email?.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex flex-col">
-                      <span className="font-bold text-sm">{user.fullName}</span>
-                      <span className="text-xs text-muted-foreground">{user.email}</span>
+                    <div className="flex flex-col min-w-0">
+                      <span className="font-bold text-sm truncate">{u.fullName}</span>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-widest">{u.email}</span>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-2">
-                    {user.role === 'Admin' ? <Shield className="h-3 w-3 text-primary" /> : <User className="h-3 w-3 text-muted-foreground" />}
-                    <span className="text-sm">{user.role}</span>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-[10px] font-bold">
+                        {u.role === 'Admin' ? <Shield className="h-3 w-3 mr-1" /> : <User className="h-3 w-3 mr-1" />}
+                        {u.role}
+                      </Badge>
+                    </div>
+                    <span className="text-[11px] text-muted-foreground">{u.phoneNumber || "-"}</span>
                   </div>
                 </TableCell>
                 <TableCell>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex items-center gap-2 text-xs font-mono bg-muted/30 px-2 py-1 rounded cursor-help">
+                          <Key className="h-3 w-3 text-muted-foreground" />
+                          <span>{u.passwordDisplay ? "••••••••" : "Belum diatur"}</span>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="font-mono text-xs">Password: {u.passwordDisplay || "N/A"}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </TableCell>
+                <TableCell>
                   <Badge 
-                    variant={user.status === 'Active' ? 'default' : user.status === 'Pending Verification' ? 'secondary' : 'destructive'} 
-                    className="text-[10px]"
+                    variant={u.status === 'Active' ? 'default' : u.status === 'Pending Verification' ? 'secondary' : 'destructive'} 
+                    className="text-[9px] uppercase font-bold tracking-widest"
                   >
-                    {user.status}
+                    {u.status}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
@@ -129,21 +165,21 @@ export default function UserManagementPage() {
                       <Button variant="ghost" size="icon"><MoreVertical className="h-4 w-4" /></Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56">
-                      {user.status === 'Pending Verification' && (
+                      {u.status === 'Pending Verification' && (
                         <>
-                          <DropdownMenuItem onClick={() => handleVerify(user.id, 'Staff')} className="text-green-600">
+                          <DropdownMenuItem onClick={() => handleVerify(u.id, 'Staff')} className="text-green-600 font-medium">
                             <UserCheck className="mr-2 h-4 w-4" /> Verifikasi (Staff)
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleVerify(user.id, 'KSB')} className="text-amber-600">
+                          <DropdownMenuItem onClick={() => handleVerify(u.id, 'KSB')} className="text-amber-600 font-medium">
                             <Briefcase className="mr-2 h-4 w-4" /> Verifikasi (KSB)
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleVerify(user.id, 'Admin')} className="text-blue-600">
+                          <DropdownMenuItem onClick={() => handleVerify(u.id, 'Admin')} className="text-blue-600 font-medium">
                             <Shield className="mr-2 h-4 w-4" /> Verifikasi (Admin)
                           </DropdownMenuItem>
                         </>
                       )}
-                      {user.status === 'Active' && (
-                        <DropdownMenuItem onClick={() => handleDeactivate(user.id)} className="text-destructive">
+                      {u.status === 'Active' && (
+                        <DropdownMenuItem onClick={() => handleDeactivate(u.id)} className="text-destructive font-medium">
                           <UserX className="mr-2 h-4 w-4" /> Nonaktifkan
                         </DropdownMenuItem>
                       )}
@@ -152,13 +188,6 @@ export default function UserManagementPage() {
                 </TableCell>
               </TableRow>
             ))}
-            {!isLoading && users?.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={4} className="text-center py-12 text-muted-foreground">
-                  Tidak ada user terdaftar.
-                </TableCell>
-              </TableRow>
-            )}
           </TableBody>
         </Table>
       </div>
