@@ -7,19 +7,6 @@ service cloud.firestore {
      * This ruleset enforces a multi-tier authorization model designed for office management. 
      * It leverages "Authorization Independence" by denormalizing ownership IDs (e.g., reporterId, 
      * createdByUserId) and using marker collections for high-performance role checks.
-     *
-     * DATA STRUCTURE
-     * - /users/{userId}: Primary user profiles.
-     * - /roles_admin/{userId} & /roles_officer/{userId}: Marker collections for rapid RBAC.
-     * - /correspondences, /activity_reports, /financial_transactions, /office_tasks: Core business entities 
-     *   secured by ownership and role-based access.
-     * - /documents: Centralized file storage with 'accessScope' metadata for visibility control.
-     *
-     * KEY SECURITY DECISIONS
-     * - Role Validation: Uses exists() on marker collections to avoid heavy get() calls on user profiles.
-     * - Prototyping Mode: Rules enforce 'who' can write (authorization) and 'relational integrity' 
-     *   (linking data to the correct user) but do not restrict specific data types or field shapes.
-     * - Immutability: Critical relationship fields (like creator IDs) are made immutable after creation.
      */
 
     // --- Helper Functions ---
@@ -33,7 +20,10 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid)) ||
+        request.auth.token.email == "agus@hanura.id"
+      );
     }
 
     function isOfficer() {
@@ -46,13 +36,6 @@ service cloud.firestore {
 
     // --- Collection Rules ---
 
-    /**
-     * @description Rules for user profiles. Users manage their own data; Admins manage roles/status.
-     * @path /users/{userId}
-     * @allow (get) If user is owner or admin. (create) If ID matches auth UID.
-     * @deny (list) For non-admins to prevent user enumeration.
-     * @principle Path-based ownership and self-creation.
-     */
     match /users/{userId} {
       allow get: if isOwner(userId) || isAdmin();
       allow list: if isAdmin();
@@ -61,39 +44,20 @@ service cloud.firestore {
       allow delete: if resource != null && isAdmin();
     }
 
-    /**
-     * @description Role markers for Admin. Managed strictly by existing Admins.
-     * @path /roles_admin/{userId}
-     * @allow (get) If signed in. (write) Admin only.
-     * @deny (list) General users.
-     * @principle Marker collection for efficient RBAC.
-     */
     match /roles_admin/{userId} {
       allow get: if isSignedIn();
       allow list: if isAdmin();
-      allow create, update, delete: if isAdmin();
+      // Allow the designated super admin to create their own marker
+      allow create: if isOwner(userId) && request.auth.token.email == "agus@hanura.id";
+      allow update, delete: if isAdmin();
     }
 
-    /**
-     * @description Role markers for Officers. Managed by Admins.
-     * @path /roles_officer/{userId}
-     * @allow (get) If signed in. (write) Admin only.
-     * @deny (list) General users.
-     * @principle Marker collection for efficient RBAC.
-     */
     match /roles_officer/{userId} {
       allow get: if isSignedIn();
       allow list: if isAdmin();
       allow create, update, delete: if isAdmin();
     }
 
-    /**
-     * @description Office correspondence (Incoming/Outgoing).
-     * @path /correspondences/{correspondenceId}
-     * @allow (create) Any signed-in user setting themselves as creator. (read) Creator, Officer, or Admin.
-     * @deny (update/delete) If not the creator or admin.
-     * @principle Ownership-based writes with elevated role-based reads.
-     */
     match /correspondences/{correspondenceId} {
       allow get, list: if isSignedIn() && (isAdmin() || isOfficer() || resource.data.createdByUserId == request.auth.uid);
       allow create: if isSignedIn() && request.resource.data.createdByUserId == request.auth.uid;
@@ -101,13 +65,6 @@ service cloud.firestore {
       allow delete: if resource != null && (isAdmin() || isExistingOwner(resource.data.createdByUserId));
     }
 
-    /**
-     * @description Officer activity reports.
-     * @path /activity_reports/{activityReportId}
-     * @allow (create) Any signed-in user (usually Officers). (read) Reporter or Admin.
-     * @deny (update) Changing the reporterId.
-     * @principle Enforces relational integrity on creation and immutability on update.
-     */
     match /activity_reports/{activityReportId} {
       allow get, list: if isSignedIn() && (isAdmin() || isOfficer() || resource.data.reporterId == request.auth.uid);
       allow create: if isSignedIn() && request.resource.data.reporterId == request.auth.uid;
@@ -115,13 +72,6 @@ service cloud.firestore {
       allow delete: if resource != null && (isAdmin() || isExistingOwner(resource.data.reporterId));
     }
 
-    /**
-     * @description Central document repository. Visibility controlled by 'accessScope'.
-     * @path /documents/{documentId}
-     * @allow (list) Based on scope (office_wide for staff, personal for owner).
-     * @deny (create) If uploadedById is forged.
-     * @principle Structural segregation via metadata for authorization independence.
-     */
     match /documents/{documentId} {
       allow get, list: if isSignedIn() && (isAdmin() || resource.data.accessScope == 'office_wide' || (resource.data.accessScope == 'personal' && resource.data.uploadedById == request.auth.uid));
       allow create: if isSignedIn() && request.resource.data.uploadedById == request.auth.uid;
@@ -129,25 +79,11 @@ service cloud.firestore {
       allow delete: if resource != null && (isAdmin() || isExistingOwner(resource.data.uploadedById));
     }
 
-    /**
-     * @description Categories for finance. Admin managed metadata.
-     * @path /financial_categories/{categoryId}
-     * @allow (read) All signed-in users. (write) Admin only.
-     * @deny (write) Officers or regular users.
-     * @principle Read-only access for non-admins on configuration data.
-     */
     match /financial_categories/{categoryId} {
       allow get, list: if isSignedIn();
       allow create, update, delete: if isAdmin();
     }
 
-    /**
-     * @description Office financial transactions (Incomes, Expenses, Salaries).
-     * @path /financial_transactions/{transactionId}
-     * @allow (create) Officers/Admins only. (read) Recorder, Involved Party (e.g., Salary recipient), or Admin.
-     * @deny (delete) To maintain audit trail integrity (except Admins).
-     * @principle Complex shared access based on multiple denormalized user IDs.
-     */
     match /financial_transactions/{transactionId} {
       allow get, list: if isSignedIn() && (isAdmin() || resource.data.recordedByUserId == request.auth.uid || resource.data.involvedPartyId == request.auth.uid);
       allow create: if (isAdmin() || isOfficer()) && request.resource.data.recordedByUserId == request.auth.uid;
@@ -155,19 +91,11 @@ service cloud.firestore {
       allow delete: if resource != null && isAdmin();
     }
 
-    /**
-     * @description Internal office tasks and assignments.
-     * @path /office_tasks/{taskId}
-     * @allow (read) Creator, Assignee, or Admin. (update) Assignee can update status.
-     * @deny (create) Forging creator identity.
-     * @principle Shared access between creators and assigned collaborators.
-     */
     match /office_tasks/{taskId} {
       allow get, list: if isSignedIn() && (isAdmin() || resource.data.createdById == request.auth.uid || resource.data.assignedToUserId == request.auth.uid);
       allow create: if isSignedIn() && request.resource.data.createdById == request.auth.uid;
       allow update: if resource != null && (isAdmin() || resource.data.createdById == request.auth.uid || resource.data.assignedToUserId == request.auth.uid);
       allow delete: if resource != null && (isAdmin() || isExistingOwner(resource.data.createdById));
     }
-
   }
 }
