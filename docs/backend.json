@@ -36,18 +36,23 @@
     },
     "ActivityReport": {
       "title": "ActivityReport",
-      "description": "Represents an activity report submitted by staff.",
+      "description": "Represents an activity report submitted by staff with specific attachments.",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
         "title": { "type": "string" },
+        "location": { "type": "string" },
         "description": { "type": "string" },
         "reportDate": { "type": "string", "format": "date-time" },
         "reporterId": { "type": "string" },
         "status": { "type": "string" },
+        "absensiFile": { "type": "string" },
+        "spandukFile": { "type": "string" },
+        "fotoBersamaFile": { "type": "string" },
+        "fotoPendukungFile": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["title", "description", "reportDate", "reporterId", "status", "createdAt"]
+      "required": ["title", "location", "description", "reportDate", "reporterId", "status", "createdAt"]
     },
     "FinancialTransaction": {
       "title": "FinancialTransaction",

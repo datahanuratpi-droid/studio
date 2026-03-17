@@ -43,11 +43,15 @@ export type ReportStatus = 'Draft' | 'Submitted' | 'Approved' | 'Rejected';
 export interface ActivityReport {
   id: string;
   title: string;
+  location: string;
   description: string;
   reportDate: string;
   reporterId: string;
   status: ReportStatus;
-  attachmentIds: string[];
+  absensiFile?: string;
+  spandukFile?: string;
+  fotoBersamaFile?: string;
+  fotoPendukungFile?: string;
   createdAt: string;
   updatedAt: string;
 }
