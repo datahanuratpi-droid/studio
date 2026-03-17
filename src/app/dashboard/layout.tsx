@@ -23,7 +23,8 @@ import {
   Menu,
   X,
   Loader2,
-  Clock
+  Clock,
+  Calendar
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -123,22 +124,30 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const auth = useAuth()
   const firestore = useFirestore()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
-  const [currentTime, setCurrentTime] = React.useState<string | null>(null)
+  const [currentDateTime, setCurrentDateTime] = React.useState<{date: string, time: string} | null>(null)
 
-  // Real-time Clock logic
+  // Real-time Clock & Date logic
   React.useEffect(() => {
-    const updateTime = () => {
+    const updateDateTime = () => {
       const now = new Date()
-      setCurrentTime(now.toLocaleTimeString('id-ID', { 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit',
-        hour12: false 
-      }))
+      setCurrentDateTime({
+        date: now.toLocaleDateString('id-ID', { 
+          weekday: 'long', 
+          day: 'numeric', 
+          month: 'long', 
+          year: 'numeric' 
+        }),
+        time: now.toLocaleTimeString('id-ID', { 
+          hour: '2-digit', 
+          minute: '2-digit', 
+          second: '2-digit',
+          hour12: false 
+        })
+      })
     }
     
-    updateTime() // Initial call
-    const timer = setInterval(updateTime, 1000)
+    updateDateTime() // Initial call
+    const timer = setInterval(updateDateTime, 1000)
     return () => clearInterval(timer)
   }, [])
 
@@ -297,12 +306,17 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
               />
             </div>
             
-            {/* Real-time Clock Next to Search */}
-            <div className="hidden md:flex items-center gap-2 px-4 py-1.5 bg-muted/30 rounded-full border border-border/50">
+            {/* Real-time Clock & Date Next to Search */}
+            <div className="hidden md:flex items-center gap-3 px-4 py-1.5 bg-muted/30 rounded-full border border-border/50 shadow-sm">
               <Clock className="h-3.5 w-3.5 text-primary animate-pulse" />
-              <span className="text-xs font-mono font-bold text-primary tabular-nums">
-                {currentTime || "00:00:00"}
-              </span>
+              <div className="flex flex-col items-start leading-none gap-0.5">
+                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-tighter">
+                  {currentDateTime?.date || "Memuat Tanggal..."}
+                </span>
+                <span className="text-xs font-mono font-bold text-primary tabular-nums">
+                  {currentDateTime?.time || "00:00:00"}
+                </span>
+              </div>
             </div>
           </div>
           
