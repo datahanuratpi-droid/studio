@@ -13,7 +13,12 @@ import {
   AlertCircle,
   Library,
   Users,
-  User as UserIcon
+  User as UserIcon,
+  ShieldCheck,
+  MapPin,
+  Calendar,
+  CreditCard,
+  UserCheck
 } from "lucide-react"
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -22,9 +27,18 @@ import { cn } from "@/lib/utils"
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
 import { collection } from "firebase/firestore"
 import Link from "next/link"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Separator } from "@/components/ui/separator"
 
 export default function DashboardPage() {
   const firestore = useFirestore()
+  const [isReniDetailOpen, setIsReniDetailOpen] = React.useState(false)
 
   const lettersRef = useMemoFirebase(() => collection(firestore, "correspondences"), [firestore])
   const reportsRef = useMemoFirebase(() => collection(firestore, "activity_reports"), [firestore])
@@ -66,7 +80,7 @@ export default function DashboardPage() {
       .slice(0, 6)
   }, [letters, reports, transactions, library])
 
-  if (loadingLetters || loadingReports || loadingTrans || loadingUsers || loadingLibrary) {
+  if (loadingLetters || loadingReports || loadingLetters || loadingUsers || loadingLibrary) {
     return (
       <div className="flex h-[60vh] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -118,13 +132,17 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="p-6 md:p-10">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-              <div className="flex flex-col items-center text-center space-y-4 p-6 rounded-3xl bg-muted/10 border border-border/50 group hover:border-primary transition-all hover:bg-white hover:shadow-xl">
+              <div 
+                className="flex flex-col items-center text-center space-y-4 p-6 rounded-3xl bg-muted/10 border border-border/50 group hover:border-primary transition-all hover:bg-white hover:shadow-xl cursor-pointer"
+                onClick={() => setIsReniDetailOpen(true)}
+              >
                 <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
                   <UserIcon className="h-10 w-10" />
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Ketua</p>
                   <p className="text-sm font-black text-primary uppercase">RENI, SE</p>
+                  <p className="text-[9px] text-accent font-bold uppercase tracking-tighter opacity-0 group-hover:opacity-100 transition-opacity">Klik untuk detail</p>
                 </div>
               </div>
 
@@ -202,6 +220,100 @@ export default function DashboardPage() {
           </div>
         </Link>
       )}
+
+      {/* Dialog Detail Reni, SE */}
+      <Dialog open={isReniDetailOpen} onOpenChange={setIsReniDetailOpen}>
+        <DialogContent className="sm:max-w-[500px] p-0 border-none rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in duration-300">
+          <DialogHeader className="p-8 bg-primary text-white text-left relative overflow-hidden">
+            <div className="relative z-10 flex items-center gap-4">
+              <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
+                <UserIcon className="h-8 w-8 text-white" />
+              </div>
+              <div className="space-y-1">
+                <DialogTitle className="text-2xl font-headline font-bold">RENI, SE</DialogTitle>
+                <DialogDescription className="text-white/80 font-bold uppercase text-[10px] tracking-widest">
+                  Ketua DPC Hanura Kota Tanjungpinang
+                </DialogDescription>
+              </div>
+            </div>
+            <div className="absolute top-0 right-0 p-8 opacity-10">
+              <ShieldCheck className="w-32 h-32" />
+            </div>
+          </DialogHeader>
+
+          <div className="p-8 space-y-6 max-h-[60vh] overflow-y-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Nama Lengkap</p>
+                <p className="font-bold text-primary">Reni</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Jenis Kelamin</p>
+                <p className="font-bold text-primary">Perempuan</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">No KTA</p>
+                <div className="flex items-center gap-2">
+                  <CreditCard className="h-3.5 w-3.5 text-accent" />
+                  <p className="font-mono text-sm font-bold text-primary">21.72.04.1005.000003</p>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">NIK</p>
+                <p className="font-mono text-sm font-bold text-primary">2172036010850001</p>
+              </div>
+              <div className="space-y-1 md:col-span-2">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Tempat / Tgl Lahir</p>
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-3.5 w-3.5 text-accent" />
+                  <p className="font-bold text-primary">Tanjungpinang, 20 Oktober 1985</p>
+                </div>
+              </div>
+            </div>
+
+            <Separator className="bg-muted" />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Agama</p>
+                <p className="font-bold text-primary">Buddha</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Status Perkawinan</p>
+                <p className="font-bold text-primary">Belum Menikah</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Penerbit KTA</p>
+                <p className="font-bold text-primary">Kota Tanjungpinang</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Tanggal Disahkan</p>
+                <p className="font-bold text-primary">21 Juni 2023</p>
+              </div>
+              <div className="space-y-1 md:col-span-2">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Alamat</p>
+                <div className="flex items-start gap-2">
+                  <MapPin className="h-3.5 w-3.5 text-accent mt-0.5" />
+                  <p className="font-bold text-primary leading-relaxed text-sm">Jalan Rawasari No 73</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 bg-muted/20 border-t flex items-center justify-between">
+            <div className="flex items-center gap-2 text-green-600">
+              <UserCheck className="h-4 w-4" />
+              <span className="text-[10px] font-bold uppercase tracking-widest">Data Terverifikasi SITU</span>
+            </div>
+            <button 
+              onClick={() => setIsReniDetailOpen(false)}
+              className="px-6 py-2 bg-primary text-white rounded-full text-xs font-bold hover:bg-primary/90 transition-colors shadow-lg"
+            >
+              Tutup
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
