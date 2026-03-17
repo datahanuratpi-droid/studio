@@ -2,7 +2,7 @@
 "use client"
 
 import * as React from "react"
-import { Search, Archive, FileText, Download, Filter, Loader2, Plus, FileUp, File as FileIcon } from "lucide-react"
+import { Search, Archive, FileText, Download, Filter, Loader2, Plus, FileUp, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -19,16 +19,26 @@ import { Label } from "@/components/ui/label"
 import { useFirestore, useCollection, useMemoFirebase, useUser, addDocumentNonBlocking } from "@/firebase"
 import { collection } from "firebase/firestore"
 import { DigitalArchive } from "@/lib/types"
+import { useToast } from "@/hooks/use-toast"
 
 export default function ArsipPage() {
   const firestore = useFirestore()
   const { user } = useUser()
+  const { toast } = useToast()
   const [isCreateOpen, setIsCreateOpen] = React.useState(false)
   const [searchQuery, setSearchQuery] = React.useState("")
+  const [selectedFileName, setSelectedFileName] = React.useState<string | null>(null)
 
   // Mengambil data arsip digital umum secara real-time
   const archivesRef = useMemoFirebase(() => collection(firestore, "digital_archives"), [firestore])
   const { data: archives, isLoading } = useCollection<DigitalArchive>(archivesRef)
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setSelectedFileName(file.name)
+    }
+  }
 
   const handleAddArchive = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -40,13 +50,18 @@ export default function ArsipPage() {
 
     const data = {
       archiveTitle: title,
-      fileName: file?.name || "dokumen_arsip.pdf",
+      fileName: file?.name || selectedFileName || "dokumen_arsip.pdf",
       uploadedByUserId: user.uid,
       createdAt: new Date().toISOString()
     }
 
     addDocumentNonBlocking(collection(firestore, "digital_archives"), data)
     setIsCreateOpen(false)
+    setSelectedFileName(null)
+    toast({
+      title: "Arsip Berhasil Disimpan",
+      description: `Dokumen "${title}" telah diarsipkan ke sistem.`,
+    })
   }
 
   const filteredArchives = archives?.filter(archive => 
@@ -62,7 +77,10 @@ export default function ArsipPage() {
         </div>
         <Button 
           className="bg-accent hover:bg-accent/90 text-white rounded-full px-6"
-          onClick={() => setIsCreateOpen(true)}
+          onClick={() => {
+            setSelectedFileName(null)
+            setIsCreateOpen(true)
+          }}
         >
           <Plus className="mr-2 h-4 w-4" /> Tambah Arsip Baru
         </Button>
@@ -145,19 +163,32 @@ export default function ArsipPage() {
                 <Input id="title" name="title" placeholder="Contoh: SK Pengurus DPC 2024" required className="h-11" />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="file" className="font-bold text-sm">Unggah Berkas (PDF)</Label>
-                <div className="border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center gap-3 bg-muted/10 hover:bg-muted/20 transition-colors cursor-pointer relative">
-                  <FileUp className="h-10 w-10 text-primary/40" />
-                  <div className="text-center">
-                    <p className="text-xs font-bold text-primary">Klik untuk memilih file</p>
-                    <p className="text-[10px] text-muted-foreground uppercase mt-1">Hanya mendukung format PDF</p>
-                  </div>
+                <Label className="font-bold text-sm">Unggah Berkas (PDF)</Label>
+                <div className="border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center gap-3 bg-muted/10 hover:bg-muted/20 transition-colors cursor-pointer relative group">
+                  {selectedFileName ? (
+                    <>
+                      <CheckCircle2 className="h-10 w-10 text-green-500" />
+                      <div className="text-center">
+                        <p className="text-xs font-bold text-green-600 truncate max-w-[200px]">{selectedFileName}</p>
+                        <p className="text-[10px] text-muted-foreground uppercase mt-1">Klik untuk mengganti berkas</p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <FileUp className="h-10 w-10 text-primary/40 group-hover:text-primary transition-colors" />
+                      <div className="text-center">
+                        <p className="text-xs font-bold text-primary">Klik untuk memilih file</p>
+                        <p className="text-[10px] text-muted-foreground uppercase mt-1">Hanya mendukung format PDF</p>
+                      </div>
+                    </>
+                  )}
                   <Input 
                     id="file" 
                     name="file" 
                     type="file" 
                     accept=".pdf" 
                     required 
+                    onChange={handleFileChange}
                     className="absolute inset-0 opacity-0 cursor-pointer" 
                   />
                 </div>

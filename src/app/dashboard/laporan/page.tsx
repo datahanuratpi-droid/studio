@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -12,7 +13,7 @@ import {
   ClipboardList,
   Image as ImageIcon,
   FileCheck,
-  X
+  CheckCircle2
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -31,12 +32,21 @@ import { Textarea } from "@/components/ui/textarea"
 import { useFirestore, useUser, addDocumentNonBlocking, useCollection, useMemoFirebase } from "@/firebase"
 import { collection } from "firebase/firestore"
 import { cn } from "@/lib/utils"
+import { useToast } from "@/hooks/use-toast"
 
 export default function LaporanKegiatanPage() {
   const [isCreateOpen, setIsCreateOpen] = React.useState(false)
   const [selectedReport, setSelectedReport] = React.useState<any>(null)
+  const [fileStatus, setFileStatus] = React.useState({
+    absensi: false,
+    spanduk: false,
+    fotoBersama: false,
+    fotoPendukung: false,
+  })
+
   const firestore = useFirestore()
   const { user } = useUser()
+  const { toast } = useToast()
 
   const reportsRef = useMemoFirebase(() => {
     if (!firestore) return null
@@ -45,14 +55,21 @@ export default function LaporanKegiatanPage() {
 
   const { data: reports, isLoading } = useCollection(reportsRef)
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof typeof fileStatus) => {
+    if (e.target.files?.[0]) {
+      setFileStatus(prev => ({ ...prev, [field]: true }))
+    }
+  }
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!user || !firestore) return
 
     const formData = new FormData(e.currentTarget)
+    const title = formData.get("title") as string
     
     const data = {
-      title: formData.get("title") as string,
+      title: title,
       location: formData.get("location") as string,
       description: formData.get("description") as string,
       reportDate: formData.get("reportDate") as string || new Date().toISOString(),
@@ -68,6 +85,11 @@ export default function LaporanKegiatanPage() {
 
     addDocumentNonBlocking(collection(firestore, "activity_reports"), data)
     setIsCreateOpen(false)
+    setFileStatus({ absensi: false, spanduk: false, fotoBersama: false, fotoPendukung: false })
+    toast({
+      title: "Laporan Terkirim",
+      description: `Laporan "${title}" telah berhasil disimpan ke sistem.`,
+    })
   }
 
   const sortedReports = React.useMemo(() => {
@@ -83,7 +105,10 @@ export default function LaporanKegiatanPage() {
         </div>
         <Button 
           className="bg-accent hover:bg-accent/90 text-white rounded-full px-6"
-          onClick={() => setIsCreateOpen(true)}
+          onClick={() => {
+            setFileStatus({ absensi: false, spanduk: false, fotoBersama: false, fotoPendukung: false })
+            setIsCreateOpen(true)
+          }}
         >
           <Plus className="mr-2 h-4 w-4" /> Buat Laporan
         </Button>
@@ -262,22 +287,27 @@ export default function LaporanKegiatanPage() {
                   <FileUp className="h-4 w-4" /> Unggah Berkas (PDF / Gambar)
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="grid gap-1.5">
-                    <Label htmlFor="absensi" className="text-xs font-bold">1. Absensi (PDF)</Label>
-                    <Input id="absensi" name="absensi" type="file" className="h-8 text-[11px] py-1 cursor-pointer" accept=".pdf" />
-                  </div>
-                  <div className="grid gap-1.5">
-                    <Label htmlFor="spanduk" className="text-xs font-bold">2. Foto Spanduk</Label>
-                    <Input id="spanduk" name="spanduk" type="file" className="h-8 text-[11px] py-1 cursor-pointer" accept="image/*" />
-                  </div>
-                  <div className="grid gap-1.5">
-                    <Label htmlFor="fotoBersama" className="text-xs font-bold">3. Foto Bersama</Label>
-                    <Input id="fotoBersama" name="fotoBersama" type="file" className="h-8 text-[11px] py-1 cursor-pointer" accept="image/*" />
-                  </div>
-                  <div className="grid gap-1.5">
-                    <Label htmlFor="fotoPendukung" className="text-xs font-bold">4. Dokumentasi Pendukung</Label>
-                    <Input id="fotoPendukung" name="fotoPendukung" type="file" className="h-8 text-[11px] py-1 cursor-pointer" accept="image/*, .pdf" />
-                  </div>
+                  {[
+                    { id: "absensi", label: "1. Absensi (PDF)", field: "absensi" as const },
+                    { id: "spanduk", label: "2. Foto Spanduk", field: "spanduk" as const },
+                    { id: "fotoBersama", label: "3. Foto Bersama", field: "fotoBersama" as const },
+                    { id: "fotoPendukung", label: "4. Dokumentasi Pendukung", field: "fotoPendukung" as const }
+                  ].map((item) => (
+                    <div key={item.id} className="grid gap-1.5 relative">
+                      <Label htmlFor={item.id} className="text-xs font-bold flex items-center justify-between">
+                        {item.label}
+                        {fileStatus[item.field] && <CheckCircle2 className="h-3 w-3 text-green-500" />}
+                      </Label>
+                      <Input 
+                        id={item.id} 
+                        name={item.id} 
+                        type="file" 
+                        className={cn("h-8 text-[11px] py-1 cursor-pointer", fileStatus[item.field] && "border-green-500 bg-green-50")}
+                        accept={item.id === 'absensi' ? '.pdf' : 'image/*, .pdf'}
+                        onChange={(e) => handleFileChange(e, item.field)}
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
