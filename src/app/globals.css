@@ -10,7 +10,7 @@
     --card-foreground: 209 60% 10%;
     --popover: 0 0% 100%;
     --popover-foreground: 209 60% 10%;
-    --primary: 209 60% 35%; /* Default Blue */
+    --primary: 209 60% 35%;
     --primary-foreground: 0 0% 100%;
     --secondary: 198 15% 85%;
     --secondary-foreground: 209 60% 25%;
@@ -24,11 +24,6 @@
     --input: 209 30% 85%;
     --ring: 209 60% 35%;
     --radius: 1rem;
-    --chart-1: 209 60% 35%;
-    --chart-2: 229 91% 65%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
   }
 
   .dark {
@@ -53,73 +48,23 @@
     --ring: 209 60% 45%;
   }
 
-  /* Theme Color Variations - Defined AFTER .dark to ensure precedence for the primary color */
-  .theme-red { 
-    --primary: 0 84% 60%; 
-    --ring: 0 84% 60%; 
-    --primary-foreground: 0 0% 100%;
-  }
-  .theme-blue { 
-    --primary: 209 60% 35%; 
-    --ring: 209 60% 35%; 
-    --primary-foreground: 0 0% 100%;
-  }
-  .theme-orange { 
-    --primary: 24 95% 53%; 
-    --ring: 24 95% 53%; 
-    --primary-foreground: 0 0% 100%;
-  }
-  .theme-magenta { 
-    --primary: 327 73% 53%; 
-    --ring: 327 73% 53%; 
-    --primary-foreground: 0 0% 100%;
-  }
-  .theme-purple { 
-    --primary: 262 83% 58%; 
-    --ring: 262 83% 58%; 
-    --primary-foreground: 0 0% 100%;
-  }
-  .theme-yellow { 
-    --primary: 47 95% 55%; 
-    --ring: 47 95% 55%; 
-    --primary-foreground: 209 60% 10%; /* Dark text for yellow background visibility */
-  }
+  .theme-red { --primary: 0 84% 60%; --ring: 0 84% 60%; }
+  .theme-blue { --primary: 209 60% 35%; --ring: 209 60% 35%; }
+  .theme-orange { --primary: 24 95% 53%; --ring: 24 95% 53%; }
+  .theme-magenta { --primary: 327 73% 53%; --ring: 327 73% 53%; }
+  .theme-purple { --primary: 262 83% 58%; --ring: 262 83% 58%; }
+  .theme-yellow { --primary: 47 95% 55%; --ring: 47 95% 55%; --primary-foreground: 209 60% 10%; }
 }
 
 @layer base {
   * {
-    @apply border-border transition-colors duration-200;
+    @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-body;
-    -webkit-tap-highlight-color: transparent;
-  }
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-headline;
+    @apply bg-background text-foreground font-body antialiased;
   }
 }
 
-/* Mouse Hover Indicator - Conditional Text Color */
-.hover\:text-black:hover {
-  color: #000 !important;
-}
-.dark .hover\:text-white:hover {
-  color: #fff !important;
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  @apply bg-transparent;
-}
-::-webkit-scrollbar-thumb {
-  @apply bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/40 transition-colors;
-}
-
-/* Modern Hover Effects */
-.hover-card {
-  @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+.hover-text-primary:hover {
+  color: hsl(var(--primary)) !important;
 }
