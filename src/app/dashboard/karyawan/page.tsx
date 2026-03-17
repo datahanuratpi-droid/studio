@@ -594,8 +594,6 @@ export default function KaryawanPage() {
                     <span className="uppercase">: {selectedStaff.fullName}</span>
                     <span className="font-bold">Pengurus</span>
                     <span className="uppercase">: {selectedStaff.position}</span>
-                    <span className="font-bold">Status</span>
-                    <span className="uppercase">: Karyawan Tetap</span>
                   </div>
 
                   {/* Tabel Utama Penghasilan & Potongan */}
