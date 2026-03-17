@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils"
 
 export default function LaporanKegiatanPage() {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
-  const { firestore } = useFirestore()
+  const firestore = useFirestore()
   const { user } = useUser()
 
   const reportsRef = useMemoFirebase(() => {

@@ -29,7 +29,7 @@ import { collection } from "firebase/firestore"
 
 export default function SuratKeluarPage() {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
-  const { firestore } = useFirestore()
+  const firestore = useFirestore()
   const { user } = useUser()
 
   const lettersRef = useMemoFirebase(() => {

@@ -15,8 +15,8 @@ import { doc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 
 export default function LoginPage() {
-  const { auth } = useAuth();
-  const { firestore } = useFirestore();
+  const auth = useAuth();
+  const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
   const router = useRouter();
   const { toast } = useToast();
@@ -35,10 +35,8 @@ export default function LoginPage() {
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Memulai proses masuk...");
     
     if (!auth) {
-      console.error("Firebase Auth belum siap.");
       toast({ variant: 'destructive', title: 'Sistem Belum Siap', description: 'Silakan muat ulang halaman.' });
       return;
     }
@@ -55,11 +53,9 @@ export default function LoginPage() {
     }
 
     const email = formatEmail(emailInput);
-    console.log(`Mencoba masuk dengan: ${email}`);
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      console.log("Masuk berhasil.");
       toast({ title: 'Login Berhasil', description: 'Mengarahkan Anda ke Dashboard...' });
     } catch (err: any) {
       console.error("Login error:", err);
@@ -70,8 +66,6 @@ export default function LoginPage() {
         message = "Password yang Anda masukkan salah.";
       } else if (err.code === 'auth/invalid-credential') {
         message = "Kredensial tidak valid. Periksa kembali username/password.";
-      } else if (err.code === 'auth/too-many-requests') {
-        message = "Terlalu banyak percobaan. Silakan coba lagi nanti.";
       }
       
       toast({ variant: 'destructive', title: 'Gagal Masuk', description: message });
@@ -81,10 +75,8 @@ export default function LoginPage() {
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Memulai proses pendaftaran...");
     
     if (!auth || !firestore) {
-      console.error("Firebase Auth atau Firestore belum siap.");
       toast({ variant: 'destructive', title: 'Sistem Belum Siap', description: 'Silakan muat ulang halaman.' });
       return;
     }
@@ -107,15 +99,12 @@ export default function LoginPage() {
     }
 
     const email = formatEmail(emailInput);
-    console.log(`Mencoba mendaftar dengan: ${email}`);
     
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const newUser = userCredential.user;
-      console.log("Pendaftaran di Firebase Auth berhasil.");
 
-      // Special check for primary admin AGUS (case insensitive)
-      const isAdminAgus = emailInput.toLowerCase() === 'agus';
+      const isAdminAgus = emailInput.toUpperCase() === 'AGUS';
 
       const userProfile = {
         id: newUser.uid,
@@ -127,7 +116,6 @@ export default function LoginPage() {
         updatedAt: new Date().toISOString(),
       };
 
-      console.log(`Menyimpan profil ke Firestore: Status=${userProfile.status}`);
       setDocumentNonBlocking(doc(firestore, 'users', newUser.uid), userProfile, { merge: true });
       
       if (isAdminAgus) {
@@ -143,17 +131,12 @@ export default function LoginPage() {
         });
       }
       
-      // Berikan waktu sedikit agar toast terlihat sebelum loading dihentikan (atau router pindah)
       setTimeout(() => setLoading(false), 1000);
     } catch (err: any) {
       console.error("Signup error:", err);
       let message = "Terjadi kesalahan saat mendaftar.";
       if (err.code === 'auth/email-already-in-use') {
         message = "Username ini sudah terdaftar. Silakan gunakan menu Masuk.";
-      } else if (err.code === 'auth/operation-not-allowed') {
-        message = "Metode pendaftaran ini belum diaktifkan di Firebase Console.";
-      } else if (err.code === 'auth/weak-password') {
-        message = "Password minimal harus 6 karakter.";
       }
       
       toast({ variant: 'destructive', title: 'Pendaftaran Gagal', description: message });

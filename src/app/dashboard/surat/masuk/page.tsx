@@ -25,11 +25,11 @@ import {
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useFirestore, useUser, addDocumentNonBlocking, useCollection, useMemoFirebase } from "@/firebase"
-import { collection, serverTimestamp } from "firebase/firestore"
+import { collection } from "firebase/firestore"
 
 export default function SuratMasukPage() {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
-  const { firestore } = useFirestore()
+  const firestore = useFirestore()
   const { user } = useUser()
 
   const lettersRef = useMemoFirebase(() => {

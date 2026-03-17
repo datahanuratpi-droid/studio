@@ -1,3 +1,4 @@
+
 'use client'
 
 import * as React from "react"
@@ -118,8 +119,8 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const { user, isUserLoading } = useUser()
-  const { auth } = useAuth()
-  const { firestore } = useFirestore()
+  const auth = useAuth()
+  const firestore = useFirestore()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
 
   const userDocRef = useMemoFirebase(() => {

@@ -26,7 +26,7 @@ import {
 import { UserProfile } from "@/lib/types"
 
 export default function UserManagementPage() {
-  const { firestore } = useFirestore()
+  const firestore = useFirestore()
   
   const usersRef = useMemoFirebase(() => {
     if (!firestore) return null

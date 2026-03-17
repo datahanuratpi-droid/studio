@@ -36,14 +36,14 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/select"
 import { useFirestore, useUser, addDocumentNonBlocking, useCollection, useMemoFirebase } from "@/firebase"
 import { collection } from "firebase/firestore"
 
 export default function KasOfficePage() {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
   const [selectedType, setSelectedType] = React.useState<string>("Payment")
-  const { firestore } = useFirestore()
+  const firestore = useFirestore()
   const { user } = useUser()
 
   const transRef = useMemoFirebase(() => {
