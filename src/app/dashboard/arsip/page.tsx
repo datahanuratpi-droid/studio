@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Search, Archive, FileText, Download, Filter, Loader2, Plus, FileUp, CheckCircle2 } from "lucide-react"
+import { Search, Archive, FileText, Download, Filter, Loader2, Plus, FileUp, CheckCircle2, Eye, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -15,8 +15,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { useFirestore, useCollection, useMemoFirebase, useUser, addDocumentNonBlocking } from "@/firebase"
-import { collection } from "firebase/firestore"
+import { useFirestore, useCollection, useMemoFirebase, useUser, addDocumentNonBlocking, deleteDocumentNonBlocking } from "@/firebase"
+import { collection, doc } from "firebase/firestore"
 import { DigitalArchive } from "@/lib/types"
 import { useToast } from "@/hooks/use-toast"
 
@@ -63,6 +63,29 @@ export default function ArsipPage() {
     })
   }
 
+  const handleDelete = (id: string, title: string) => {
+    if (!firestore) return
+    deleteDocumentNonBlocking(doc(firestore, "digital_archives", id))
+    toast({
+      title: "Arsip Dihapus",
+      description: `Dokumen "${title}" telah dihapus dari sistem.`,
+    })
+  }
+
+  const handleView = (title: string) => {
+    toast({
+      title: "Membuka Dokumen",
+      description: `Menyiapkan pratinjau untuk "${title}"...`,
+    })
+  }
+
+  const handleDownload = (fileName: string) => {
+    toast({
+      title: "Mengunduh Berkas",
+      description: `Berkas "${fileName}" sedang diproses untuk diunduh.`,
+    })
+  }
+
   const filteredArchives = archives?.filter(archive => 
     archive.archiveTitle.toLowerCase().includes(searchQuery.toLowerCase())
   )
@@ -75,7 +98,7 @@ export default function ArsipPage() {
           <p className="text-muted-foreground">Kelola dan simpan dokumen penting secara digital dan aman.</p>
         </div>
         <Button 
-          className="bg-accent hover:bg-accent/90 text-white rounded-full px-6"
+          className="bg-accent hover:bg-accent/90 text-white rounded-full px-6 h-11 shadow-lg"
           onClick={() => {
             setSelectedFileName(null)
             setIsCreateOpen(true)
@@ -90,12 +113,12 @@ export default function ArsipPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input 
             placeholder="Cari judul arsip..." 
-            className="pl-10 h-11 bg-white rounded-xl" 
+            className="pl-10 h-11 bg-white rounded-xl shadow-sm border-muted" 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <Button variant="outline" className="h-11 px-6 bg-white rounded-xl"><Filter className="mr-2 h-4 w-4" /> Filter</Button>
+        <Button variant="outline" className="h-11 px-6 bg-white rounded-xl border-muted shadow-sm"><Filter className="mr-2 h-4 w-4" /> Filter</Button>
       </div>
 
       {isLoading ? (
@@ -104,31 +127,54 @@ export default function ArsipPage() {
           <p className="text-muted-foreground font-medium uppercase tracking-widest text-xs">Menyinkronkan Arsip...</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredArchives?.map((archive) => (
-            <Card key={archive.id} className="overflow-hidden group hover:border-accent transition-all hover:shadow-xl border-border/50 bg-white rounded-2xl">
-              <div className="aspect-square bg-muted/20 flex flex-col items-center justify-center relative p-6 border-b">
-                <div className="p-4 bg-white rounded-3xl shadow-sm mb-3 group-hover:scale-110 transition-transform">
-                  <FileText className="h-12 w-12 text-primary/60" />
+            <Card key={archive.id} className="overflow-hidden group hover:border-accent transition-all hover:shadow-2xl border-border/50 bg-white rounded-2xl relative">
+              <div className="aspect-[4/3] bg-muted/10 flex flex-col items-center justify-center relative p-6 border-b">
+                <div className="p-4 bg-white rounded-3xl shadow-sm mb-3 group-hover:scale-90 transition-transform duration-500">
+                  <FileText className="h-14 w-14 text-primary/40" />
                 </div>
-                <Badge variant="outline" className="text-[9px] font-bold uppercase tracking-wider bg-white">
+                <Badge variant="outline" className="text-[9px] font-bold uppercase tracking-wider bg-white border-muted">
                   PDF DOCUMENT
                 </Badge>
                 
-                <div className="absolute inset-0 bg-primary/90 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
-                  <Button variant="secondary" className="rounded-full shadow-lg font-bold text-xs">
-                    <Download className="mr-2 h-4 w-4" /> Buka Arsip
+                {/* Overlay Action Buttons */}
+                <div className="absolute inset-0 bg-primary/95 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-2 p-4">
+                  <Button 
+                    variant="secondary" 
+                    className="w-full rounded-full shadow-lg font-bold text-xs h-10"
+                    onClick={() => handleView(archive.archiveTitle)}
+                  >
+                    <Eye className="mr-2 h-4 w-4" /> Lihat Dokumen
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full rounded-full shadow-lg font-bold text-xs h-10 bg-white/10 text-white border-white/20 hover:bg-white/20 hover:text-white"
+                    onClick={() => handleDownload(archive.fileName)}
+                  >
+                    <Download className="mr-2 h-4 w-4" /> Unduh Berkas
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full rounded-full text-[10px] text-white/60 hover:text-white hover:bg-white/5 h-8 mt-2"
+                    onClick={() => handleDelete(archive.id, archive.archiveTitle)}
+                  >
+                    <Trash2 className="mr-2 h-3.5 w-3.5" /> Hapus Arsip
                   </Button>
                 </div>
               </div>
-              <CardContent className="p-4 space-y-2">
+              <CardContent className="p-5 space-y-2">
                 <div className="space-y-1">
-                  <p className="text-sm font-bold text-primary line-clamp-2 leading-tight" title={archive.archiveTitle}>
+                  <p className="text-sm font-bold text-primary line-clamp-2 leading-tight min-h-[2.5rem]" title={archive.archiveTitle}>
                     {archive.archiveTitle}
                   </p>
-                  <p className="text-[10px] text-muted-foreground font-medium">
-                    {new Date(archive.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })}
-                  </p>
+                  <div className="flex items-center justify-between pt-2">
+                    <p className="text-[10px] text-muted-foreground font-medium flex items-center gap-1.5 uppercase tracking-tighter">
+                      <Archive className="h-3 w-3" />
+                      {new Date(archive.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })}
+                    </p>
+                    <span className="text-[9px] font-mono text-muted-foreground/60">v1.0</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -148,21 +194,21 @@ export default function ArsipPage() {
 
       {/* Dialog Tambah Arsip */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent className="sm:max-w-[450px] rounded-3xl">
+        <DialogContent className="sm:max-w-[450px] rounded-3xl p-0 overflow-hidden border-none shadow-2xl">
           <form onSubmit={handleAddArchive}>
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-headline font-bold text-primary">Tambah Arsip Digital</DialogTitle>
-              <DialogDescription>
+            <DialogHeader className="p-6 bg-primary text-white">
+              <DialogTitle className="text-2xl font-headline font-bold">Tambah Arsip Digital</DialogTitle>
+              <DialogDescription className="text-white/70">
                 Unggah dokumen penting ke dalam sistem arsip digital SITU HANURA.
               </DialogDescription>
             </DialogHeader>
-            <div className="grid gap-6 py-6">
+            <div className="grid gap-6 p-6">
               <div className="grid gap-2">
-                <Label htmlFor="title" className="font-bold text-sm">Judul Arsip</Label>
-                <Input id="title" name="title" placeholder="Contoh: SK Pengurus DPC 2024" required className="h-11 rounded-xl" />
+                <Label htmlFor="title" className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Judul Arsip</Label>
+                <Input id="title" name="title" placeholder="Contoh: SK Pengurus DPC 2024" required className="h-11 rounded-xl bg-muted/20 border-none" />
               </div>
               <div className="grid gap-2">
-                <Label className="font-bold text-sm">Unggah Berkas (PDF)</Label>
+                <Label className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Unggah Berkas (PDF)</Label>
                 <div className="border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center gap-3 bg-muted/10 hover:bg-muted/20 transition-colors cursor-pointer relative group min-h-[160px]">
                   {selectedFileName ? (
                     <>
@@ -194,9 +240,9 @@ export default function ArsipPage() {
                 </div>
               </div>
             </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)} className="rounded-full">Batal</Button>
-              <Button type="submit" className="bg-primary text-white hover:bg-primary/90 rounded-full px-8">
+            <DialogFooter className="p-6 bg-muted/20 gap-2">
+              <Button type="button" variant="ghost" onClick={() => setIsCreateOpen(false)} className="flex-1 rounded-full font-bold">Batal</Button>
+              <Button type="submit" className="flex-1 bg-primary text-white hover:bg-primary/90 rounded-full font-bold px-8 shadow-lg">
                 Simpan Arsip
               </Button>
             </DialogFooter>
