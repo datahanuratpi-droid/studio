@@ -76,7 +76,7 @@ function SidebarItem({ href, icon, label, active, subItems }: SidebarItemProps) 
           </Button>
         </CollapsibleTrigger>
         <CollapsibleContent className="pl-9 space-y-1 mt-1">
-          {item.subItems.map((subItem) => (
+          {subItems.map((subItem) => (
             <Link key={subItem.href} href={subItem.href}>
               <Button
                 variant="ghost"
@@ -159,7 +159,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         <div className="max-w-md space-y-2">
           <h1 className="text-2xl font-headline font-bold text-primary">Akun Menunggu Verifikasi</h1>
           <p className="text-muted-foreground">
-            Terima kasih telah mendaftar, <strong>{user.email}</strong>. Saat ini akun Anda sedang dalam proses verifikasi oleh Admin.
+            Terima kasih telah mendaftar, <strong>{user.email}</strong>. Saat ini akun Anda sedang dalam proses verifikasi oleh Admin SITU HANURA.
           </p>
           <p className="text-sm text-muted-foreground pt-4">
             Anda akan bisa mengakses fitur aplikasi SITU HANURA setelah Admin memberikan peran (Role) pada akun Anda.
@@ -216,7 +216,8 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           </nav>
         </div>
 
-        <div className="mt-auto p-6 border-t">
+        <div className="mt-auto p-6 border-t text-center space-y-4">
+          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-tighter">Partai Hanura Tanjungpinang</p>
           <Button 
             variant="ghost" 
             className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
@@ -268,6 +269,9 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           </div>
           
           <div className="flex items-center gap-3">
+            <div className="hidden md:block text-right mr-2">
+              <p className="text-[10px] font-bold text-primary uppercase tracking-wider">Kota Tanjungpinang</p>
+            </div>
             <Button variant="ghost" size="icon" className="relative text-muted-foreground">
               <Bell className="h-5 w-5" />
               <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-accent rounded-full border-2 border-white"></span>

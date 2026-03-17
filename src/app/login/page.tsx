@@ -94,7 +94,7 @@ export default function LoginPage() {
             <FileText className="h-6 w-6 text-white" />
           </div>
           <h1 className="mt-6 text-3xl font-headline font-bold text-primary">SITU HANURA</h1>
-          <p className="mt-2 text-muted-foreground">Sistem Informasi Terpadu</p>
+          <p className="mt-2 text-muted-foreground">Sistem Informasi Terpadu Partai Hanura Kota Tanjungpinang</p>
         </div>
 
         <Tabs defaultValue="login" className="w-full">
@@ -115,7 +115,7 @@ export default function LoginPage() {
                     <Label htmlFor="email">Email</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input id="email" name="email" type="email" placeholder="nama@situ.com" className="pl-10" required />
+                      <Input id="email" name="email" type="email" placeholder="nama@hanura-pinang.com" className="pl-10" required />
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -148,7 +148,7 @@ export default function LoginPage() {
                     <Label htmlFor="reg-email">Email</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input id="reg-email" name="email" type="email" placeholder="nama@situ.com" className="pl-10" required />
+                      <Input id="reg-email" name="email" type="email" placeholder="nama@hanura-pinang.com" className="pl-10" required />
                     </div>
                   </div>
                   <div className="space-y-2">

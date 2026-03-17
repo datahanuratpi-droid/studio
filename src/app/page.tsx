@@ -24,7 +24,10 @@ export default function RootPage() {
       <div className="text-center space-y-4">
         <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto" />
         <p className="text-lg font-headline font-bold text-primary animate-pulse">SITU HANURA</p>
-        <p className="text-sm text-muted-foreground">Sistem Informasi Terpadu</p>
+        <div className="space-y-1">
+          <p className="text-sm text-muted-foreground font-medium">Sistem Informasi Terpadu Partai Hanura</p>
+          <p className="text-xs text-muted-foreground/60 uppercase tracking-widest">Kota Tanjungpinang</p>
+        </div>
       </div>
     </div>
   );

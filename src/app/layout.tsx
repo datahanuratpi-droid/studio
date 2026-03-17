@@ -3,8 +3,8 @@ import './globals.css';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 export const metadata: Metadata = {
-  title: 'SITU HANURA | Sistem Informasi Terpadu',
-  description: 'Sistem Informasi Terpadu untuk efisiensi alur kerja operasional Anda.',
+  title: 'SITU HANURA | Sistem Informasi Terpadu Partai Hanura Kota Tanjungpinang',
+  description: 'Sistem Informasi Terpadu Partai Hanura Kota Tanjungpinang untuk efisiensi alur kerja operasional.',
 };
 
 export default function RootLayout({

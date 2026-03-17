@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Info, Shield, Zap, Heart, Code, Github } from "lucide-react"
+import { Info, Shield, Zap, Heart, Code, Github, MapPin } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
@@ -13,58 +13,58 @@ export default function AboutPage() {
           <Info className="h-12 w-12 text-primary" />
         </div>
         <h1 className="text-4xl font-headline font-bold text-primary">Tentang SITU HANURA</h1>
-        <p className="text-xl text-muted-foreground">Sistem Informasi Terpadu v1.0.0</p>
+        <p className="text-xl text-muted-foreground">Sistem Informasi Terpadu Partai Hanura Kota Tanjungpinang</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="space-y-6">
-          <h2 className="text-2xl font-headline font-bold text-primary">Visi Kami</h2>
+          <h2 className="text-2xl font-headline font-bold text-primary">Visi & Misi</h2>
           <p className="text-muted-foreground leading-relaxed">
-            SITU HANURA dirancang untuk mengintegrasikan berbagai alur kerja operasional dalam satu platform digital yang efisien. Kami berkomitmen untuk menyediakan sistem yang transparan, aman, dan mudah diakses untuk meningkatkan produktivitas organisasi.
+            SITU HANURA adalah platform digital yang dirancang khusus untuk mengelola administrasi, keuangan, dan pelaporan kegiatan Partai Hanura di wilayah Kota Tanjungpinang. Kami berkomitmen mewujudkan transparansi dan efisiensi dalam tata kelola organisasi partai.
           </p>
           <div className="flex gap-4">
             <div className="p-3 bg-accent/10 rounded-xl text-accent">
               <Shield className="h-6 w-6" />
             </div>
             <div>
-              <h4 className="font-bold">Keamanan Data</h4>
-              <p className="text-sm text-muted-foreground">Sistem keamanan terintegrasi untuk melindungi data penting Anda.</p>
+              <h4 className="font-bold">Kerahasiaan Data</h4>
+              <p className="text-sm text-muted-foreground">Sistem keamanan enkripsi untuk melindungi data internal partai.</p>
             </div>
           </div>
           <div className="flex gap-4">
             <div className="p-3 bg-accent/10 rounded-xl text-accent">
-              <Zap className="h-6 w-6" />
+              <MapPin className="h-6 w-6" />
             </div>
             <div>
-              <h4 className="font-bold">Integrasi Cepat</h4>
-              <p className="text-sm text-muted-foreground">Data terhubung secara real-time antar berbagai modul aplikasi.</p>
+              <h4 className="font-bold">Lokalitas</h4>
+              <p className="text-sm text-muted-foreground">Disesuaikan dengan kebutuhan operasional DPC Hanura Kota Tanjungpinang.</p>
             </div>
           </div>
         </div>
 
         <Card className="border-none shadow-xl bg-gradient-to-br from-primary to-primary/80 text-white">
           <CardContent className="p-8 space-y-6">
-            <h3 className="text-xl font-bold">Informasi Pengembang</h3>
-            <p className="text-primary-foreground/80">Aplikasi ini dikembangkan untuk memodernisasi sistem informasi tradisional menjadi ekosistem digital yang terpadu.</p>
+            <h3 className="text-xl font-bold">Informasi Sistem</h3>
+            <p className="text-primary-foreground/80">Aplikasi ini merupakan bagian dari upaya digitalisasi infrastruktur partai untuk mendukung koordinasi yang lebih cepat dan akurat.</p>
             <div className="pt-4 space-y-3">
               <div className="flex items-center gap-2">
                 <Code className="h-4 w-4" />
-                <span className="text-sm">Built with Next.js & Firebase</span>
+                <span className="text-sm">Versi 1.1.0 (Digitalized Infrastructure)</span>
               </div>
               <div className="flex items-center gap-2">
                 <Heart className="h-4 w-4 fill-white" />
-                <span className="text-sm">Made with passion for integration</span>
+                <span className="text-sm">Made for Hanura Tanjungpinang</span>
               </div>
             </div>
             <Button variant="secondary" className="w-full mt-4">
-              <Github className="mr-2 h-4 w-4" /> Hubungi Support
+               Hubungi Sekretariat
             </Button>
           </CardContent>
         </Card>
       </div>
 
       <footer className="text-center pt-12 text-sm text-muted-foreground">
-        © 2024 SITU HANURA - Sistem Informasi Terpadu. All rights reserved.
+        © 2024 SITU HANURA - DPC Partai Hanura Kota Tanjungpinang. All rights reserved.
       </footer>
     </div>
   )
