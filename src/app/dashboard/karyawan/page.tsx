@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -458,12 +457,12 @@ export default function KaryawanPage() {
 
               {/* Printable Content Container */}
               <div className="flex-1 overflow-auto p-4 md:p-8 flex justify-center print:p-0 print:overflow-visible print:block">
-                <div className="bg-white w-full max-w-[800px] shadow-2xl p-10 md:p-16 flex flex-col min-h-[1000px] print:shadow-none print:p-8 print:min-h-0 print:w-full print:m-0">
+                <div className="bg-white w-full max-w-[800px] shadow-2xl p-10 md:p-16 flex flex-col min-h-[1000px] print:shadow-none print:p-8 print:min-h-0 print:w-full print:m-0 print:border-none">
                   
                   {/* Kop Surat */}
                   <div className="flex flex-col items-center text-center space-y-4 border-b-4 border-double border-primary pb-6 mb-8">
                     <div className="flex items-center justify-center gap-5">
-                      <div className="w-14 h-14 bg-primary rounded-xl flex items-center justify-center shadow-lg">
+                      <div className="w-14 h-14 bg-primary rounded-xl flex items-center justify-center shadow-lg print:shadow-none">
                         <FileText className="h-8 w-8 text-white" />
                       </div>
                       <div className="flex flex-col items-center">
@@ -485,7 +484,7 @@ export default function KaryawanPage() {
                   </div>
 
                   {/* Data Karyawan */}
-                  <div className="grid grid-cols-2 gap-x-8 gap-y-3 mb-10 border p-5 rounded-xl bg-muted/5">
+                  <div className="grid grid-cols-2 gap-x-8 gap-y-3 mb-10 border p-5 rounded-xl bg-muted/5 print:bg-slate-50">
                     <div className="space-y-0.5">
                       <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">Nama Karyawan</p>
                       <p className="text-xs font-bold text-primary uppercase">{selectedStaff.fullName}</p>
@@ -519,7 +518,7 @@ export default function KaryawanPage() {
                           <td className="py-3 px-4 text-right font-mono">Rp {selectedStaff.baseSalary.toLocaleString('id-ID')}</td>
                         </tr>
                         {getOutstandingKasbon(selectedStaff.id) > 0 && (
-                          <tr className="border-b text-red-600 bg-red-50/30">
+                          <tr className="border-b text-red-600 bg-red-50/30 print:bg-red-50">
                             <td className="py-3 px-4 font-bold flex items-center gap-2">
                               <Calculator className="h-3 w-3" />
                               Potongan Kasbon (Outstanding)
@@ -527,7 +526,7 @@ export default function KaryawanPage() {
                             <td className="py-3 px-4 text-right font-mono">- Rp {getOutstandingKasbon(selectedStaff.id).toLocaleString('id-ID')}</td>
                           </tr>
                         )}
-                        <tr className="bg-slate-50">
+                        <tr className="bg-slate-50 print:bg-slate-100">
                           <td className="py-3 px-4 font-black text-primary uppercase">Total Gaji Bersih (Net Salary)</td>
                           <td className="py-3 px-4 text-right font-mono font-black text-primary text-base">
                             Rp {(selectedStaff.baseSalary - getOutstandingKasbon(selectedStaff.id)).toLocaleString('id-ID')}
@@ -536,7 +535,7 @@ export default function KaryawanPage() {
                       </tbody>
                     </table>
 
-                    <div className="p-4 bg-muted/20 rounded-lg border border-dashed border-muted-foreground/30 text-[9px] leading-relaxed italic text-muted-foreground">
+                    <div className="p-4 bg-muted/20 rounded-lg border border-dashed border-muted-foreground/30 text-[9px] leading-relaxed italic text-muted-foreground print:bg-slate-50 print:border-slate-300">
                       Catatan: Slip gaji ini dihasilkan secara otomatis oleh Sistem Informasi Terpadu (SITU) Hanura. Potongan kasbon dihitung berdasarkan saldo pinjaman yang belum lunas pada saat slip ini dicetak.
                     </div>
                   </div>
