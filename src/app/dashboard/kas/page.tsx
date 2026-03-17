@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -7,20 +6,18 @@ import {
   Wallet, 
   TrendingUp, 
   TrendingDown, 
-  CreditCard, 
   FileText, 
-  ArrowUpRight, 
-  ArrowDownRight,
   Filter,
   Loader2,
   Banknote,
   Receipt,
-  AlertCircle,
   Info,
   Printer,
-  ChevronRight,
-  Download,
-  CheckCircle2
+  Trash2,
+  Eye,
+  MoreVertical,
+  Calendar,
+  User as UserIcon
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -42,14 +39,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useFirestore, useUser, addDocumentNonBlocking, useCollection, useMemoFirebase } from "@/firebase"
-import { collection } from "firebase/firestore"
+import { useFirestore, useUser, addDocumentNonBlocking, useCollection, useMemoFirebase, deleteDocumentNonBlocking } from "@/firebase"
+import { collection, doc } from "firebase/firestore"
 import { FinancialTransaction } from "@/lib/types"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { cn } from "@/lib/utils"
+import { useToast } from "@/hooks/use-toast"
 
 export default function KasOfficePage() {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
@@ -57,9 +60,11 @@ export default function KasOfficePage() {
   const [activeTab, setActiveTab] = React.useState("all")
   const [recipientName, setRecipientName] = React.useState("")
   const [viewingSlip, setViewingSlip] = React.useState<FinancialTransaction | null>(null)
+  const [viewingTransaction, setViewingTransaction] = React.useState<FinancialTransaction | null>(null)
   
   const firestore = useFirestore()
   const { user } = useUser()
+  const { toast } = useToast()
 
   const transRef = useMemoFirebase(() => {
     if (!firestore) return null
@@ -68,7 +73,6 @@ export default function KasOfficePage() {
 
   const { data: transactions, isLoading } = useCollection<FinancialTransaction>(transRef)
 
-  // Hitung total kasbon aktif untuk nama tertentu
   const outstandingKasbon = React.useMemo(() => {
     if (!recipientName || !transactions) return 0
     return transactions
@@ -90,7 +94,6 @@ export default function KasOfficePage() {
     let finalAmount = amount
 
     if (selectedType === 'SalarySlip') {
-      // Jika ada kasbon, kurangi otomatis
       if (outstandingKasbon > 0) {
         finalAmount = amount - outstandingKasbon
         finalDescription = `Slip Gaji: ${personName} (${personPosition}) - ${baseDescription} (Potongan Kasbon: Rp ${outstandingKasbon.toLocaleString('id-ID')})`
@@ -116,6 +119,13 @@ export default function KasOfficePage() {
     addDocumentNonBlocking(collection(firestore, "financial_transactions"), data)
     setIsDialogOpen(false)
     setRecipientName("")
+    toast({ title: "Berhasil", description: "Transaksi telah dicatat." })
+  }
+
+  const handleDelete = (id: string) => {
+    if (!firestore) return
+    deleteDocumentNonBlocking(doc(firestore, "financial_transactions", id))
+    toast({ title: "Terhapus", description: "Transaksi telah dihapus dari sistem." })
   }
 
   const totalSaldo = transactions?.reduce((acc, curr) => {
@@ -271,18 +281,26 @@ export default function KasOfficePage() {
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        {t.type === 'SalarySlip' ? (
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="rounded-full text-[10px] font-bold uppercase tracking-tighter border-primary text-primary hover:bg-primary/10 h-8"
-                            onClick={() => setViewingSlip(t)}
-                          >
-                            <Printer className="mr-1.5 h-3 w-3" /> Cetak Slip
-                          </Button>
-                        ) : (
-                          <Button variant="ghost" size="sm" className="rounded-full text-[10px] font-bold uppercase tracking-tighter h-8">Buka Detail</Button>
-                        )}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="rounded-full h-8 w-8">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48 rounded-xl">
+                            <DropdownMenuItem onClick={() => setViewingTransaction(t)} className="cursor-pointer">
+                              <Eye className="mr-2 h-4 w-4 text-blue-500" /> Lihat Detail
+                            </DropdownMenuItem>
+                            {t.type === 'SalarySlip' && (
+                              <DropdownMenuItem onClick={() => setViewingSlip(t)} className="cursor-pointer">
+                                <Printer className="mr-2 h-4 w-4 text-purple-500" /> Cetak Slip Gaji
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem onClick={() => handleDelete(t.id)} className="text-red-600 cursor-pointer">
+                              <Trash2 className="mr-2 h-4 w-4" /> Hapus Transaksi
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </TableCell>
                     </TableRow>
                   ))
@@ -397,6 +415,88 @@ export default function KasOfficePage() {
                   <Printer className="mr-2 h-4 w-4" /> Cetak Sekarang
                 </Button>
               </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog View Detail Transaksi */}
+      <Dialog open={!!viewingTransaction} onOpenChange={() => setViewingTransaction(null)}>
+        <DialogContent className="sm:max-w-[480px] rounded-3xl p-0 overflow-hidden border-none shadow-2xl">
+          {viewingTransaction && (
+            <div className="bg-white">
+              <div className={cn("p-6 text-white", 
+                viewingTransaction.type === 'Receipt' ? "bg-green-600" :
+                viewingTransaction.type === 'SalarySlip' ? "bg-purple-600" :
+                viewingTransaction.type === 'CashAdvance' ? "bg-amber-600" : "bg-blue-600"
+              )}>
+                <div className="flex justify-between items-start mb-4">
+                  <Badge variant="secondary" className="bg-white/20 text-white border-none text-[10px] uppercase font-bold tracking-widest">
+                    Detail Transaksi Kas
+                  </Badge>
+                  <span className="text-[10px] font-mono opacity-80 uppercase">{viewingTransaction.id}</span>
+                </div>
+                <h2 className="text-3xl font-headline font-bold">Rp {viewingTransaction.amount.toLocaleString('id-ID')}</h2>
+                <p className="text-sm font-medium opacity-90 mt-1 uppercase tracking-wider">{viewingTransaction.type}</p>
+              </div>
+
+              <div className="p-8 space-y-6">
+                <div className="grid gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 bg-muted rounded-lg text-muted-foreground">
+                      <Calendar className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">Tanggal Transaksi</p>
+                      <p className="text-sm font-bold">{new Date(viewingTransaction.transactionDate).toLocaleDateString('id-ID', { dateStyle: 'full' })}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 bg-muted rounded-lg text-muted-foreground">
+                      <FileText className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">Keterangan / Deskripsi</p>
+                      <p className="text-sm font-bold">{viewingTransaction.description}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 bg-muted rounded-lg text-muted-foreground">
+                      <UserIcon className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">Petugas Pencatat (ID)</p>
+                      <p className="text-sm font-bold">{viewingTransaction.recordedByUserId}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 bg-muted rounded-lg text-muted-foreground">
+                      <Info className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">Waktu Input Sistem</p>
+                      <p className="text-xs font-medium">{new Date(viewingTransaction.createdAt).toLocaleString('id-ID')}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 flex justify-end gap-2">
+                   <Button variant="outline" onClick={() => setViewingTransaction(null)} className="rounded-full">Tutup</Button>
+                   <Button 
+                    variant="destructive" 
+                    className="rounded-full"
+                    onClick={() => {
+                      handleDelete(viewingTransaction.id)
+                      setViewingTransaction(null)
+                    }}
+                   >
+                    <Trash2 className="mr-2 h-4 w-4" /> Hapus
+                   </Button>
+                </div>
+              </div>
             </div>
           )}
         </DialogContent>
