@@ -2,7 +2,7 @@
 "use client"
 
 import * as React from "react"
-import { Plus, Search, Filter, Send, Calendar, User, MoreHorizontal, FileText } from "lucide-react"
+import { Plus, Search, Filter, Send, Calendar, User, MoreHorizontal, FileText, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { 
@@ -14,13 +14,53 @@ import {
   TableRow 
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { useFirestore, useUser, addDocumentNonBlocking, useCollection, useMemoFirebase } from "@/firebase"
+import { collection } from "firebase/firestore"
 
 export default function SuratKeluarPage() {
-  const letters = [
-    { id: "1", no: "002/ADM/OUT/2024", subject: "Balasan Kerjasama Vendor", recipient: "PT. Maju Bersama", date: "2024-03-21", status: "Sent" },
-    { id: "2", no: "003/ORG/OUT/2024", subject: "Surat Tugas Monitoring", recipient: "Andi Wijaya", date: "2024-03-22", status: "Draft" },
-    { id: "3", no: "005/ADM/OUT/2024", subject: "Pemberitahuan Cuti Bersama", recipient: "Seluruh Karyawan", date: "2024-03-23", status: "Reviewed" },
-  ]
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false)
+  const { firestore } = useFirestore()
+  const { user } = useUser()
+
+  const lettersRef = useMemoFirebase(() => {
+    if (!firestore) return null
+    return collection(firestore, "correspondences")
+  }, [firestore])
+
+  const { data: letters, isLoading } = useCollection(lettersRef)
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (!user || !firestore) return
+
+    const formData = new FormData(e.currentTarget)
+    const data = {
+      subject: formData.get("subject") as string,
+      body: formData.get("body") as string,
+      type: "Outgoing",
+      correspondenceNumber: formData.get("no") as string,
+      correspondenceDate: new Date().toISOString(),
+      senderRecipientName: formData.get("recipient") as string,
+      status: "Sent",
+      createdByUserId: user.uid,
+      attachmentIds: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+
+    addDocumentNonBlocking(collection(firestore, "correspondences"), data)
+    setIsDialogOpen(false)
+  }
 
   return (
     <div className="space-y-8">
@@ -29,7 +69,10 @@ export default function SuratKeluarPage() {
           <h1 className="text-3xl font-headline font-bold text-primary">Surat Keluar</h1>
           <p className="text-muted-foreground">Kelola dan tracking surat yang keluar dari kantor.</p>
         </div>
-        <Button className="bg-accent hover:bg-accent/90 text-white rounded-full">
+        <Button 
+          className="bg-accent hover:bg-accent/90 text-white rounded-full"
+          onClick={() => setIsDialogOpen(true)}
+        >
           <Plus className="mr-2 h-4 w-4" /> Buat Surat Keluar
         </Button>
       </div>
@@ -58,12 +101,18 @@ export default function SuratKeluarPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {letters.map((letter) => (
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
+                </TableCell>
+              </TableRow>
+            ) : letters?.filter(l => l.type === 'Outgoing').map((letter) => (
               <TableRow key={letter.id}>
-                <TableCell className="font-mono text-xs">{letter.no}</TableCell>
+                <TableCell className="font-mono text-xs">{letter.correspondenceNumber}</TableCell>
                 <TableCell className="font-medium">{letter.subject}</TableCell>
-                <TableCell>{letter.recipient}</TableCell>
-                <TableCell>{letter.date}</TableCell>
+                <TableCell>{letter.senderRecipientName}</TableCell>
+                <TableCell>{new Date(letter.correspondenceDate).toLocaleDateString()}</TableCell>
                 <TableCell>
                   <Badge variant={letter.status === 'Sent' ? 'default' : letter.status === 'Draft' ? 'outline' : 'secondary'}>
                     {letter.status}
@@ -74,9 +123,49 @@ export default function SuratKeluarPage() {
                 </TableCell>
               </TableRow>
             ))}
+            {!isLoading && (!letters || letters.filter(l => l.type === 'Outgoing').length === 0) && (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  Belum ada data surat keluar.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <form onSubmit={handleSubmit}>
+            <DialogHeader>
+              <DialogTitle>Buat Surat Keluar</DialogTitle>
+              <DialogDescription>Input detail surat keluar yang dikirim secara resmi.</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="no">Nomor Surat</Label>
+                <Input id="no" name="no" placeholder="Contoh: 002/ADM/OUT/2024" required />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="recipient">Penerima</Label>
+                <Input id="recipient" name="recipient" placeholder="Tujuan Instansi/Orang" required />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="subject">Subjek</Label>
+                <Input id="subject" name="subject" placeholder="Perihal Surat" required />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="body">Ringkasan Isi</Label>
+                <Textarea id="body" name="body" placeholder="Catatan singkat isi surat..." />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Batal</Button>
+              <Button type="submit" className="bg-accent text-white hover:bg-accent/90">Kirim Surat</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
