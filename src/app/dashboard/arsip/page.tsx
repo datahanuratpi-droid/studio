@@ -73,16 +73,29 @@ export default function ArsipPage() {
   }
 
   const handleView = (title: string) => {
+    // Simulasi membuka PDF di tab baru agar dibaca oleh browser reader perangkat
+    const dummyPdfUrl = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+    window.open(dummyPdfUrl, '_blank');
+    
     toast({
-      title: "Membuka Dokumen",
-      description: `Menyiapkan pratinjau untuk "${title}"...`,
+      title: "Membuka Reader",
+      description: `Menampilkan "${title}" pada browser reader perangkat...`,
     })
   }
 
   const handleDownload = (fileName: string) => {
+    // Simulasi download file secara otomatis
+    const dummyPdfUrl = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+    const link = document.createElement('a');
+    link.href = dummyPdfUrl;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
     toast({
       title: "Mengunduh Berkas",
-      description: `Berkas "${fileName}" sedang diproses untuk diunduh.`,
+      description: `Berkas "${fileName}" sedang diunduh secara otomatis.`,
     })
   }
 
