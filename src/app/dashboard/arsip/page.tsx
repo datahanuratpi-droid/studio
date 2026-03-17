@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -73,9 +74,9 @@ export default function ArsipPage() {
   }
 
   const handleView = (title: string) => {
-    // Simulasi membuka PDF di tab baru agar dibaca oleh browser reader perangkat
-    const dummyPdfUrl = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
-    window.open(dummyPdfUrl, '_blank');
+    // Membuka route reader internal yang mensimulasikan tampilan PDF profesional di browser
+    const readerUrl = `/dashboard/arsip/reader?title=${encodeURIComponent(title)}`;
+    window.open(readerUrl, '_blank');
     
     toast({
       title: "Membuka Reader",
