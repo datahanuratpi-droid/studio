@@ -143,14 +143,16 @@ export default function KasOfficePage() {
     if (!transactions) return []
     let filtered = transactions
     
-    // Non-admins can only see routine transactions in "all" or filtered tabs
+    // Non-admins can only see certain transaction types
     if (!isAdmin) {
       filtered = filtered.filter(t => t.type === 'Receipt' || t.type === 'Payment')
     }
 
-    if (activeTab === "rutin") filtered = filtered.filter(t => t.type === 'Receipt' || t.type === 'Payment')
-    else if (activeTab === "kasbon") filtered = filtered.filter(t => t.type === 'CashAdvance')
-    else if (activeTab === "gaji") filtered = filtered.filter(t => t.type === 'SalarySlip')
+    if (activeTab === "pemasukkan") {
+      filtered = filtered.filter(t => t.type === 'Receipt')
+    } else if (activeTab === "pengeluaran") {
+      filtered = filtered.filter(t => t.type !== 'Receipt')
+    }
 
     if (searchQuery) {
       filtered = filtered.filter(t => t.description.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -235,13 +237,8 @@ export default function KasOfficePage() {
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
           <TabsList className="bg-white border p-1 rounded-2xl shadow-sm h-12 w-full sm:w-auto">
             <TabsTrigger value="all" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-white text-xs">Semua</TabsTrigger>
-            <TabsTrigger value="rutin" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-white text-xs">Operasional</TabsTrigger>
-            {isAdmin && (
-              <>
-                <TabsTrigger value="kasbon" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-white text-xs">Kasbon</TabsTrigger>
-                <TabsTrigger value="gaji" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-white text-xs">Gaji</TabsTrigger>
-              </>
-            )}
+            <TabsTrigger value="pemasukkan" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-white text-xs">Pemasukkan</TabsTrigger>
+            <TabsTrigger value="pengeluaran" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-white text-xs">Pengeluaran</TabsTrigger>
           </TabsList>
           <div className="relative w-full sm:max-w-xs">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
