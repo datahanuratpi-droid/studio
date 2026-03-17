@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -11,11 +12,12 @@ import {
   Inbox,
   ArrowRight,
   AlertCircle,
-  Library
+  Library,
+  Users,
+  User as UserIcon
 } from "lucide-react"
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
@@ -107,38 +109,50 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-        <Card className="lg:col-span-2 border-none shadow-md rounded-3xl overflow-hidden">
-          <CardHeader className="bg-muted/10">
+        {/* Pengurus Card */}
+        <Card className="lg:col-span-2 border-none shadow-md rounded-3xl overflow-hidden bg-white">
+          <CardHeader className="bg-primary text-white">
             <CardTitle className="font-headline font-bold flex items-center gap-2 text-lg md:text-xl">
-              <TrendingUp className="h-5 w-5 text-accent" /> Progres Operasional
+              <Users className="h-5 w-5" /> PENGURUS DPC HANURA KOTA TANJUNGPINANG
             </CardTitle>
-            <CardDescription className="text-xs">Pencapaian target administrasi bulan ini.</CardDescription>
+            <CardDescription className="text-white/70 text-[10px] uppercase tracking-[0.2em] font-bold">Struktur Organisasi Inti</CardDescription>
           </CardHeader>
-          <CardContent className="p-6 space-y-8">
-            <div className="space-y-4">
-              <div className="flex justify-between text-xs font-bold uppercase tracking-wider">
-                <span className="flex items-center gap-2 text-primary"><FileText className="h-4 w-4" /> Laporan</span>
-                <span>{laporanCount} / 20</span>
+          <CardContent className="p-6 md:p-10">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+              <div className="flex flex-col items-center text-center space-y-4 p-6 rounded-3xl bg-muted/10 border border-border/50 group hover:border-primary transition-all hover:bg-white hover:shadow-xl">
+                <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
+                  <UserIcon className="h-10 w-10" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Ketua</p>
+                  <p className="text-sm font-black text-primary uppercase">RENI, SE</p>
+                </div>
               </div>
-              <Progress value={Math.min(100, (laporanCount / 20) * 100)} className="h-3 rounded-full" />
-            </div>
-            <div className="space-y-4">
-              <div className="flex justify-between text-xs font-bold uppercase tracking-wider">
-                <span className="flex items-center gap-2 text-primary"><Inbox className="h-4 w-4" /> Registrasi Surat</span>
-                <span>{suratMasukCount} / 50</span>
+
+              <div className="flex flex-col items-center text-center space-y-4 p-6 rounded-3xl bg-muted/10 border border-border/50 group hover:border-primary transition-all hover:bg-white hover:shadow-xl">
+                <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
+                  <UserIcon className="h-10 w-10" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Sekretaris</p>
+                  <p className="text-sm font-black text-primary uppercase">BERI KURNIAWAN</p>
+                </div>
               </div>
-              <Progress value={Math.min(100, (suratMasukCount / 50) * 100)} className="h-3 rounded-full" />
-            </div>
-            <div className="space-y-4">
-              <div className="flex justify-between text-xs font-bold uppercase tracking-wider">
-                <span className="flex items-center gap-2 text-primary"><Library className="h-4 w-4" /> Pustaka Drive</span>
-                <span>{pustakaCount} / 30</span>
+
+              <div className="flex flex-col items-center text-center space-y-4 p-6 rounded-3xl bg-muted/10 border border-border/50 group hover:border-primary transition-all hover:bg-white hover:shadow-xl">
+                <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
+                  <UserIcon className="h-10 w-10" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Bendahara</p>
+                  <p className="text-sm font-black text-primary uppercase">ENDANG WIRNANTO</p>
+                </div>
               </div>
-              <Progress value={Math.min(100, (pustakaCount / 30) * 100)} className="h-3 rounded-full bg-muted" />
             </div>
           </CardContent>
         </Card>
 
+        {/* Activity Card */}
         <Card className="border-none shadow-md rounded-3xl overflow-hidden">
           <CardHeader className="bg-muted/10">
             <CardTitle className="font-headline font-bold flex items-center gap-2 text-lg md:text-xl">
