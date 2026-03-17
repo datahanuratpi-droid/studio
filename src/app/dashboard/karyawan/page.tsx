@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -199,25 +198,55 @@ export default function KaryawanPage() {
   }
 
   const handleDownloadImage = async () => {
-    if (slipRef.current === null) return
+    if (slipRef.current === null || !selectedStaff) return
     setIsImageGenerating(true)
+    
+    const fileName = `Slip-Gaji-${selectedStaff.fullName}-${new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}.png`
+
     try {
-      const dataUrl = await toPng(slipRef.current, { cacheBust: true, pixelRatio: 2 })
+      // First attempt with full features (including fonts)
+      const dataUrl = await toPng(slipRef.current, { 
+        cacheBust: true, 
+        pixelRatio: 3, 
+        backgroundColor: '#ffffff'
+      })
+      
       const link = document.createElement('a')
-      link.download = `Slip-Gaji-${selectedStaff?.fullName}-${new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}.png`
+      link.download = fileName
       link.href = dataUrl
       link.click()
+      
       toast({
         title: "Gambar Berhasil Dibuat",
         description: "Slip gaji telah diunduh sebagai file gambar PNG.",
       })
     } catch (err) {
-      console.error(err)
-      toast({
-        variant: "destructive",
-        title: "Gagal Membuat Gambar",
-        description: "Terjadi kesalahan saat mengonversi slip gaji menjadi gambar.",
-      })
+      console.warn("Initial image generation failed, trying fallback:", err)
+      try {
+        // Fallback: skip fonts which is the common cause of SecurityError with cross-origin stylesheets
+        const dataUrl = await toPng(slipRef.current, { 
+          skipFonts: true,
+          pixelRatio: 2,
+          backgroundColor: '#ffffff'
+        })
+        
+        const link = document.createElement('a')
+        link.download = fileName
+        link.href = dataUrl
+        link.click()
+        
+        toast({
+          title: "Gambar Berhasil Dibuat (Mode Kompatibilitas)",
+          description: "Slip gaji diunduh tanpa font khusus karena batasan keamanan browser.",
+        })
+      } catch (fallbackErr) {
+        console.error("Critical error generating image:", fallbackErr)
+        toast({
+          variant: "destructive",
+          title: "Gagal Membuat Gambar",
+          description: "Terjadi kesalahan keamanan browser saat mengonversi slip gaji menjadi gambar.",
+        })
+      }
     } finally {
       setIsImageGenerating(false)
     }
