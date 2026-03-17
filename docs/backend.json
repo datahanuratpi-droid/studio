@@ -16,6 +16,22 @@
       },
       "required": ["id", "email", "fullName", "role", "status", "createdAt", "updatedAt"]
     },
+    "StaffMember": {
+      "title": "StaffMember",
+      "description": "Data detail karyawan untuk keperluan penggajian.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "fullName": { "type": "string" },
+        "position": { "type": "string" },
+        "baseSalary": { "type": "number" },
+        "bankName": { "type": "string" },
+        "accountNumber": { "type": "string" },
+        "phoneNumber": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["fullName", "position", "baseSalary", "createdAt"]
+    },
     "Correspondence": {
       "title": "Correspondence",
       "description": "Represents incoming or outgoing mail.",
@@ -65,6 +81,8 @@
         "description": { "type": "string" },
         "type": { "type": "string" },
         "recordedByUserId": { "type": "string" },
+        "involvedStaffId": { "type": "string" },
+        "isClosed": { "type": "boolean" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["amount", "transactionDate", "description", "type", "recordedByUserId", "createdAt"]
@@ -93,6 +111,10 @@
       "schema": "UserProfile",
       "description": "User profile data."
     },
+    "/staff_members/{id}": {
+      "schema": "StaffMember",
+      "description": "Master data karyawan."
+    },
     "/correspondences/{id}": {
       "schema": "Correspondence",
       "description": "Store all mail records."
@@ -108,18 +130,6 @@
     "/library_items/{id}": {
       "schema": "LibraryItem",
       "description": "Google Drive links and library resources."
-    },
-    "/roles_admin/{userId}": {
-      "schema": { "type": "object", "properties": { "active": { "type": "boolean" } } },
-      "description": "Marker for admin role."
-    },
-    "/roles_ksb/{userId}": {
-      "schema": { "type": "object", "properties": { "active": { "type": "boolean" } } },
-      "description": "Marker for KSB (Ketua, Sekretaris, Bendahara) role."
-    },
-    "/roles_staff/{userId}": {
-      "schema": { "type": "object", "properties": { "active": { "type": "boolean" } } },
-      "description": "Marker for Staff role."
     }
   }
 }

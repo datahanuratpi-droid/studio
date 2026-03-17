@@ -66,10 +66,22 @@ export interface FinancialTransaction {
   type: TransactionType;
   categoryId: string;
   recordedByUserId: string;
-  involvedPartyId?: string;
+  involvedStaffId?: string;
+  isClosed?: boolean;
   attachmentIds: string[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface StaffMember {
+  id: string;
+  fullName: string;
+  position: string;
+  baseSalary: number;
+  bankName?: string;
+  accountNumber?: string;
+  phoneNumber?: string;
+  createdAt: string;
 }
 
 export interface LibraryItem {

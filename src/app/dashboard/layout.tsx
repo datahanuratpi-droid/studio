@@ -29,7 +29,8 @@ import {
   Code,
   Phone,
   Mail as MailIcon,
-  Library
+  Library,
+  Briefcase
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -228,6 +229,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     },
     { href: "/dashboard/laporan", icon: <FileText className="h-5 w-5" />, label: "Laporan Kegiatan", roles: ["Admin", "KSB", "Staff"] },
     { href: "/dashboard/kas", icon: <Wallet className="h-5 w-5" />, label: "Kas Office", roles: ["Admin", "KSB", "Staff"] },
+    { href: "/dashboard/karyawan", icon: <Briefcase className="h-5 w-5" />, label: "Karyawan", roles: ["Admin"] },
     { href: "/dashboard/pustaka", icon: <Library className="h-5 w-5" />, label: "Pustaka Hanura", roles: ["Admin", "KSB", "Staff"] },
     { href: "/dashboard/users", icon: <Users className="h-5 w-5" />, label: "Manajemen User", roles: ["Admin"] },
     { href: "/dashboard/pengaturan", icon: <Settings className="h-5 w-5" />, label: "Pengaturan", roles: ["Admin", "KSB", "Staff"] },
