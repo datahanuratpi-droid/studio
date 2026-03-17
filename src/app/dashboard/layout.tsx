@@ -1,4 +1,3 @@
-
 'use client'
 
 import * as React from "react"
@@ -303,8 +302,10 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 className="pl-10 h-9 bg-background/50 border-none shadow-none focus-visible:ring-1 focus-visible:ring-accent rounded-full transition-all focus:max-w-md"
               />
             </div>
-            
-            {/* Real-time Clock & Date */}
+          </div>
+          
+          <div className="flex items-center gap-2 md:gap-3 ml-2">
+            {/* Real-time Clock & Date - Moved here */}
             <div className="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-1.5 bg-muted/40 rounded-full border border-border/50 shadow-sm shrink-0">
               <Clock className="h-3.5 w-3.5 text-primary animate-pulse" />
               <div className="flex flex-col items-start leading-none">
@@ -316,9 +317,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 </span>
               </div>
             </div>
-          </div>
-          
-          <div className="flex items-center gap-2 md:gap-3 ml-2">
+
             <Button variant="ghost" size="icon" className="relative text-muted-foreground hidden sm:flex">
               <Bell className="h-5 w-5" />
               <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-accent rounded-full border-2 border-white"></span>
