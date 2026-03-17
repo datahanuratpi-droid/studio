@@ -1,10 +1,10 @@
-
 import type {Metadata} from 'next';
 import './globals.css';
+import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 export const metadata: Metadata = {
-  title: 'TaskFlow Pro | Efficient Task Management',
-  description: 'Streamline your workflow with TaskFlow Pro - The professional way to manage your tasks.',
+  title: 'OfficeFlow | Integrated Office Management',
+  description: 'Sistem Manajemen Kantor Terintegrasi untuk efisiensi alur kerja Anda.',
 };
 
 export default function RootLayout({
@@ -20,7 +20,9 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased min-h-screen bg-background">
-        {children}
+        <FirebaseClientProvider>
+          {children}
+        </FirebaseClientProvider>
       </body>
     </html>
   );
