@@ -432,6 +432,10 @@ export default function KaryawanPage() {
       {/* Slip Gaji Floating Dialog */}
       <Dialog open={isSlipDialogOpen} onOpenChange={setIsSlipDialogOpen}>
         <DialogContent className="max-w-[850px] w-full p-0 border-none rounded-3xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col bg-[#525659] print:bg-white print:max-h-none print:shadow-none print:fixed print:inset-0 print:z-[100] print:rounded-none">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Pratinjau Slip Gaji</DialogTitle>
+            <DialogDescription>Detail rincian gaji dan potongan kasbon karyawan.</DialogDescription>
+          </DialogHeader>
           {selectedStaff && (
             <div className="flex flex-col h-full print:h-auto print:block">
               {/* Toolbar */}
