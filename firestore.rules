@@ -52,6 +52,12 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // --- Master Data Karyawan ---
+    match /staff_members/{id} {
+      allow read: if isStaff() && isActive();
+      allow write: if isAdmin() && isActive();
+    }
+
     // --- Common Access (Surat, Laporan, Kas) ---
     match /correspondences/{id} {
       allow read, write: if isStaff() && isActive();
