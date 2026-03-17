@@ -3,99 +3,99 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * CORE PHILOSOPHY
-     * This ruleset enforces a multi-tier authorization model designed for office management. 
-     * It leverages "Authorization Independence" by denormalizing ownership IDs (e.g., reporterId, 
-     * createdByUserId) and using marker collections for high-performance role checks.
+     * CORE PHILOSOPHY:
+     * This ruleset enforces a strict user-ownership model where all data is private by default. 
+     * Access is strictly governed by the user's authenticated identity (UID) matching the 
+     * hierarchical path of the document.
+     *
+     * DATA STRUCTURE:
+     * All application data is nested under the `/users/{userId}` root. 
+     * - User profiles are stored at the root of the user's tree.
+     * - Tasks are subcollections of the user.
+     * - Subtasks are further nested within specific tasks.
+     *
+     * KEY SECURITY DECISIONS:
+     * 1. Path-Based Authorization: We primarily use the `{userId}` variable in the document 
+     *    path to determine ownership, providing high performance and simplicity.
+     * 2. Denormalization for Integrity: Relational fields like `userProfileId` and `taskId` 
+     *    are required within the document data. Rules enforce that these internal IDs match 
+     *    the document's path during creation and remain immutable thereafter.
+     * 3. Prototyping Flexibility: While authorization is strictly enforced, the rules do 
+     *    not validate specific data types or schemas for non-relational fields (e.g., descriptions, 
+     *    titles, dates), allowing for rapid frontend iteration.
+     * 4. Safe Deletion: All destructive operations (update/delete) explicitly verify the 
+     *    document's existence and ownership before proceeding.
      */
 
-    // --- Helper Functions ---
+    // --- Global Helper Functions ---
 
+    /**
+     * @description Checks if the request is made by an authenticated user.
+     */
     function isSignedIn() {
       return request.auth != null;
     }
 
+    /**
+     * @description Checks if the authenticated user's UID matches the provided userId.
+     */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    function isAdmin() {
-      return isSignedIn() && (
-        exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid)) ||
-        request.auth.token.email == "agus@hanura.id"
-      );
-    }
-
-    function isOfficer() {
-      return isSignedIn() && exists(/databases/$(database)/documents/roles_officer/$(request.auth.uid));
-    }
-
+    /**
+     * @description Combines ownership check with a check for document existence. 
+     * Used for update and delete operations.
+     */
     function isExistingOwner(userId) {
       return resource != null && isOwner(userId);
     }
 
     // --- Collection Rules ---
 
+    /**
+     * @description Rules for UserProfile documents.
+     * @path /users/{userId}
+     * @allow (get) If the user is signed in and requesting their own profile document.
+     * @deny (list) If a user tries to list all user profiles in the system.
+     * @principle Restricts access to a user's own data tree and enforces self-creation.
+     */
     match /users/{userId} {
-      allow get: if isOwner(userId) || isAdmin();
-      allow list: if isAdmin();
-      allow create: if isOwner(userId);
-      allow update: if resource != null && (isOwner(userId) || isAdmin());
-      allow delete: if resource != null && isAdmin();
-    }
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
 
-    match /roles_admin/{userId} {
-      allow get: if isSignedIn();
-      allow list: if isAdmin();
-      // Allow the designated super admin to create their own marker
-      allow create: if isOwner(userId) && request.auth.token.email == "agus@hanura.id";
-      allow update, delete: if isAdmin();
-    }
+      /**
+       * @description Rules for Task documents.
+       * @path /users/{userId}/tasks/{taskId}
+       * @allow (create) If the user is the owner of the path and provides matching userProfileId.
+       * @deny (update) If the user attempts to change the userProfileId (ownership) of a task.
+       * @principle Enforces document ownership for writes and ensures relational integrity.
+       */
+      match /tasks/{taskId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userProfileId == userId;
+        allow update: if isExistingOwner(userId) && request.resource.data.userProfileId == resource.data.userProfileId;
+        allow delete: if isExistingOwner(userId);
 
-    match /roles_officer/{userId} {
-      allow get: if isSignedIn();
-      allow list: if isAdmin();
-      allow create, update, delete: if isAdmin();
-    }
-
-    match /correspondences/{correspondenceId} {
-      allow get, list: if isSignedIn() && (isAdmin() || isOfficer() || resource.data.createdByUserId == request.auth.uid);
-      allow create: if isSignedIn() && request.resource.data.createdByUserId == request.auth.uid;
-      allow update: if resource != null && (isAdmin() || isExistingOwner(resource.data.createdByUserId));
-      allow delete: if resource != null && (isAdmin() || isExistingOwner(resource.data.createdByUserId));
-    }
-
-    match /activity_reports/{activityReportId} {
-      allow get, list: if isSignedIn() && (isAdmin() || isOfficer() || resource.data.reporterId == request.auth.uid);
-      allow create: if isSignedIn() && request.resource.data.reporterId == request.auth.uid;
-      allow update: if resource != null && (isAdmin() || isExistingOwner(resource.data.reporterId)) && request.resource.data.reporterId == resource.data.reporterId;
-      allow delete: if resource != null && (isAdmin() || isExistingOwner(resource.data.reporterId));
-    }
-
-    match /documents/{documentId} {
-      allow get, list: if isSignedIn() && (isAdmin() || resource.data.accessScope == 'office_wide' || (resource.data.accessScope == 'personal' && resource.data.uploadedById == request.auth.uid));
-      allow create: if isSignedIn() && request.resource.data.uploadedById == request.auth.uid;
-      allow update: if resource != null && (isAdmin() || isExistingOwner(resource.data.uploadedById));
-      allow delete: if resource != null && (isAdmin() || isExistingOwner(resource.data.uploadedById));
-    }
-
-    match /financial_categories/{categoryId} {
-      allow get, list: if isSignedIn();
-      allow create, update, delete: if isAdmin();
-    }
-
-    match /financial_transactions/{transactionId} {
-      allow get, list: if isSignedIn() && (isAdmin() || resource.data.recordedByUserId == request.auth.uid || resource.data.involvedPartyId == request.auth.uid);
-      allow create: if (isAdmin() || isOfficer()) && request.resource.data.recordedByUserId == request.auth.uid;
-      allow update: if resource != null && isAdmin();
-      allow delete: if resource != null && isAdmin();
-    }
-
-    match /office_tasks/{taskId} {
-      allow get, list: if isSignedIn() && (isAdmin() || resource.data.createdById == request.auth.uid || resource.data.assignedToUserId == request.auth.uid);
-      allow create: if isSignedIn() && request.resource.data.createdById == request.auth.uid;
-      allow update: if resource != null && (isAdmin() || resource.data.createdById == request.auth.uid || resource.data.assignedToUserId == request.auth.uid);
-      allow delete: if resource != null && (isAdmin() || isExistingOwner(resource.data.createdById));
+        /**
+         * @description Rules for SubTask documents.
+         * @path /users/{userId}/tasks/{taskId}/subTasks/{subTaskId}
+         * @allow (list) If the authenticated user is the owner of the parent task path.
+         * @deny (create) If the taskId in the data does not match the taskId in the path.
+         * @principle Hierarchical ownership and path-to-data consistency.
+         */
+        match /subTasks/{subTaskId} {
+          allow get: if isOwner(userId);
+          allow list: if isOwner(userId);
+          allow create: if isOwner(userId) && request.resource.data.userProfileId == userId && request.resource.data.taskId == taskId;
+          allow update: if isExistingOwner(userId) && request.resource.data.userProfileId == resource.data.userProfileId && request.resource.data.taskId == resource.data.taskId;
+          allow delete: if isExistingOwner(userId);
+        }
+      }
     }
   }
 }
