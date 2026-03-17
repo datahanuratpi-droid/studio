@@ -435,9 +435,9 @@ export default function KaryawanPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Slip Gaji Redesigned Dialog */}
+      {/* Slip Gaji Redesigned Dialog - SETENGAH A4 SIZE */}
       <Dialog open={isSlipDialogOpen} onOpenChange={setIsSlipDialogOpen}>
-        <DialogContent className="max-w-[950px] w-full p-0 border-none rounded-none overflow-hidden shadow-2xl max-h-[95vh] flex flex-col bg-white print:fixed print:inset-0 print:z-[100] print:m-0 print:p-0">
+        <DialogContent className="max-w-[850px] w-full p-0 border-none rounded-none overflow-hidden shadow-2xl max-h-[95vh] flex flex-col bg-white print:fixed print:inset-0 print:z-[100] print:m-0 print:p-0">
           <DialogHeader className="sr-only">
             <DialogTitle>Slip Gaji Hanura</DialogTitle>
             <DialogDescription>Rincian Gaji Karyawan DPC Hanura Kota Tanjungpinang</DialogDescription>
@@ -461,30 +461,24 @@ export default function KaryawanPage() {
                 </div>
               </header>
 
-              {/* Document Container */}
+              {/* Document Container - HALF A4 SIZE ADJUSTMENT */}
               <div className="flex-1 overflow-auto p-4 md:p-8 flex justify-center bg-slate-50 print:bg-white print:p-0">
-                <div className="bg-white w-full max-w-[850px] p-8 md:p-12 flex flex-col shadow-lg border border-slate-200 print:shadow-none print:border-none print:max-w-none print:w-full">
+                <div className="bg-white w-full max-w-[800px] min-h-[500px] p-6 md:p-10 flex flex-col shadow-lg border border-slate-200 print:shadow-none print:border-none print:max-w-none print:w-full">
                   
                   {/* Top Header Section */}
-                  <div className="flex justify-between items-start mb-8">
-                    {/* Logo simulation based on image */}
+                  <div className="flex justify-between items-start mb-6">
+                    {/* Removed Logo Block */}
                     <div className="flex flex-col">
-                       <div className="border-2 border-black p-2 flex items-center justify-center bg-white mb-2" style={{ width: '150px' }}>
-                          <div className="flex flex-col items-center">
-                             <span className="text-red-600 font-black text-2xl leading-none">HANURA</span>
-                             <span className="text-[7px] font-bold uppercase tracking-tighter">PARTAI HATI NURANI RAKYAT</span>
-                          </div>
-                       </div>
                        <div className="text-[10px] space-y-0.5 uppercase">
-                          <p className="font-bold">HANURA KOTA TANJUNGPINANG</p>
+                          <p className="font-bold text-primary">HANURA KOTA TANJUNGPINANG</p>
                           <p>Jalan Gatot Subroto</p>
                           <p>Tanjungpinang, Kepulauan Riau</p>
                        </div>
                     </div>
 
                     <div className="text-right flex flex-col items-end">
-                       <h1 className="text-5xl font-black uppercase mb-4">Slip Gaji</h1>
-                       <div className="grid grid-cols-[auto_1fr] gap-x-8 gap-y-1 text-xs text-left w-full max-w-sm">
+                       <h1 className="text-4xl font-black uppercase mb-2">Slip Gaji</h1>
+                       <div className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-1 text-xs text-left w-full max-w-sm">
                           <span className="font-bold">NAMA</span>
                           <span className="uppercase text-right">{selectedStaff.fullName} / {selectedStaff.id.slice(0, 10).toUpperCase()}</span>
                           <span className="font-bold">JABATAN</span>
@@ -496,13 +490,13 @@ export default function KaryawanPage() {
                   </div>
 
                   {/* Tables Section */}
-                  <div className="grid grid-cols-2 border-y-2 border-black mb-6">
+                  <div className="grid grid-cols-2 border-y-2 border-black mb-4">
                     {/* Pendapatan Column */}
                     <div className="border-r-2 border-black">
                        <div className="bg-slate-200 py-1 px-4 border-b-2 border-black">
-                          <span className="font-bold text-sm uppercase">Pendapatan</span>
+                          <span className="font-bold text-[11px] uppercase">Pendapatan</span>
                        </div>
-                       <div className="p-4 space-y-2 text-sm min-h-[140px]">
+                       <div className="p-3 space-y-1 text-xs min-h-[100px]">
                           <div className="flex justify-between">
                              <span>Gaji</span>
                              <span className="font-mono">{selectedStaff.baseSalary.toLocaleString('id-ID')}</span>
@@ -512,11 +506,11 @@ export default function KaryawanPage() {
                              <span className="font-mono">-</span>
                           </div>
                           <div className="flex justify-between">
-                             <span className="italic">* Kegiatan DPC 2026</span>
+                             <span className="italic text-[10px]">* Kegiatan DPC 2026</span>
                              <span className="font-mono">-</span>
                           </div>
                        </div>
-                       <div className="border-t-2 border-black py-2 px-4 flex justify-between bg-white font-bold text-sm uppercase">
+                       <div className="border-t-2 border-black py-1.5 px-4 flex justify-between bg-white font-bold text-xs uppercase">
                           <span>Total Pendapatan</span>
                           <span className="font-mono">{selectedStaff.baseSalary.toLocaleString('id-ID')}</span>
                        </div>
@@ -525,9 +519,9 @@ export default function KaryawanPage() {
                     {/* Potongan Column */}
                     <div>
                        <div className="bg-slate-200 py-1 px-4 border-b-2 border-black">
-                          <span className="font-bold text-sm uppercase">Potongan</span>
+                          <span className="font-bold text-[11px] uppercase">Potongan</span>
                        </div>
-                       <div className="p-4 space-y-2 text-sm min-h-[140px]">
+                       <div className="p-3 space-y-1 text-xs min-h-[100px]">
                           <div className="flex justify-between">
                              <span>Pembayaran Hutang (Kasbon)</span>
                              <span className="font-mono text-red-600">{getOutstandingKasbon(selectedStaff.id).toLocaleString('id-ID')}</span>
@@ -541,7 +535,7 @@ export default function KaryawanPage() {
                              <span className="font-mono">-</span>
                           </div>
                        </div>
-                       <div className="border-t-2 border-black py-2 px-4 flex justify-between bg-white font-bold text-sm uppercase">
+                       <div className="border-t-2 border-black py-1.5 px-4 flex justify-between bg-white font-bold text-xs uppercase">
                           <span>Total Potongan</span>
                           <span className="font-mono text-red-600">{getOutstandingKasbon(selectedStaff.id).toLocaleString('id-ID')}</span>
                        </div>
@@ -549,16 +543,16 @@ export default function KaryawanPage() {
                   </div>
 
                   {/* Calculation Details Section */}
-                  <div className="border-2 border-black mb-10 overflow-hidden">
+                  <div className="border-2 border-black mb-6 overflow-hidden">
                      <div className="bg-slate-200 py-1 px-4 border-b-2 border-black">
-                        <span className="font-bold text-sm uppercase">Rincian Perhitungan Gaji Harian</span>
+                        <span className="font-bold text-[11px] uppercase">Rincian Perhitungan Gaji Harian</span>
                      </div>
-                     <div className="p-4 space-y-3 text-sm">
+                     <div className="p-3 space-y-2 text-xs">
                         <div className="flex justify-between border-b border-slate-200 pb-1">
                            <span>Hari Kerja</span>
                            <span>25 Hari</span>
                         </div>
-                        <div className="flex justify-between items-center py-1">
+                        <div className="flex justify-between items-center py-0.5">
                            <span>Gaji Per Hari</span>
                            <div className="flex items-center gap-10">
                               <span className="text-[10px] text-slate-400">x</span>
@@ -569,16 +563,6 @@ export default function KaryawanPage() {
                            <span>Total Gaji</span>
                            <span className="font-mono">{( (selectedStaff.dailyRate || 0) * 25 ).toLocaleString('id-ID')}</span>
                         </div>
-                        <div className="flex justify-between items-center py-1">
-                           <span>Ketidakhadiran</span>
-                           <div className="flex items-center gap-4">
-                              <span>0 Hari</span>
-                              <span className="text-[10px] text-slate-400">x</span>
-                              <span className="font-mono w-24 text-right">{(selectedStaff.dailyRate || 0).toLocaleString('id-ID')}</span>
-                              <span className="text-[10px] text-slate-400">=</span>
-                              <span className="font-mono w-24 text-right">-</span>
-                           </div>
-                        </div>
                         <div className="flex justify-between font-bold border-t-2 border-black pt-1">
                            <span>Total Gaji Bersih</span>
                            <span className="font-mono">{selectedStaff.baseSalary.toLocaleString('id-ID')}</span>
@@ -588,16 +572,16 @@ export default function KaryawanPage() {
 
                   {/* Final Total Box */}
                   <div className="mt-auto flex justify-end">
-                     <div className="border-4 border-black p-6 w-full max-w-sm text-center space-y-2 bg-white">
-                        <p className="font-bold text-sm uppercase tracking-widest">Total Penerimaan Bulan Ini</p>
-                        <p className="text-6xl font-black font-mono">
+                     <div className="border-4 border-black p-4 w-full max-w-sm text-center space-y-1 bg-white">
+                        <p className="font-bold text-[11px] uppercase tracking-widest leading-none">Total Penerimaan Bulan Ini</p>
+                        <p className="text-5xl font-black font-mono">
                            {(selectedStaff.baseSalary - getOutstandingKasbon(selectedStaff.id)).toLocaleString('id-ID')}
                         </p>
                      </div>
                   </div>
 
                   {/* Footer note */}
-                  <div className="mt-8 text-[9px] text-slate-400 italic">
+                  <div className="mt-4 text-[9px] text-slate-400 italic">
                     Dokumen ini sah dihasilkan secara elektronik oleh Sistem Informasi Terpadu (SITU) DPC HANURA Kota Tanjungpinang.
                   </div>
                 </div>
