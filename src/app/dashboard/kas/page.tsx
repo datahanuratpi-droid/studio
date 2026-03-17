@@ -14,7 +14,9 @@ import {
   Filter,
   Loader2,
   Banknote,
-  Receipt
+  Receipt,
+  AlertCircle,
+  Info
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -42,11 +44,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useFirestore, useUser, addDocumentNonBlocking, useCollection, useMemoFirebase } from "@/firebase"
 import { collection } from "firebase/firestore"
 import { FinancialTransaction } from "@/lib/types"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 export default function KasOfficePage() {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
   const [selectedType, setSelectedType] = React.useState<string>("Payment")
   const [activeTab, setActiveTab] = React.useState("all")
+  const [recipientName, setRecipientName] = React.useState("")
+  
   const firestore = useFirestore()
   const { user } = useUser()
 
@@ -57,6 +62,14 @@ export default function KasOfficePage() {
 
   const { data: transactions, isLoading } = useCollection<FinancialTransaction>(transRef)
 
+  // Hitung total kasbon aktif untuk nama tertentu
+  const outstandingKasbon = React.useMemo(() => {
+    if (!recipientName || !transactions) return 0
+    return transactions
+      .filter(t => t.type === 'CashAdvance' && t.description.toLowerCase().includes(recipientName.toLowerCase()))
+      .reduce((acc, curr) => acc + curr.amount, 0)
+  }, [recipientName, transactions])
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!user || !firestore) return
@@ -64,16 +77,26 @@ export default function KasOfficePage() {
     const formData = new FormData(e.currentTarget)
     const amount = parseFloat(formData.get("amount") as string)
     const baseDescription = formData.get("description") as string
+    const personName = formData.get("recipientName") as string
+    const personPosition = formData.get("position") as string
     
     let finalDescription = baseDescription
+    let finalAmount = amount
+
     if (selectedType === 'SalarySlip') {
-      const recipientName = formData.get("recipientName") as string
-      const position = formData.get("position") as string
-      finalDescription = `Slip Gaji: ${recipientName} (${position}) - ${baseDescription}`
+      // Jika ada kasbon, kurangi otomatis
+      if (outstandingKasbon > 0) {
+        finalAmount = amount - outstandingKasbon
+        finalDescription = `Slip Gaji: ${personName} (${personPosition}) - ${baseDescription} (Potongan Kasbon: Rp ${outstandingKasbon.toLocaleString('id-ID')})`
+      } else {
+        finalDescription = `Slip Gaji: ${personName} (${personPosition}) - ${baseDescription}`
+      }
+    } else if (selectedType === 'CashAdvance') {
+      finalDescription = `Kasbon: ${personName} (${personPosition}) - ${baseDescription}`
     }
 
     const data = {
-      amount,
+      amount: finalAmount,
       transactionDate: new Date().toISOString(),
       description: finalDescription,
       type: selectedType as any,
@@ -86,6 +109,7 @@ export default function KasOfficePage() {
 
     addDocumentNonBlocking(collection(firestore, "financial_transactions"), data)
     setIsDialogOpen(false)
+    setRecipientName("")
   }
 
   const totalSaldo = transactions?.reduce((acc, curr) => {
@@ -116,7 +140,10 @@ export default function KasOfficePage() {
         <div className="flex gap-2">
            <Button 
             className="bg-accent hover:bg-accent/90 text-white rounded-full px-6 shadow-lg transition-transform hover:scale-105"
-            onClick={() => setIsDialogOpen(true)}
+            onClick={() => {
+              setRecipientName("")
+              setIsDialogOpen(true)
+            }}
            >
             <Plus className="mr-2 h-4 w-4" /> Catat Transaksi Baru
            </Button>
@@ -267,11 +294,19 @@ export default function KasOfficePage() {
                 </Select>
               </div>
 
-              {selectedType === 'SalarySlip' && (
+              {(selectedType === 'SalarySlip' || selectedType === 'CashAdvance') && (
                 <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
                   <div className="grid gap-2">
-                    <Label htmlFor="recipientName" className="font-bold text-sm">Nama Penerima</Label>
-                    <Input id="recipientName" name="recipientName" placeholder="Nama Lengkap" required className="h-12 rounded-2xl" />
+                    <Label htmlFor="recipientName" className="font-bold text-sm">Nama Lengkap</Label>
+                    <Input 
+                      id="recipientName" 
+                      name="recipientName" 
+                      placeholder="Nama Penerima" 
+                      required 
+                      className="h-12 rounded-2xl"
+                      value={recipientName}
+                      onChange={(e) => setRecipientName(e.target.value)}
+                    />
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="position" className="font-bold text-sm">Jabatan</Label>
@@ -280,8 +315,21 @@ export default function KasOfficePage() {
                 </div>
               )}
 
+              {selectedType === 'SalarySlip' && recipientName && outstandingKasbon > 0 && (
+                <Alert className="bg-amber-50 border-amber-200 text-amber-800 animate-in zoom-in duration-300">
+                  <Info className="h-4 w-4" />
+                  <AlertTitle className="font-bold text-xs uppercase tracking-wider">Deteksi Kasbon Aktif</AlertTitle>
+                  <AlertDescription className="text-xs">
+                    Ditemukan pinjaman sebesar <strong>Rp {outstandingKasbon.toLocaleString('id-ID')}</strong> untuk {recipientName}. 
+                    Jumlah ini akan <strong>dikurangi secara otomatis</strong> dari total gaji saat disimpan.
+                  </AlertDescription>
+                </Alert>
+              )}
+
               <div className="grid gap-2">
-                <Label htmlFor="amount" className="font-bold text-sm">Jumlah (Rp)</Label>
+                <Label htmlFor="amount" className="font-bold text-sm">
+                  {selectedType === 'SalarySlip' ? "Total Gaji Kotor (Rp)" : "Jumlah (Rp)"}
+                </Label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-muted-foreground">Rp</span>
                   <Input id="amount" name="amount" type="number" placeholder="0" required className="h-12 pl-12 rounded-2xl font-bold" />
@@ -289,7 +337,7 @@ export default function KasOfficePage() {
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="description" className="font-bold text-sm">Keterangan Keperluan</Label>
-                <Input id="description" name="description" placeholder="Contoh: Pembayaran Listrik Bulanan / Kasbon Staff" required className="h-12 rounded-2xl" />
+                <Input id="description" name="description" placeholder="Contoh: Gaji Bulan Januari / Keperluan Mendesak" required className="h-12 rounded-2xl" />
               </div>
             </div>
             <DialogFooter className="gap-2 sm:gap-0">
