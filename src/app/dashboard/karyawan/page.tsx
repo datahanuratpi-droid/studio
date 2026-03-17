@@ -3,7 +3,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Users, Search, Edit, Trash2, Loader2, Banknote, UserPlus, Phone, Briefcase, Wallet, Receipt, Calculator, MoreVertical, Printer } from "lucide-react"
+import { Plus, Users, Search, Edit, Trash2, Loader2, Banknote, UserPlus, Phone, Briefcase, Wallet, Receipt, Calculator, MoreVertical, Printer, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -148,6 +148,11 @@ export default function KaryawanPage() {
     toast({ title: "Terhapus", description: "Karyawan telah dihapus dari sistem." })
   }
 
+  const handleGenerateSlip = (staffId: string) => {
+    const url = `/dashboard/karyawan/slip?id=${staffId}`
+    window.open(url, '_blank')
+  }
+
   const filteredStaff = staff?.filter(s => 
     s.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     s.position.toLowerCase().includes(searchQuery.toLowerCase())
@@ -242,7 +247,13 @@ export default function KaryawanPage() {
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="rounded-full h-8 w-8"><MoreVertical className="h-4 w-4" /></Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-48 rounded-xl p-2">
+                          <DropdownMenuContent align="end" className="w-56 rounded-xl p-2">
+                            <DropdownMenuItem 
+                              onClick={() => handleGenerateSlip(s.id)}
+                              className="cursor-pointer text-green-700 font-bold"
+                            >
+                              <Printer className="mr-2 h-4 w-4" /> Cetak Slip Gaji
+                            </DropdownMenuItem>
                             <DropdownMenuItem 
                               onClick={() => {
                                 setSelectedStaff(s)
