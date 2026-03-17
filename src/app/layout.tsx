@@ -1,6 +1,7 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: 'SITU HANURA | Sistem Informasi Terpadu Partai Hanura Kota Tanjungpinang',
@@ -22,6 +23,7 @@ export default function RootLayout({
       <body className="font-body antialiased min-h-screen bg-background">
         <FirebaseClientProvider>
           {children}
+          <Toaster />
         </FirebaseClientProvider>
       </body>
     </html>

@@ -41,6 +41,16 @@ export default function LoginPage() {
     const emailInput = formData.get('email') as string;
     const password = formData.get('password') as string;
     
+    if (!emailInput || !password) {
+      toast({
+        variant: 'destructive',
+        title: 'Input Kosong',
+        description: 'Silakan isi username dan password.'
+      });
+      setLoading(false);
+      return;
+    }
+
     const email = formatEmail(emailInput);
 
     try {
@@ -49,13 +59,22 @@ export default function LoginPage() {
         title: 'Login Berhasil', 
         description: 'Mengarahkan Anda ke Dashboard...' 
       });
-      // setLoading(false) is handled by navigation or can be called here
+      // Redirect handled by useEffect
     } catch (err: any) {
       console.error("Login error:", err);
+      let message = "Username atau password salah.";
+      if (err.code === 'auth/user-not-found') {
+        message = "Akun tidak ditemukan. Silakan Daftar terlebih dahulu.";
+      } else if (err.code === 'auth/wrong-password') {
+        message = "Password yang Anda masukkan salah.";
+      } else if (err.code === 'auth/invalid-credential') {
+        message = "Kredensial tidak valid. Periksa kembali username/password.";
+      }
+      
       toast({ 
         variant: 'destructive', 
-        title: 'Login Gagal', 
-        description: "Username/Email atau password salah. Pastikan Anda sudah terdaftar." 
+        title: 'Gagal Masuk', 
+        description: message 
       });
       setLoading(false);
     }
@@ -67,9 +86,19 @@ export default function LoginPage() {
 
     setLoading(true);
     const formData = new FormData(e.currentTarget);
-    const emailInput = formData.get('email') as string;
+    const emailInput = (formData.get('email') as string)?.trim();
     const password = formData.get('password') as string;
     
+    if (!emailInput || !password) {
+      toast({
+        variant: 'destructive',
+        title: 'Input Kosong',
+        description: 'Silakan isi username dan password baru.'
+      });
+      setLoading(false);
+      return;
+    }
+
     const email = formatEmail(emailInput);
     
     try {
@@ -77,7 +106,7 @@ export default function LoginPage() {
       const newUser = userCredential.user;
 
       // Special check for primary admin AGUS (case insensitive)
-      const isAdminAgus = email.split('@')[0] === 'agus';
+      const isAdminAgus = emailInput.toLowerCase() === 'agus';
 
       const userProfile = {
         id: newUser.uid,
@@ -94,8 +123,8 @@ export default function LoginPage() {
       if (isAdminAgus) {
         setDocumentNonBlocking(doc(firestore, 'roles_admin', newUser.uid), { active: true }, { merge: true });
         toast({ 
-          title: 'Akun Admin Berhasil Dibuat', 
-          description: 'Selamat datang, Bapak Agus. Akun Anda otomatis aktif.' 
+          title: 'Akun Admin Aktif', 
+          description: 'Selamat datang Pak Agus. Akun Anda telah otomatis diverifikasi.' 
         });
       } else {
         toast({ 
@@ -108,7 +137,7 @@ export default function LoginPage() {
       console.error("Signup error:", err);
       let message = "Terjadi kesalahan saat mendaftar.";
       if (err.code === 'auth/email-already-in-use') {
-        message = "Username/Email ini sudah terdaftar.";
+        message = "Username ini sudah terdaftar. Silakan gunakan menu Masuk.";
       } else if (err.code === 'auth/weak-password') {
         message = "Password minimal harus 6 karakter.";
       }
