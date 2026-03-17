@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -23,8 +24,10 @@ import {
   ShieldCheck,
   CheckCircle,
   Download,
-  X
+  X,
+  Image as ImageIcon
 } from "lucide-react"
+import { toPng } from 'html-to-image'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -69,9 +72,7 @@ function terbilang(n: number): string {
   if (n < 12) res = unit[n];
   else if (n < 20) res = terbilang(n - 10) + " Belas";
   else if (n < 100) res = terbilang(Math.floor(n / 10)) + " Puluh " + terbilang(n % 10);
-  else if (n < 200) res = "Seratus " + terbilang(n - 100);
   else if (n < 1000) res = terbilang(Math.floor(n / 100)) + " Ratus " + terbilang(n % 100);
-  else if (n < 2000) res = "Seribu " + terbilang(n - 1000);
   else if (n < 1000000) res = terbilang(Math.floor(n / 1000)) + " Ribu " + terbilang(n % 1000);
   else if (n < 1000000000) res = terbilang(Math.floor(n / 1000000)) + " Juta " + terbilang(n % 1000000);
   
@@ -83,10 +84,12 @@ export default function KaryawanPage() {
   const { user, isUserLoading } = useUser()
   const firestore = useFirestore()
   const { toast } = useToast()
+  const slipRef = React.useRef<HTMLDivElement>(null)
 
   const [isStaffDialogOpen, setIsStaffDialogOpen] = React.useState(false)
   const [isFinanceDialogOpen, setIsFinanceDialogOpen] = React.useState(false)
   const [isSlipDialogOpen, setIsSlipDialogOpen] = React.useState(false)
+  const [isImageGenerating, setIsImageGenerating] = React.useState(false)
   const [editingStaff, setEditingStaff] = React.useState<StaffMember | null>(null)
   const [selectedStaff, setSelectedStaff] = React.useState<StaffMember | null>(null)
   const [financeType, setFinanceType] = React.useState<'CashAdvance' | 'SalarySlip'>('CashAdvance')
@@ -193,6 +196,31 @@ export default function KaryawanPage() {
 
   const handlePrint = () => {
     window.print()
+  }
+
+  const handleDownloadImage = async () => {
+    if (slipRef.current === null) return
+    setIsImageGenerating(true)
+    try {
+      const dataUrl = await toPng(slipRef.current, { cacheBust: true, pixelRatio: 2 })
+      const link = document.createElement('a')
+      link.download = `Slip-Gaji-${selectedStaff?.fullName}-${new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}.png`
+      link.href = dataUrl
+      link.click()
+      toast({
+        title: "Gambar Berhasil Dibuat",
+        description: "Slip gaji telah diunduh sebagai file gambar PNG.",
+      })
+    } catch (err) {
+      console.error(err)
+      toast({
+        variant: "destructive",
+        title: "Gagal Membuat Gambar",
+        description: "Terjadi kesalahan saat mengonversi slip gaji menjadi gambar.",
+      })
+    } finally {
+      setIsImageGenerating(false)
+    }
   }
 
   const filteredStaff = staff?.filter(s => 
@@ -322,7 +350,7 @@ export default function KaryawanPage() {
                               }}
                               className="cursor-pointer text-green-700 font-bold"
                             >
-                              <Printer className="mr-2 h-4 w-4" /> Cetak Slip Gaji
+                              <Printer className="mr-2 h-4 w-4" /> Cetak / Unduh Slip Gaji
                             </DropdownMenuItem>
                             <DropdownMenuItem 
                               onClick={() => {
@@ -490,6 +518,16 @@ export default function KaryawanPage() {
                   <span className="text-xs font-bold uppercase tracking-wider">Pratinjau Slip Gaji (14.8 x 21 cm)</span>
                 </div>
                 <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handleDownloadImage} 
+                    className="h-8 rounded-full border-accent text-accent hover:bg-accent hover:text-white"
+                    disabled={isImageGenerating}
+                  >
+                    {isImageGenerating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <ImageIcon className="mr-2 h-4 w-4" />}
+                    Unduh Gambar
+                  </Button>
                   <Button variant="outline" size="sm" onClick={handlePrint} className="h-8 rounded-full border-primary text-primary hover:bg-primary hover:text-white">
                     <Printer className="mr-2 h-4 w-4" /> Cetak Slip
                   </Button>
@@ -501,9 +539,13 @@ export default function KaryawanPage() {
 
               {/* Document Container */}
               <div className="flex-1 overflow-auto p-4 flex justify-center bg-slate-200 print:bg-white print:p-0">
-                <div id="slip-gaji-print" className="bg-white w-full max-w-[148mm] min-h-[210mm] p-8 flex flex-col shadow-lg border border-slate-300 print:shadow-none print:border-none print:max-w-none print:w-full">
+                <div 
+                  id="slip-gaji-print" 
+                  ref={slipRef}
+                  className="bg-white w-full max-w-[148mm] min-h-[210mm] p-8 flex flex-col shadow-lg border border-slate-300 print:shadow-none print:border-none print:max-w-none print:w-full"
+                >
                   
-                  {/* Header Teks Sesuai Gambar */}
+                  {/* Header Teks */}
                   <div className="text-center space-y-1 mb-6 border-b pb-4">
                     <h1 className="text-xl font-black uppercase tracking-tight">HANURA KOTA TANJUNGPINANG</h1>
                     <p className="text-[10px] font-medium text-slate-600">Jl. Gatot Subroto No. 12, Tanjungpinang, Kepulauan Riau</p>
@@ -585,7 +627,7 @@ export default function KaryawanPage() {
                     </div>
                   </div>
 
-                  {/* Penerimaan Bersih Sesuai Gambar */}
+                  {/* Penerimaan Bersih */}
                   <div className="border-2 border-black p-3 mb-4 bg-slate-100">
                     <div className="flex justify-between items-center mb-1">
                       <span className="font-black text-sm uppercase">Penerimaan Bersih (A-B)</span>
