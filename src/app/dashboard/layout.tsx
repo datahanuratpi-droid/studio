@@ -67,7 +67,7 @@ function SidebarItem({ href, icon, label, active, onClick, subItems }: SidebarIt
           <Button
             variant="ghost"
             className={cn(
-              "w-full justify-between px-3 py-2 h-10 font-medium transition-all hover:bg-accent/10",
+              "w-full justify-between px-3 py-2 h-10 font-medium transition-all hover:bg-accent/10 hover:text-black dark:hover:text-white",
               active && "bg-accent/5 text-primary"
             )}
           >
@@ -85,7 +85,7 @@ function SidebarItem({ href, icon, label, active, onClick, subItems }: SidebarIt
                 variant="ghost"
                 size="sm"
                 className={cn(
-                  "w-full justify-start h-9 text-muted-foreground font-normal hover:text-primary hover:bg-accent/5",
+                  "w-full justify-start h-9 text-muted-foreground font-normal hover:text-black dark:hover:text-white hover:bg-accent/5",
                   pathname === subItem.href && "text-primary font-medium bg-accent/5"
                 )}
               >
@@ -104,7 +104,7 @@ function SidebarItem({ href, icon, label, active, onClick, subItems }: SidebarIt
       <Button
         variant="ghost"
         className={cn(
-          "w-full justify-start px-3 py-2 h-10 font-medium transition-all hover:bg-accent/10",
+          "w-full justify-start px-3 py-2 h-10 font-medium transition-all hover:bg-accent/10 hover:text-black dark:hover:text-white",
           active && "bg-accent/10 text-primary border-r-2 border-primary rounded-none"
         )}
       >
@@ -257,7 +257,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest opacity-60">DPC Hanura Tanjungpinang</p>
           <Button 
             variant="ghost" 
-            className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl"
+            className="w-full justify-start text-destructive hover:text-black dark:hover:text-white hover:bg-destructive/10 rounded-xl"
             onClick={handleLogout}
           >
             <LogOut className="mr-3 h-5 w-5" /> Keluar
@@ -346,14 +346,14 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
+                <DropdownMenuItem asChild className="rounded-xl cursor-pointer hover:text-black dark:hover:text-white">
                   <Link href="/dashboard/pengaturan"><UserIcon className="mr-2 h-4 w-4" /> Profil</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild className="rounded-xl cursor-pointer">
+                <DropdownMenuItem asChild className="rounded-xl cursor-pointer hover:text-black dark:hover:text-white">
                   <Link href="/dashboard/pengaturan"><Settings className="mr-2 h-4 w-4" /> Pengaturan</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive font-bold rounded-xl cursor-pointer" onClick={handleLogout}>
+                <DropdownMenuItem className="text-destructive font-bold rounded-xl cursor-pointer hover:text-black dark:hover:text-white" onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" /> Keluar
                 </DropdownMenuItem>
               </DropdownMenuContent>
