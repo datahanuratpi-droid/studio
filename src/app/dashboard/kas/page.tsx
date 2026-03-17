@@ -52,7 +52,7 @@ import {
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useFirestore, useUser, addDocumentNonBlocking, useCollection, useMemoFirebase, deleteDocumentNonBlocking } from "@/firebase"
+import { useFirestore, useUser, addDocumentNonBlocking, useCollection, useMemoFirebase, deleteDocumentNonBlocking, useDoc } from "@/firebase"
 import { collection, doc, writeBatch } from "firebase/firestore"
 import { FinancialTransaction } from "@/lib/types"
 import { useToast } from "@/hooks/use-toast"
@@ -69,6 +69,14 @@ export default function KasOfficePage() {
   const firestore = useFirestore()
   const { user } = useUser()
   const { toast } = useToast()
+
+  const userDocRef = useMemoFirebase(() => {
+    if (!firestore || !user?.uid) return null
+    return doc(firestore, 'users', user.uid)
+  }, [firestore, user?.uid])
+  const { data: profile } = useDoc(userDocRef)
+
+  const isAdmin = profile?.role === 'Admin'
 
   const transRef = useMemoFirebase(() => collection(firestore, "financial_transactions"), [firestore])
   const { data: transactions, isLoading } = useCollection<FinancialTransaction>(transRef)
@@ -135,16 +143,21 @@ export default function KasOfficePage() {
     if (!transactions) return []
     let filtered = transactions
     
-    if (activeTab === "rutin") filtered = transactions.filter(t => t.type === 'Receipt' || t.type === 'Payment')
-    else if (activeTab === "kasbon") filtered = transactions.filter(t => t.type === 'CashAdvance')
-    else if (activeTab === "gaji") filtered = transactions.filter(t => t.type === 'SalarySlip')
+    // Non-admins can only see routine transactions in "all" or filtered tabs
+    if (!isAdmin) {
+      filtered = filtered.filter(t => t.type === 'Receipt' || t.type === 'Payment')
+    }
+
+    if (activeTab === "rutin") filtered = filtered.filter(t => t.type === 'Receipt' || t.type === 'Payment')
+    else if (activeTab === "kasbon") filtered = filtered.filter(t => t.type === 'CashAdvance')
+    else if (activeTab === "gaji") filtered = filtered.filter(t => t.type === 'SalarySlip')
 
     if (searchQuery) {
       filtered = filtered.filter(t => t.description.toLowerCase().includes(searchQuery.toLowerCase()))
     }
 
     return filtered
-  }, [transactions, activeTab, searchQuery])
+  }, [transactions, activeTab, searchQuery, isAdmin])
 
   const sortedTransactions = [...filteredTransactions].sort((a, b) => 
     new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime()
@@ -158,7 +171,7 @@ export default function KasOfficePage() {
           <p className="text-sm text-muted-foreground">Catat Pemasukan dan Pengeluaran Operasional Kantor.</p>
         </div>
         <div className="flex flex-wrap gap-2 w-full lg:w-auto">
-           {isFirstDayOfMonth && (
+           {isAdmin && isFirstDayOfMonth && (
              <Button 
                variant="outline" 
                className="border-amber-500 text-amber-700 hover:bg-amber-50 h-11 px-6 rounded-full"
@@ -223,8 +236,12 @@ export default function KasOfficePage() {
           <TabsList className="bg-white border p-1 rounded-2xl shadow-sm h-12 w-full sm:w-auto">
             <TabsTrigger value="all" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-white text-xs">Semua</TabsTrigger>
             <TabsTrigger value="rutin" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-white text-xs">Operasional</TabsTrigger>
-            <TabsTrigger value="kasbon" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-white text-xs">Kasbon</TabsTrigger>
-            <TabsTrigger value="gaji" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-white text-xs">Gaji</TabsTrigger>
+            {isAdmin && (
+              <>
+                <TabsTrigger value="kasbon" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-white text-xs">Kasbon</TabsTrigger>
+                <TabsTrigger value="gaji" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-white text-xs">Gaji</TabsTrigger>
+              </>
+            )}
           </TabsList>
           <div className="relative w-full sm:max-w-xs">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -280,7 +297,7 @@ export default function KasOfficePage() {
                       <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="rounded-full h-8 w-8"><MoreVertical className="h-4 w-4" /></Button></DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48 rounded-xl p-2">
                         <DropdownMenuItem onClick={() => setViewingTransaction(t)} className="cursor-pointer rounded-lg"><Eye className="mr-2 h-4 w-4" /> Detail</DropdownMenuItem>
-                        {!t.isClosed && (
+                        {isAdmin && !t.isClosed && (
                           <DropdownMenuItem onClick={() => handleDelete(t.id)} className="text-red-600 cursor-pointer rounded-lg"><Trash2 className="mr-2 h-4 w-4" /> Hapus</DropdownMenuItem>
                         )}
                       </DropdownMenuContent>
@@ -288,6 +305,13 @@ export default function KasOfficePage() {
                   </TableCell>
                 </TableRow>
               ))}
+              {sortedTransactions.length === 0 && !isLoading && (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-20 text-muted-foreground">
+                    Tidak ada data transaksi ditemukan.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>

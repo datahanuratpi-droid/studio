@@ -2,6 +2,7 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 import { Plus, Users, Search, Edit, Trash2, Loader2, Banknote, UserPlus, Phone, Briefcase, Wallet, Receipt, Calculator, MoreVertical, Printer } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -29,7 +30,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useFirestore, useCollection, useMemoFirebase, useUser, addDocumentNonBlocking, deleteDocumentNonBlocking, updateDocumentNonBlocking } from "@/firebase"
+import { useFirestore, useCollection, useMemoFirebase, useUser, addDocumentNonBlocking, deleteDocumentNonBlocking, updateDocumentNonBlocking, useDoc } from "@/firebase"
 import { collection, doc } from "firebase/firestore"
 import { StaffMember, FinancialTransaction } from "@/lib/types"
 import { useToast } from "@/hooks/use-toast"
@@ -37,16 +38,35 @@ import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export default function KaryawanPage() {
+  const router = useRouter()
+  const { user, isUserLoading } = useUser()
+  const firestore = useFirestore()
+  const { toast } = useToast()
+
   const [isStaffDialogOpen, setIsStaffDialogOpen] = React.useState(false)
   const [isFinanceDialogOpen, setIsFinanceDialogOpen] = React.useState(false)
   const [editingStaff, setEditingStaff] = React.useState<StaffMember | null>(null)
   const [selectedStaff, setSelectedStaff] = React.useState<StaffMember | null>(null)
   const [financeType, setFinanceType] = React.useState<'CashAdvance' | 'SalarySlip'>('CashAdvance')
   const [searchQuery, setSearchQuery] = React.useState("")
-  
-  const firestore = useFirestore()
-  const { user } = useUser()
-  const { toast } = useToast()
+
+  // Role Protection
+  const userDocRef = useMemoFirebase(() => {
+    if (!firestore || !user?.uid) return null
+    return doc(firestore, 'users', user.uid)
+  }, [firestore, user?.uid])
+  const { data: profile, isLoading: isProfileLoading } = useDoc(userDocRef)
+
+  React.useEffect(() => {
+    if (!isUserLoading && !isProfileLoading && profile && profile.role !== 'Admin') {
+      toast({
+        variant: "destructive",
+        title: "Akses Ditolak",
+        description: "Hanya Admin yang dapat mengakses menu Karyawan."
+      })
+      router.replace("/dashboard")
+    }
+  }, [profile, isUserLoading, isProfileLoading, router, toast])
 
   // Fetch Staff
   const staffRef = useMemoFirebase(() => collection(firestore, "staff_members"), [firestore])
@@ -132,6 +152,14 @@ export default function KaryawanPage() {
     s.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     s.position.toLowerCase().includes(searchQuery.toLowerCase())
   )
+
+  if (isUserLoading || isProfileLoading || (profile && profile.role !== 'Admin')) {
+    return (
+      <div className="flex h-[60vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -257,6 +285,13 @@ export default function KaryawanPage() {
                   </TableRow>
                 )
               })}
+              {(!filteredStaff || filteredStaff.length === 0) && !isLoading && (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-20 text-muted-foreground">
+                    Belum ada data karyawan.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>

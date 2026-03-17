@@ -52,10 +52,9 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // --- Master Data Karyawan ---
+    // --- Master Data Karyawan (Admin Only) ---
     match /staff_members/{id} {
-      allow read: if (isStaff() || isAdmin()) && isActive();
-      allow write: if isAdmin() && isActive();
+      allow read, write: if isAdmin() && isActive();
     }
 
     // --- Common Access (Surat, Laporan, Kas) ---
@@ -68,6 +67,7 @@ service cloud.firestore {
     }
 
     match /financial_transactions/{id} {
+      // Allow read for staff, but we'll handle sensitive data filtering in UI
       allow read, write: if (isStaff() || isAdmin()) && isActive();
     }
 
@@ -75,6 +75,11 @@ service cloud.firestore {
     match /library_items/{id} {
       allow read: if isSignedIn() && isActive();
       allow write: if isAdmin() && isActive();
+    }
+    
+    // --- Digital Archives ---
+    match /digital_archives/{id} {
+      allow read, write: if (isStaff() || isAdmin()) && isActive();
     }
   }
 }
