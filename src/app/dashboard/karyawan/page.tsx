@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -204,7 +205,6 @@ export default function KaryawanPage() {
     const fileName = `Slip-Gaji-${selectedStaff.fullName}-${new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}.png`
 
     try {
-      // First attempt with full features (including fonts)
       const dataUrl = await toPng(slipRef.current, { 
         cacheBust: true, 
         pixelRatio: 3, 
@@ -223,7 +223,6 @@ export default function KaryawanPage() {
     } catch (err) {
       console.warn("Initial image generation failed, trying fallback:", err)
       try {
-        // Fallback: skip fonts which is the common cause of SecurityError with cross-origin stylesheets
         const dataUrl = await toPng(slipRef.current, { 
           skipFonts: true,
           pixelRatio: 2,
@@ -530,7 +529,7 @@ export default function KaryawanPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Slip Gaji Dialog - A5 Size (14.8 x 21 cm) */}
+      {/* Slip Gaji Dialog - A5 Size (14.8 x 21 cm) - Added robust scroll support */}
       <Dialog open={isSlipDialogOpen} onOpenChange={setIsSlipDialogOpen}>
         <DialogContent className="max-w-[650px] w-full p-0 border-none rounded-none overflow-hidden shadow-2xl max-h-[98vh] flex flex-col bg-white print:fixed print:inset-0 print:z-[100] print:m-0 print:p-0">
           <DialogHeader className="sr-only">
@@ -539,12 +538,12 @@ export default function KaryawanPage() {
           </DialogHeader>
           
           {selectedStaff && (
-            <div className="flex flex-col h-full bg-white font-body text-slate-900">
+            <div className="flex flex-col h-full bg-white font-body text-slate-900 overflow-hidden">
               {/* Toolbar */}
-              <header className="h-12 bg-slate-100 flex items-center justify-between px-6 shrink-0 border-b print-hidden">
+              <header className="h-12 bg-slate-100 flex items-center justify-between px-6 shrink-0 border-b print-hidden z-20">
                 <div className="flex items-center gap-2">
                   <FileText className="h-4 w-4 text-primary" />
-                  <span className="text-xs font-bold uppercase tracking-wider">Pratinjau Slip Gaji (14.8 x 21 cm)</span>
+                  <span className="text-xs font-bold uppercase tracking-wider">Pratinjau Slip Gaji (A5)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button 
@@ -566,119 +565,121 @@ export default function KaryawanPage() {
                 </div>
               </header>
 
-              {/* Document Container */}
-              <div className="flex-1 overflow-auto p-4 flex justify-center bg-slate-200 print:bg-white print:p-0">
-                <div 
-                  id="slip-gaji-print" 
-                  ref={slipRef}
-                  className="bg-white w-full max-w-[148mm] min-h-[210mm] p-8 flex flex-col shadow-lg border border-slate-300 print:shadow-none print:border-none print:max-w-none print:w-full"
-                >
-                  
-                  {/* Header Teks */}
-                  <div className="text-center space-y-1 mb-6 border-b pb-4">
-                    <h1 className="text-xl font-black uppercase tracking-tight">HANURA KOTA TANJUNGPINANG</h1>
-                    <p className="text-[10px] font-medium text-slate-600">Jl Gatot Subroto ( Depan Gerbang Rawasari ) , Tanjungpinang</p>
-                  </div>
+              {/* Document Container with Scroll */}
+              <div className="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-200 print:bg-white print:p-0 custom-scrollbar">
+                <div className="flex justify-center min-h-full">
+                  <div 
+                    id="slip-gaji-print" 
+                    ref={slipRef}
+                    className="bg-white w-full max-w-[148mm] min-h-[210mm] p-8 flex flex-col shadow-xl border border-slate-300 print:shadow-none print:border-none print:max-w-none print:w-full shrink-0"
+                  >
+                    
+                    {/* Header Teks */}
+                    <div className="text-center space-y-1 mb-6 border-b pb-4">
+                      <h1 className="text-xl font-black uppercase tracking-tight">HANURA KOTA TANJUNGPINANG</h1>
+                      <p className="text-[10px] font-medium text-slate-600">Jl Gatot Subroto ( Depan Gerbang Rawasari ) , Tanjungpinang</p>
+                    </div>
 
-                  {/* Judul Dokumen */}
-                  <div className="text-center space-y-1 mb-6">
-                    <h2 className="text-lg font-black uppercase tracking-[0.2em] border-y-2 border-black py-1">SLIP GAJI KARYAWAN</h2>
-                    <p className="text-[11px] font-bold mt-2">Periode {new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}</p>
-                  </div>
+                    {/* Judul Dokumen */}
+                    <div className="text-center space-y-1 mb-6">
+                      <h2 className="text-lg font-black uppercase tracking-[0.2em] border-y-2 border-black py-1">SLIP GAJI KARYAWAN</h2>
+                      <p className="text-[11px] font-bold mt-2">Periode {new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}</p>
+                    </div>
 
-                  {/* Informasi Staf */}
-                  <div className="grid grid-cols-[100px_1fr] gap-y-1 text-xs mb-6 px-2">
-                    <span className="font-bold">NIK</span>
-                    <span className="uppercase">: {selectedStaff.id.slice(0, 10).toUpperCase()}</span>
-                    <span className="font-bold">Nama</span>
-                    <span className="uppercase">: {selectedStaff.fullName}</span>
-                    <span className="font-bold">Pengurus</span>
-                    <span className="uppercase">: {selectedStaff.position}</span>
-                  </div>
+                    {/* Informasi Staf */}
+                    <div className="grid grid-cols-[100px_1fr] gap-y-1 text-xs mb-6 px-2">
+                      <span className="font-bold">NIK</span>
+                      <span className="uppercase">: {selectedStaff.id.slice(0, 10).toUpperCase()}</span>
+                      <span className="font-bold">Nama</span>
+                      <span className="uppercase">: {selectedStaff.fullName}</span>
+                      <span className="font-bold">Pengurus</span>
+                      <span className="uppercase">: {selectedStaff.position}</span>
+                    </div>
 
-                  {/* Tabel Utama Penghasilan & Potongan */}
-                  <div className="grid grid-cols-2 border-2 border-black mb-6">
-                    {/* Kolom Penghasilan */}
-                    <div className="border-r-2 border-black">
-                      <div className="bg-slate-100 py-1.5 px-3 border-b-2 border-black font-black text-xs uppercase tracking-wider">
-                        PENGHASILAN
+                    {/* Tabel Utama Penghasilan & Potongan */}
+                    <div className="grid grid-cols-2 border-2 border-black mb-6">
+                      {/* Kolom Penghasilan */}
+                      <div className="border-r-2 border-black">
+                        <div className="bg-slate-100 py-1.5 px-3 border-b-2 border-black font-black text-xs uppercase tracking-wider">
+                          PENGHASILAN
+                        </div>
+                        <div className="p-3 space-y-2 text-[11px] min-h-[140px]">
+                          <div className="flex justify-between">
+                            <span>Gaji Pokok</span>
+                            <span>Rp {selectedStaff.baseSalary.toLocaleString('id-ID')}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Tunjangan Jabatan</span>
+                            <span>Rp 0</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Tunjangan Makan</span>
+                            <span>Rp 0</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Bonus Kinerja</span>
+                            <span>Rp 0</span>
+                          </div>
+                        </div>
+                        <div className="border-t-2 border-black py-1.5 px-3 bg-slate-50 font-black text-[11px] flex justify-between">
+                          <span>Total Penghasilan (A)</span>
+                          <span>{selectedStaff.baseSalary.toLocaleString('id-ID')}</span>
+                        </div>
                       </div>
-                      <div className="p-3 space-y-2 text-[11px] min-h-[140px]">
-                        <div className="flex justify-between">
-                          <span>Gaji Pokok</span>
-                          <span>Rp {selectedStaff.baseSalary.toLocaleString('id-ID')}</span>
+
+                      {/* Kolom Potongan */}
+                      <div>
+                        <div className="bg-slate-100 py-1.5 px-3 border-b-2 border-black font-black text-xs uppercase tracking-wider">
+                          POTONGAN
                         </div>
-                        <div className="flex justify-between">
-                          <span>Tunjangan Jabatan</span>
-                          <span>Rp 0</span>
+                        <div className="p-3 space-y-2 text-[11px] min-h-[140px]">
+                          <div className="flex justify-between">
+                            <span>Potongan Kasbon</span>
+                            <span className="text-red-600">Rp {getOutstandingKasbon(selectedStaff.id).toLocaleString('id-ID')}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>BPJS Kesehatan</span>
+                            <span>Rp 0</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>BPJS Ketenagakerjaan</span>
+                            <span>Rp 0</span>
+                          </div>
                         </div>
-                        <div className="flex justify-between">
-                          <span>Tunjangan Makan</span>
-                          <span>Rp 0</span>
+                        <div className="border-t-2 border-black py-1.5 px-3 bg-slate-50 font-black text-[11px] flex justify-between">
+                          <span>Total Potongan (B)</span>
+                          <span className="text-red-600">{getOutstandingKasbon(selectedStaff.id).toLocaleString('id-ID')}</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span>Bonus Kinerja</span>
-                          <span>Rp 0</span>
-                        </div>
-                      </div>
-                      <div className="border-t-2 border-black py-1.5 px-3 bg-slate-50 font-black text-[11px] flex justify-between">
-                        <span>Total Penghasilan (A)</span>
-                        <span>{selectedStaff.baseSalary.toLocaleString('id-ID')}</span>
                       </div>
                     </div>
 
-                    {/* Kolom Potongan */}
-                    <div>
-                      <div className="bg-slate-100 py-1.5 px-3 border-b-2 border-black font-black text-xs uppercase tracking-wider">
-                        POTONGAN
+                    {/* Penerimaan Bersih */}
+                    <div className="border-2 border-black p-3 mb-4 bg-slate-100">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="font-black text-sm uppercase">Penerimaan Bersih (A-B)</span>
+                        <span className="font-black text-lg">Rp {(selectedStaff.baseSalary - getOutstandingKasbon(selectedStaff.id)).toLocaleString('id-ID')}</span>
                       </div>
-                      <div className="p-3 space-y-2 text-[11px] min-h-[140px]">
-                        <div className="flex justify-between">
-                          <span>Potongan Kasbon</span>
-                          <span className="text-red-600">Rp {getOutstandingKasbon(selectedStaff.id).toLocaleString('id-ID')}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>BPJS Kesehatan</span>
-                          <span>Rp 0</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>BPJS Ketenagakerjaan</span>
-                          <span>Rp 0</span>
-                        </div>
-                      </div>
-                      <div className="border-t-2 border-black py-1.5 px-3 bg-slate-50 font-black text-[11px] flex justify-between">
-                        <span>Total Potongan (B)</span>
-                        <span className="text-red-600">{getOutstandingKasbon(selectedStaff.id).toLocaleString('id-ID')}</span>
+                      <div className="text-[10px] italic flex gap-2">
+                        <span className="font-bold whitespace-nowrap">Terbilang:</span>
+                        <span className="capitalize">{terbilang(selectedStaff.baseSalary - getOutstandingKasbon(selectedStaff.id))} Rupiah</span>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Penerimaan Bersih */}
-                  <div className="border-2 border-black p-3 mb-4 bg-slate-100">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="font-black text-sm uppercase">Penerimaan Bersih (A-B)</span>
-                      <span className="font-black text-lg">Rp {(selectedStaff.baseSalary - getOutstandingKasbon(selectedStaff.id)).toLocaleString('id-ID')}</span>
+                    {/* Footer Tanda Tangan */}
+                    <div className="mt-auto grid grid-cols-2 pt-10 px-4">
+                      <div className="text-center space-y-16">
+                        <p className="text-[10px] font-bold">Penerima,</p>
+                        <p className="text-[10px] font-black underline uppercase">{selectedStaff.fullName}</p>
+                      </div>
+                      <div className="text-center space-y-16">
+                        <p className="text-[10px] font-bold">Bendahara,</p>
+                        <p className="text-[10px] font-black underline uppercase">ENDANG WIRNANTO</p>
+                      </div>
                     </div>
-                    <div className="text-[10px] italic flex gap-2">
-                      <span className="font-bold whitespace-nowrap">Terbilang:</span>
-                      <span className="capitalize">{terbilang(selectedStaff.baseSalary - getOutstandingKasbon(selectedStaff.id))} Rupiah</span>
-                    </div>
-                  </div>
 
-                  {/* Footer Tanda Tangan */}
-                  <div className="mt-auto grid grid-cols-2 pt-10 px-4">
-                    <div className="text-center space-y-16">
-                      <p className="text-[10px] font-bold">Penerima,</p>
-                      <p className="text-[10px] font-black underline uppercase">{selectedStaff.fullName}</p>
+                    <div className="mt-10 text-center">
+                      <p className="text-[8px] text-slate-400 font-mono">Dihasilkan oleh SITU HANURA System • {new Date().toLocaleString('id-ID')}</p>
                     </div>
-                    <div className="text-center space-y-16">
-                      <p className="text-[10px] font-bold">Bendahara,</p>
-                      <p className="text-[10px] font-black underline uppercase">ENDANG WIRNANTO</p>
-                    </div>
-                  </div>
-
-                  <div className="mt-10 text-center">
-                    <p className="text-[8px] text-slate-400 font-mono">Dihasilkan oleh SITU HANURA System • {new Date().toLocaleString('id-ID')}</p>
                   </div>
                 </div>
               </div>
