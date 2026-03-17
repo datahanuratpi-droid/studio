@@ -12,19 +12,22 @@ import {
   ArrowUpRight,
   Clock,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Inbox,
+  Send
 } from "lucide-react"
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
 
 export default function DashboardPage() {
   const stats = [
-    { label: "Surat Masuk", value: "24", icon: <Mail className="h-5 w-5" />, color: "text-blue-600", bg: "bg-blue-100", trend: "+12%" },
-    { label: "Laporan Baru", value: "8", icon: <FileText className="h-5 w-5" />, color: "text-green-600", bg: "bg-green-100", trend: "+5%" },
-    { label: "Arsip Total", value: "1,248", icon: <Archive className="h-5 w-5" />, color: "text-purple-600", bg: "bg-purple-100", trend: "+2" },
-    { label: "Saldo Kas", value: "Rp 12.5M", icon: <Wallet className="h-5 w-5" />, color: "text-amber-600", bg: "bg-amber-100", trend: "-Rp 500k" },
+    { label: "Surat Masuk", value: "24", icon: <Inbox />, color: "text-blue-600", bg: "bg-blue-100", trend: "+12%" },
+    { label: "Laporan Baru", value: "8", icon: <FileText />, color: "text-green-600", bg: "bg-green-100", trend: "+5%" },
+    { label: "Arsip Total", value: "1.248", icon: <Archive />, color: "text-purple-600", bg: "bg-purple-100", trend: "+2" },
+    { label: "Saldo Kas", value: "Rp 12.5M", icon: <Wallet />, color: "text-amber-600", bg: "bg-amber-100", trend: "-Rp 500k" },
   ]
 
   const recentActivities = [
@@ -38,7 +41,7 @@ export default function DashboardPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-headline font-bold text-primary">Dashboard Overview</h1>
-        <p className="text-muted-foreground">Selamat datang di sistem manajemen OfficeFlow.</p>
+        <p className="text-muted-foreground">Ringkasan status operasional sistem OfficeFlow hari ini.</p>
       </div>
 
       {/* Stats Grid */}
@@ -144,8 +147,4 @@ export default function DashboardPage() {
       </div>
     </div>
   )
-}
-
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(' ')
 }
