@@ -45,6 +45,7 @@ import {
 import { useUser, useAuth, useDoc, useFirestore, useMemoFirebase } from "@/firebase"
 import { signOut } from "firebase/auth"
 import { doc } from "firebase/firestore"
+import { Badge } from "@/components/ui/badge"
 
 interface SidebarItemProps {
   href: string
@@ -122,6 +123,24 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const auth = useAuth()
   const firestore = useFirestore()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
+  const [currentTime, setCurrentTime] = React.useState<string | null>(null)
+
+  // Real-time Clock logic
+  React.useEffect(() => {
+    const updateTime = () => {
+      const now = new Date()
+      setCurrentTime(now.toLocaleTimeString('id-ID', { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit',
+        hour12: false 
+      }))
+    }
+    
+    updateTime() // Initial call
+    const timer = setInterval(updateTime, 1000)
+    return () => clearInterval(timer)
+  }, [])
 
   const userDocRef = useMemoFirebase(() => {
     if (!firestore || !user?.uid) return null
@@ -276,6 +295,14 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 placeholder="Cari data..." 
                 className="pl-10 bg-background/50 border-none shadow-none focus-visible:ring-1 focus-visible:ring-accent"
               />
+            </div>
+            
+            {/* Real-time Clock Next to Search */}
+            <div className="hidden md:flex items-center gap-2 px-4 py-1.5 bg-muted/30 rounded-full border border-border/50">
+              <Clock className="h-3.5 w-3.5 text-primary animate-pulse" />
+              <span className="text-xs font-mono font-bold text-primary tabular-nums">
+                {currentTime || "00:00:00"}
+              </span>
             </div>
           </div>
           
