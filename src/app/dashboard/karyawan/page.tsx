@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -491,7 +490,7 @@ export default function KaryawanPage() {
                           <span className="font-bold">JABATAN</span>
                           <span className="uppercase text-right">{selectedStaff.position}</span>
                           <span className="font-bold">Periode Gaji</span>
-                          <span className="text-right">{new Date().toLocaleDateString('id-ID', { month: 'short', year: '2y' })}</span>
+                          <span className="text-right">{new Date().toLocaleDateString('id-ID', { month: 'short', year: 'numeric' })}</span>
                        </div>
                     </div>
                   </div>
