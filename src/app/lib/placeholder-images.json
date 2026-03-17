@@ -1,0 +1,17 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "hero-bg",
+      "description": "Professional office workspace with modern equipment",
+      "imageUrl": "https://picsum.photos/seed/taskflow1/1200/800",
+      "imageHint": "office workspace"
+    },
+    {
+      "id": "team-collab",
+      "description": "Team collaborating on a project",
+      "imageUrl": "https://picsum.photos/seed/taskflow2/600/400",
+      "imageHint": "team collaboration"
+    }
+  ]
+}
