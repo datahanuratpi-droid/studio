@@ -243,7 +243,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
-      <aside className="w-64 border-r bg-card hidden lg:flex flex-col sticky top-0 h-screen z-40">
+      <aside className="w-64 border-r bg-card hidden lg:flex flex-col sticky top-0 h-screen z-40 print:hidden">
         <div className="p-6">
           <Link href="/dashboard" className="flex flex-col items-center justify-center gap-1 mb-8 text-center group">
             <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
@@ -283,7 +283,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       </aside>
 
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 lg:hidden" onClick={() => setIsMobileMenuOpen(false)}>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 lg:hidden print:hidden" onClick={() => setIsMobileMenuOpen(false)}>
           <div className="w-72 h-full bg-card p-6 shadow-2xl animate-in slide-in-from-left duration-300" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-8">
               <div className="flex flex-col">
@@ -312,7 +312,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       )}
 
       <div className="flex-1 flex flex-col min-h-screen">
-        <header className="h-16 border-b bg-card/80 backdrop-blur-md flex items-center justify-between px-4 md:px-6 sticky top-0 z-30">
+        <header className="h-16 border-b bg-card/80 backdrop-blur-md flex items-center justify-between px-4 md:px-6 sticky top-0 z-30 print:hidden">
           <div className="flex items-center gap-4 flex-1">
             <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setIsMobileMenuOpen(true)}>
               <Menu className="h-5 w-5" />
@@ -354,15 +354,15 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="flex-1 p-4 md:p-8 overflow-y-auto">
-          <div className="max-w-7xl mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto print:p-0 print:overflow-visible">
+          <div className="max-w-7xl mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-500 print:max-w-none">
             {children}
           </div>
         </main>
       </div>
 
       <Dialog open={isAboutOpen} onOpenChange={setIsAboutOpen}>
-        <DialogContent className="max-w-4xl p-0 border-none rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in duration-300">
+        <DialogContent className="max-w-4xl p-0 border-none rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in duration-300 print:hidden">
           <DialogHeader className="sr-only">
             <DialogTitle>Tentang SITU HANURA</DialogTitle>
             <DialogDescription>Informasi mengenai Sistem Informasi Terpadu Partai Hanura Kota Tanjungpinang</DialogDescription>

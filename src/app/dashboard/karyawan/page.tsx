@@ -3,7 +3,28 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Users, Search, Edit, Trash2, Loader2, Banknote, UserPlus, Phone, Briefcase, Wallet, Receipt, Calculator, MoreVertical, Printer, FileText } from "lucide-react"
+import { 
+  Plus, 
+  Users, 
+  Search, 
+  Edit, 
+  Trash2, 
+  Loader2, 
+  Banknote, 
+  UserPlus, 
+  Phone, 
+  Briefcase, 
+  Wallet, 
+  Receipt, 
+  Calculator, 
+  MoreVertical, 
+  Printer, 
+  FileText,
+  ArrowLeft,
+  ShieldCheck,
+  CheckCircle,
+  Download
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -45,6 +66,7 @@ export default function KaryawanPage() {
 
   const [isStaffDialogOpen, setIsStaffDialogOpen] = React.useState(false)
   const [isFinanceDialogOpen, setIsFinanceDialogOpen] = React.useState(false)
+  const [isSlipDialogOpen, setIsSlipDialogOpen] = React.useState(false)
   const [editingStaff, setEditingStaff] = React.useState<StaffMember | null>(null)
   const [selectedStaff, setSelectedStaff] = React.useState<StaffMember | null>(null)
   const [financeType, setFinanceType] = React.useState<'CashAdvance' | 'SalarySlip'>('CashAdvance')
@@ -148,9 +170,8 @@ export default function KaryawanPage() {
     toast({ title: "Terhapus", description: "Karyawan telah dihapus dari sistem." })
   }
 
-  const handleGenerateSlip = (staffId: string) => {
-    const url = `/dashboard/karyawan/slip?id=${staffId}`
-    window.open(url, '_blank')
+  const handlePrint = () => {
+    window.print()
   }
 
   const filteredStaff = staff?.filter(s => 
@@ -168,7 +189,7 @@ export default function KaryawanPage() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center print:hidden">
         <div>
           <h1 className="text-3xl font-headline font-bold text-primary">Manajemen Karyawan</h1>
           <p className="text-muted-foreground">Kelola SDM, Kasbon, dan Penggajian Terintegrasi.</p>
@@ -184,7 +205,7 @@ export default function KaryawanPage() {
         </Button>
       </div>
 
-      <div className="flex items-center gap-4 bg-white p-4 rounded-2xl border shadow-sm">
+      <div className="flex items-center gap-4 bg-white p-4 rounded-2xl border shadow-sm print:hidden">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input 
@@ -196,7 +217,7 @@ export default function KaryawanPage() {
         </div>
       </div>
 
-      <Card className="border-none shadow-md overflow-hidden rounded-3xl">
+      <Card className="border-none shadow-md overflow-hidden rounded-3xl print:hidden">
         <CardContent className="p-0">
           <Table>
             <TableHeader className="bg-muted/30">
@@ -249,7 +270,10 @@ export default function KaryawanPage() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-56 rounded-xl p-2">
                             <DropdownMenuItem 
-                              onClick={() => handleGenerateSlip(s.id)}
+                              onClick={() => {
+                                setSelectedStaff(s)
+                                setIsSlipDialogOpen(true)
+                              }}
                               className="cursor-pointer text-green-700 font-bold"
                             >
                               <Printer className="mr-2 h-4 w-4" /> Cetak Slip Gaji
@@ -310,7 +334,7 @@ export default function KaryawanPage() {
 
       {/* Staff Management Dialog */}
       <Dialog open={isStaffDialogOpen} onOpenChange={setIsStaffDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] rounded-3xl p-0 overflow-hidden">
+        <DialogContent className="sm:max-w-[500px] rounded-3xl p-0 overflow-hidden print:hidden">
           <form onSubmit={handleStaffSubmit}>
             <DialogHeader className="p-6 bg-primary text-white">
               <DialogTitle className="text-2xl font-headline font-bold">
@@ -358,7 +382,7 @@ export default function KaryawanPage() {
 
       {/* Finance Action Dialog */}
       <Dialog open={isFinanceDialogOpen} onOpenChange={setIsFinanceDialogOpen}>
-        <DialogContent className="sm:max-w-[480px] rounded-3xl p-0 overflow-hidden">
+        <DialogContent className="sm:max-w-[480px] rounded-3xl p-0 overflow-hidden print:hidden">
           <form onSubmit={handleFinanceSubmit}>
             <DialogHeader className="p-6 bg-primary text-white">
               <DialogTitle className="text-2xl font-headline font-bold">
@@ -401,6 +425,153 @@ export default function KaryawanPage() {
               <Button type="submit" className="flex-1 bg-primary text-white rounded-full font-bold h-11">Proses Transaksi</Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Slip Gaji Floating Dialog */}
+      <Dialog open={isSlipDialogOpen} onOpenChange={setIsSlipDialogOpen}>
+        <DialogContent className="max-w-[850px] w-full p-0 border-none rounded-3xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col bg-[#525659] print:bg-white print:max-h-none print:shadow-none print:fixed print:inset-0 print:z-[100] print:rounded-none">
+          {selectedStaff && (
+            <div className="flex flex-col h-full print:h-auto print:block">
+              {/* Toolbar */}
+              <header className="h-14 bg-[#323639] text-white flex items-center justify-between px-6 shrink-0 print:hidden">
+                <div className="flex items-center gap-4">
+                  <div className="p-1.5 bg-primary rounded shadow-sm">
+                    <Banknote className="h-4 w-4 text-white" />
+                  </div>
+                  <span className="text-sm font-medium">Pratinjau Slip Gaji - {selectedStaff.fullName}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" size="icon" onClick={handlePrint} className="text-white hover:bg-white/10 rounded-full">
+                    <Printer className="h-5 w-5" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => setIsSlipDialogOpen(false)} className="text-white hover:bg-white/10 rounded-full">
+                    <X className="h-5 w-5" />
+                  </Button>
+                </div>
+              </header>
+
+              {/* Printable Content Container */}
+              <div className="flex-1 overflow-auto p-4 md:p-8 flex justify-center print:p-0 print:overflow-visible print:block">
+                <div className="bg-white w-full max-w-[800px] shadow-2xl p-10 md:p-16 flex flex-col min-h-[1000px] print:shadow-none print:p-8 print:min-h-0 print:w-full print:m-0">
+                  
+                  {/* Kop Surat */}
+                  <div className="flex flex-col items-center text-center space-y-4 border-b-4 border-double border-primary pb-6 mb-8">
+                    <div className="flex items-center justify-center gap-5">
+                      <div className="w-14 h-14 bg-primary rounded-xl flex items-center justify-center shadow-lg">
+                        <FileText className="h-8 w-8 text-white" />
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <h1 className="text-lg font-headline font-bold text-primary uppercase tracking-tight">PARTAI HATI NURANI RAKYAT</h1>
+                        <h2 className="text-sm font-bold text-primary uppercase">(HANURA)</h2>
+                        <h3 className="text-[10px] font-bold text-primary uppercase">DEWAN PIMPINAN CABANG KOTA TANJUNGPINANG</h3>
+                      </div>
+                    </div>
+                    <p className="text-[8px] font-medium text-muted-foreground uppercase leading-relaxed max-w-md">
+                      Jl. Gatot Subroto Km. 5 No. 12, Kel. Kampung Bulang, Kec. Tanjungpinang Timur <br />
+                      Kota Tanjungpinang, Provinsi Kepulauan Riau - Kode Pos 29124
+                    </p>
+                  </div>
+
+                  {/* Judul Dokumen */}
+                  <div className="text-center space-y-1 mb-8">
+                    <h2 className="text-base font-black underline uppercase tracking-widest">SLIP GAJI KARYAWAN</h2>
+                    <p className="text-[9px] font-mono font-bold text-muted-foreground">Periode: {new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}</p>
+                  </div>
+
+                  {/* Data Karyawan */}
+                  <div className="grid grid-cols-2 gap-x-8 gap-y-3 mb-10 border p-5 rounded-xl bg-muted/5">
+                    <div className="space-y-0.5">
+                      <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">Nama Karyawan</p>
+                      <p className="text-xs font-bold text-primary uppercase">{selectedStaff.fullName}</p>
+                    </div>
+                    <div className="space-y-0.5">
+                      <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">Jabatan</p>
+                      <p className="text-xs font-bold text-primary uppercase">{selectedStaff.position}</p>
+                    </div>
+                    <div className="space-y-0.5">
+                      <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">Bank / No Rekening</p>
+                      <p className="text-[11px] font-medium text-slate-700">{selectedStaff.bankName || "-"} / {selectedStaff.accountNumber || "-"}</p>
+                    </div>
+                    <div className="space-y-0.5">
+                      <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">Status Pembayaran</p>
+                      <Badge className="bg-green-100 text-green-700 border-green-200 text-[8px] font-bold px-2 py-0">DIGITAL PAID</Badge>
+                    </div>
+                  </div>
+
+                  {/* Rincian Finansial */}
+                  <div className="flex-1 space-y-6">
+                    <table className="w-full text-xs border-collapse">
+                      <thead>
+                        <tr className="border-y-2 border-primary bg-primary/5">
+                          <th className="text-left py-2 px-4 font-black uppercase text-[9px]">Deskripsi Pendapatan / Potongan</th>
+                          <th className="text-right py-2 px-4 font-black uppercase text-[9px]">Jumlah (IDR)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="border-b">
+                          <td className="py-3 px-4 font-bold">Gaji Pokok Bulanan</td>
+                          <td className="py-3 px-4 text-right font-mono">Rp {selectedStaff.baseSalary.toLocaleString('id-ID')}</td>
+                        </tr>
+                        {getOutstandingKasbon(selectedStaff.id) > 0 && (
+                          <tr className="border-b text-red-600 bg-red-50/30">
+                            <td className="py-3 px-4 font-bold flex items-center gap-2">
+                              <Calculator className="h-3 w-3" />
+                              Potongan Kasbon (Outstanding)
+                            </td>
+                            <td className="py-3 px-4 text-right font-mono">- Rp {getOutstandingKasbon(selectedStaff.id).toLocaleString('id-ID')}</td>
+                          </tr>
+                        )}
+                        <tr className="bg-slate-50">
+                          <td className="py-3 px-4 font-black text-primary uppercase">Total Gaji Bersih (Net Salary)</td>
+                          <td className="py-3 px-4 text-right font-mono font-black text-primary text-base">
+                            Rp {(selectedStaff.baseSalary - getOutstandingKasbon(selectedStaff.id)).toLocaleString('id-ID')}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                    <div className="p-4 bg-muted/20 rounded-lg border border-dashed border-muted-foreground/30 text-[9px] leading-relaxed italic text-muted-foreground">
+                      Catatan: Slip gaji ini dihasilkan secara otomatis oleh Sistem Informasi Terpadu (SITU) Hanura. Potongan kasbon dihitung berdasarkan saldo pinjaman yang belum lunas pada saat slip ini dicetak.
+                    </div>
+                  </div>
+
+                  {/* Tanda Tangan */}
+                  <div className="mt-16 flex justify-between items-end">
+                     <div className="text-center w-40 space-y-12">
+                        <p className="text-[9px] font-bold uppercase">Penerima,</p>
+                        <div className="border-b border-slate-400 pb-1">
+                           <p className="font-bold text-[10px] uppercase">{selectedStaff.fullName}</p>
+                        </div>
+                     </div>
+
+                     <div className="text-center w-56 space-y-12">
+                      <div className="space-y-0.5">
+                        <p className="text-[9px] font-bold uppercase">Ditetapkan di: Tanjungpinang</p>
+                        <p className="text-[9px] font-bold uppercase">{new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
+                      </div>
+                      
+                      <div className="relative inline-block">
+                        <div className="absolute -top-10 -left-10 opacity-20 pointer-events-none rotate-12">
+                           <div className="w-24 h-24 border-4 border-primary rounded-full flex items-center justify-center text-primary font-bold text-[8px] uppercase text-center p-2">
+                             DPC HANURA <br /> TANJUNGPINANG <br /> TREASURY
+                           </div>
+                        </div>
+                        <p className="font-bold underline text-xs uppercase">ENDANG WIRNANTO</p>
+                        <p className="text-[8px] font-bold text-muted-foreground uppercase">Bendahara DPC Tanjungpinang</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Verification Badge */}
+                  <div className="mt-auto pt-8 flex items-center gap-2 opacity-40 select-none">
+                    <ShieldCheck className="h-3 w-3 text-green-600" />
+                    <span className="text-[7px] font-mono font-bold uppercase text-slate-400">Payroll Digital Verified System</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
