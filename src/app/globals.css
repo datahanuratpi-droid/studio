@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -32,14 +31,6 @@
     --chart-5: 27 87% 67%;
   }
 
-  /* Theme Color Variations */
-  .theme-red { --primary: 0 84% 60%; --ring: 0 84% 60%; }
-  .theme-blue { --primary: 209 60% 35%; --ring: 209 60% 35%; }
-  .theme-orange { --primary: 24 95% 53%; --ring: 24 95% 53%; }
-  .theme-magenta { --primary: 327 73% 53%; --ring: 327 73% 53%; }
-  .theme-purple { --primary: 262 83% 58%; --ring: 262 83% 58%; }
-  .theme-yellow { --primary: 47 95% 55%; --ring: 47 95% 55%; }
-
   .dark {
     --background: 209 60% 5%;
     --foreground: 198 21% 94%;
@@ -61,6 +52,38 @@
     --input: 209 40% 20%;
     --ring: 209 60% 45%;
   }
+
+  /* Theme Color Variations - Defined AFTER .dark to ensure precedence for the primary color */
+  .theme-red { 
+    --primary: 0 84% 60%; 
+    --ring: 0 84% 60%; 
+    --primary-foreground: 0 0% 100%;
+  }
+  .theme-blue { 
+    --primary: 209 60% 35%; 
+    --ring: 209 60% 35%; 
+    --primary-foreground: 0 0% 100%;
+  }
+  .theme-orange { 
+    --primary: 24 95% 53%; 
+    --ring: 24 95% 53%; 
+    --primary-foreground: 0 0% 100%;
+  }
+  .theme-magenta { 
+    --primary: 327 73% 53%; 
+    --ring: 327 73% 53%; 
+    --primary-foreground: 0 0% 100%;
+  }
+  .theme-purple { 
+    --primary: 262 83% 58%; 
+    --ring: 262 83% 58%; 
+    --primary-foreground: 0 0% 100%;
+  }
+  .theme-yellow { 
+    --primary: 47 95% 55%; 
+    --ring: 47 95% 55%; 
+    --primary-foreground: 209 60% 10%; /* Dark text for yellow background visibility */
+  }
 }
 
 @layer base {
@@ -76,7 +99,7 @@
   }
 }
 
-/* Mouse Hover Indicator - Black Text */
+/* Mouse Hover Indicator - Conditional Text Color */
 .hover\:text-black:hover {
   color: #000 !important;
 }
