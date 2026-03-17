@@ -222,11 +222,21 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       {/* Sidebar Desktop */}
       <aside className="w-64 border-r bg-card hidden lg:flex flex-col sticky top-0 h-screen z-40 transition-all duration-300">
         <div className="p-6">
-          <Link href="/dashboard" className="flex flex-col items-center justify-center gap-2 mb-10 text-center">
-            <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform">
+          <Link href="/dashboard" className="flex flex-col items-center justify-center gap-2 mb-10 text-center group">
+            <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-lg transform group-hover:scale-105 transition-transform">
               <FileText className="h-7 w-7 text-white" />
             </div>
-            <span className="text-xl font-headline font-bold text-primary tracking-tight">SITU HANURA</span>
+            <div className="flex flex-col items-center">
+              <span className="text-xl font-headline font-bold text-primary tracking-tight">SITU HANURA</span>
+              <div className="flex flex-col items-center leading-none mt-2">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                  {currentDateTime?.date || "..."}
+                </span>
+                <span className="text-[11px] font-bold text-primary mt-0.5">
+                  {currentDateTime?.time || "00:00"}
+                </span>
+              </div>
+            </div>
           </Link>
 
           <nav className="space-y-1">
@@ -260,11 +270,21 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 lg:hidden transition-opacity duration-300" onClick={() => setIsMobileMenuOpen(false)}>
           <div className="w-72 h-full bg-card p-6 shadow-2xl animate-in slide-in-from-left duration-300" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-8">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <FileText className="h-4 w-4 text-white" />
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                    <FileText className="h-4 w-4 text-white" />
+                  </div>
+                  <span className="text-lg font-headline font-bold text-primary">SITU HANURA</span>
                 </div>
-                <span className="text-lg font-headline font-bold text-primary">SITU HANURA</span>
+                <div className="flex flex-col items-start leading-none pl-10">
+                  <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-tighter">
+                    {currentDateTime?.date || "..."}
+                  </span>
+                  <span className="text-[10px] font-bold text-primary mt-0.5">
+                    {currentDateTime?.time || "00:00"}
+                  </span>
+                </div>
               </div>
               <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)} className="rounded-full">
                 <X className="h-5 w-5" />
@@ -305,19 +325,6 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           </div>
           
           <div className="flex items-center gap-2 md:gap-3 ml-2">
-            {/* Real-time Clock & Date - Moved here */}
-            <div className="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-1.5 bg-muted/40 rounded-full border border-border/50 shadow-sm shrink-0">
-              <Clock className="h-3.5 w-3.5 text-primary animate-pulse" />
-              <div className="flex flex-col items-start leading-none">
-                <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-tighter whitespace-nowrap">
-                  {currentDateTime?.date || "..."}
-                </span>
-                <span className="text-[10px] md:text-xs font-mono font-bold text-primary tabular-nums">
-                  {currentDateTime?.time || "00:00"}
-                </span>
-              </div>
-            </div>
-
             <Button variant="ghost" size="icon" className="relative text-muted-foreground hidden sm:flex">
               <Bell className="h-5 w-5" />
               <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-accent rounded-full border-2 border-white"></span>
