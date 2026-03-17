@@ -1,3 +1,4 @@
+
 'use client'
 
 import * as React from "react"
@@ -27,7 +28,8 @@ import {
   Heart,
   Code,
   Phone,
-  Mail as MailIcon
+  Mail as MailIcon,
+  Library
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -226,6 +228,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     },
     { href: "/dashboard/laporan", icon: <FileText className="h-5 w-5" />, label: "Laporan Kegiatan", roles: ["Admin", "KSB", "Staff"] },
     { href: "/dashboard/kas", icon: <Wallet className="h-5 w-5" />, label: "Kas Office", roles: ["Admin", "KSB", "Staff"] },
+    { href: "/dashboard/pustaka", icon: <Library className="h-5 w-5" />, label: "Pustaka Hanura", roles: ["Admin", "KSB", "Staff"] },
     { href: "/dashboard/users", icon: <Users className="h-5 w-5" />, label: "Manajemen User", roles: ["Admin"] },
     { href: "/dashboard/pengaturan", icon: <Settings className="h-5 w-5" />, label: "Pengaturan", roles: ["Admin", "KSB", "Staff"] },
     { 

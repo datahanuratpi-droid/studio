@@ -69,18 +69,20 @@
       },
       "required": ["amount", "transactionDate", "description", "type", "recordedByUserId", "createdAt"]
     },
-    "DigitalArchive": {
-      "title": "DigitalArchive",
-      "description": "Represents a generic digital document archived in the system.",
+    "LibraryItem": {
+      "title": "LibraryItem",
+      "description": "Represents a reference to a file stored in Google Drive.",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
-        "archiveTitle": { "type": "string" },
-        "fileName": { "type": "string" },
-        "uploadedByUserId": { "type": "string" },
+        "title": { "type": "string" },
+        "driveUrl": { "type": "string", "format": "uri" },
+        "description": { "type": "string" },
+        "category": { "type": "string" },
+        "addedByUserId": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["archiveTitle", "fileName", "uploadedByUserId", "createdAt"]
+      "required": ["title", "driveUrl", "addedByUserId", "createdAt"]
     }
   },
   "auth": {
@@ -103,9 +105,9 @@
       "schema": "FinancialTransaction",
       "description": "Cash flow records."
     },
-    "/digital_archives/{id}": {
-      "schema": "DigitalArchive",
-      "description": "General digital archives."
+    "/library_items/{id}": {
+      "schema": "LibraryItem",
+      "description": "Google Drive links and library resources."
     },
     "/roles_admin/{userId}": {
       "schema": { "type": "object", "properties": { "active": { "type": "boolean" } } },

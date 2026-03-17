@@ -72,11 +72,13 @@ export interface FinancialTransaction {
   updatedAt: string;
 }
 
-export interface DigitalArchive {
+export interface LibraryItem {
   id: string;
-  archiveTitle: string;
-  fileName: string;
-  uploadedByUserId: string;
+  title: string;
+  driveUrl: string;
+  description?: string;
+  category?: string;
+  addedByUserId: string;
   createdAt: string;
 }
 

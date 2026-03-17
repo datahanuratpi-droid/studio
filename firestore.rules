@@ -52,7 +52,7 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // --- Common Access (Surat, Laporan, Kas, Arsip) ---
+    // --- Common Access (Surat, Laporan, Kas) ---
     match /correspondences/{id} {
       allow read, write: if isStaff() && isActive();
     }
@@ -65,8 +65,10 @@ service cloud.firestore {
       allow read, write: if isStaff() && isActive();
     }
 
-    match /digital_archives/{id} {
-      allow read, write: if isStaff() && isActive();
+    // --- Pustaka Hanura (Library) ---
+    match /library_items/{id} {
+      allow read: if isSignedIn() && isActive();
+      allow write: if isAdmin() && isActive();
     }
   }
 }
