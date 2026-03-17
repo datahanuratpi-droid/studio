@@ -40,7 +40,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/collapsible"
+} from "@/components/ui/collapsible"
 import { useUser, useAuth, useDoc, useFirestore, useMemoFirebase } from "@/firebase"
 import { signOut } from "firebase/auth"
 import { doc } from "firebase/firestore"
@@ -76,18 +76,18 @@ function SidebarItem({ href, icon, label, active, subItems }: SidebarItemProps) 
           </Button>
         </CollapsibleTrigger>
         <CollapsibleContent className="pl-9 space-y-1 mt-1">
-          {subItems.map((item) => (
-            <Link key={item.href} href={item.href}>
+          {item.subItems.map((subItem) => (
+            <Link key={subItem.href} href={subItem.href}>
               <Button
                 variant="ghost"
                 size="sm"
                 className={cn(
                   "w-full justify-start h-9 text-muted-foreground font-normal hover:text-primary",
-                  pathname === item.href && "text-primary font-medium bg-accent/5"
+                  pathname === subItem.href && "text-primary font-medium bg-accent/5"
                 )}
               >
-                {item.icon}
-                <span className="ml-2">{item.label}</span>
+                {subItem.icon}
+                <span className="ml-2">{subItem.label}</span>
               </Button>
             </Link>
           ))}
