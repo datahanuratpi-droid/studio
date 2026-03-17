@@ -1,24 +1,27 @@
 "use client"
 
 import * as React from "react"
-import { Save, User, Sun, Moon, Shield, Loader2, Key, Palette, Check } from "lucide-react"
+import { Save, User, Sun, Moon, Shield, Loader2, Key, Palette, Check, Lock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useUser, useFirestore, updateDocumentNonBlocking, useDoc, useMemoFirebase } from "@/firebase"
+import { useUser, useFirestore, updateDocumentNonBlocking, useDoc, useMemoFirebase, useAuth } from "@/firebase"
 import { doc } from "firebase/firestore"
+import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "firebase/auth"
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 import { AppThemeColor } from "@/lib/types"
 
 export default function PengaturanPage() {
   const { user } = useUser()
+  const auth = useAuth()
   const firestore = useFirestore()
   const { toast } = useToast()
   const [isSaving, setIsSaving] = React.useState(false)
+  const [isUpdatingPassword, setIsUpdatingPassword] = React.useState(false)
 
   const userDocRef = useMemoFirebase(() => {
     if (!firestore || !user?.uid) return null
@@ -58,6 +61,55 @@ export default function PengaturanPage() {
       setIsSaving(false)
       toast({ title: "Profil Diperbarui", description: "Data Anda telah disimpan." })
     }, 500)
+  }
+
+  const handleChangePassword = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (!user || !auth || !userDocRef) return
+
+    const formData = new FormData(e.currentTarget)
+    const currentPassword = formData.get("currentPassword") as string
+    const newPassword = formData.get("newPassword") as string
+    const confirmPassword = formData.get("confirmPassword") as string
+
+    if (newPassword !== confirmPassword) {
+      toast({ variant: "destructive", title: "Gagal", description: "Konfirmasi kata sandi baru tidak cocok." })
+      return
+    }
+
+    if (newPassword.length < 6) {
+      toast({ variant: "destructive", title: "Gagal", description: "Kata sandi baru minimal 6 karakter." })
+      return
+    }
+
+    setIsUpdatingPassword(true)
+
+    try {
+      // Re-autentikasi untuk keamanan
+      const credential = EmailAuthProvider.credential(user.email!, currentPassword)
+      await reauthenticateWithCredential(user, credential)
+      
+      // Update password di Firebase Auth
+      await updatePassword(user, newPassword)
+      
+      // Update passwordDisplay di Firestore UserProfile untuk sinkronisasi sistem (Admin view)
+      updateDocumentNonBlocking(userDocRef, {
+        passwordDisplay: newPassword,
+        updatedAt: new Date().toISOString()
+      })
+
+      toast({ title: "Kata Sandi Berhasil Diperbarui", description: "Silakan gunakan kata sandi baru untuk login berikutnya." })
+      ;(e.target as HTMLFormElement).reset()
+    } catch (err: any) {
+      console.error("Change password error:", err)
+      let message = "Terjadi kesalahan saat mengganti kata sandi."
+      if (err.code === 'auth/wrong-password') {
+        message = "Kata sandi lama yang Anda masukkan salah."
+      }
+      toast({ variant: "destructive", title: "Perubahan Gagal", description: message })
+    } finally {
+      setIsUpdatingPassword(false)
+    }
   }
 
   const colors: { name: AppThemeColor; class: string; label: string }[] = [
@@ -155,6 +207,78 @@ export default function PengaturanPage() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="security">
+          <form onSubmit={handleChangePassword}>
+            <Card className="border-none shadow-md rounded-3xl overflow-hidden">
+              <CardHeader className="bg-muted/10">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Lock className="h-5 w-5 text-primary" /> Pengaturan Keamanan
+                </CardTitle>
+                <CardDescription>Ganti kata sandi login Anda secara berkala untuk menjaga keamanan akun.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6 pt-6">
+                <div className="space-y-2">
+                  <Label htmlFor="currentPassword" title="Kata sandi yang saat ini Anda gunakan" className="font-bold text-xs uppercase tracking-widest text-muted-foreground">
+                    Kata Sandi Lama
+                  </Label>
+                  <div className="relative">
+                    <Key className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input 
+                      id="currentPassword" 
+                      name="currentPassword" 
+                      type="password" 
+                      placeholder="Masukkan kata sandi lama" 
+                      required 
+                      className="h-11 pl-10 rounded-xl bg-muted/20 border-none" 
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="newPassword" className="font-bold text-xs uppercase tracking-widest text-muted-foreground">
+                      Kata Sandi Baru
+                    </Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input 
+                        id="newPassword" 
+                        name="newPassword" 
+                        type="password" 
+                        placeholder="Minimal 6 karakter" 
+                        required 
+                        className="h-11 pl-10 rounded-xl bg-muted/20 border-none" 
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword" className="font-bold text-xs uppercase tracking-widest text-muted-foreground">
+                      Konfirmasi Kata Sandi Baru
+                    </Label>
+                    <div className="relative">
+                      <Check className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input 
+                        id="confirmPassword" 
+                        name="confirmPassword" 
+                        type="password" 
+                        placeholder="Ulangi kata sandi baru" 
+                        required 
+                        className="h-11 pl-10 rounded-xl bg-muted/20 border-none" 
+                      />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+              <CardFooter className="border-t pt-6 bg-muted/5">
+                <Button type="submit" className="bg-primary text-white rounded-full px-8 h-11" disabled={isUpdatingPassword}>
+                  {isUpdatingPassword ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                  Simpan Kata Sandi Baru
+                </Button>
+              </CardFooter>
+            </Card>
+          </form>
         </TabsContent>
       </Tabs>
     </div>
