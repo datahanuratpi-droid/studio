@@ -63,11 +63,19 @@ export default function KasOfficePage() {
 
     const formData = new FormData(e.currentTarget)
     const amount = parseFloat(formData.get("amount") as string)
+    const baseDescription = formData.get("description") as string
     
+    let finalDescription = baseDescription
+    if (selectedType === 'SalarySlip') {
+      const recipientName = formData.get("recipientName") as string
+      const position = formData.get("position") as string
+      finalDescription = `Slip Gaji: ${recipientName} (${position}) - ${baseDescription}`
+    }
+
     const data = {
       amount,
       transactionDate: new Date().toISOString(),
-      description: formData.get("description") as string,
+      description: finalDescription,
       type: selectedType as any,
       categoryId: "Routine",
       recordedByUserId: user.uid,
@@ -258,6 +266,20 @@ export default function KasOfficePage() {
                   </SelectContent>
                 </Select>
               </div>
+
+              {selectedType === 'SalarySlip' && (
+                <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="grid gap-2">
+                    <Label htmlFor="recipientName" className="font-bold text-sm">Nama Penerima</Label>
+                    <Input id="recipientName" name="recipientName" placeholder="Nama Lengkap" required className="h-12 rounded-2xl" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="position" className="font-bold text-sm">Jabatan</Label>
+                    <Input id="position" name="position" placeholder="Contoh: Staff IT" required className="h-12 rounded-2xl" />
+                  </div>
+                </div>
+              )}
+
               <div className="grid gap-2">
                 <Label htmlFor="amount" className="font-bold text-sm">Jumlah (Rp)</Label>
                 <div className="relative">
