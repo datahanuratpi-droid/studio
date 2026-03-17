@@ -21,7 +21,8 @@ import {
   User as UserIcon,
   Search,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  X
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -347,6 +348,78 @@ export default function KasOfficePage() {
               <Button type="submit" className="flex-1 bg-primary text-white rounded-full font-bold h-11">Simpan</Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Detail Transaksi */}
+      <Dialog open={!!viewingTransaction} onOpenChange={() => setViewingTransaction(null)}>
+        <DialogContent className="sm:max-w-[480px] rounded-3xl p-0 overflow-hidden border-none shadow-2xl">
+          {viewingTransaction && (
+            <>
+              <DialogHeader className="p-6 bg-primary text-white">
+                <div className="flex justify-between items-center">
+                  <div className="space-y-1">
+                    <DialogTitle className="text-2xl font-headline font-bold">Detail Transaksi</DialogTitle>
+                    <DialogDescription className="text-white/70">
+                      ID: {viewingTransaction.id.toUpperCase()}
+                    </DialogDescription>
+                  </div>
+                  <Button variant="ghost" size="icon" onClick={() => setViewingTransaction(null)} className="text-white hover:bg-white/10 rounded-full">
+                    <X className="h-5 w-5" />
+                  </Button>
+                </div>
+              </DialogHeader>
+              <div className="p-8 space-y-8 bg-white">
+                <div className="flex flex-col items-center text-center space-y-2 pb-6 border-b">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">Jumlah Transaksi</p>
+                  <h3 className={cn("text-3xl font-black font-headline", viewingTransaction.type === 'Receipt' ? "text-green-600" : "text-red-600")}>
+                    {viewingTransaction.type === 'Receipt' ? '+' : '-'} Rp {viewingTransaction.amount.toLocaleString('id-ID')}
+                  </h3>
+                  <Badge variant="outline" className="mt-2 text-[10px] font-bold uppercase tracking-widest bg-muted/50">
+                    {viewingTransaction.type === 'Receipt' ? 'Pemasukkan' : 'Pengeluaran'}
+                  </Badge>
+                </div>
+
+                <div className="grid gap-6">
+                  <div className="space-y-1">
+                    <Label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Keterangan</Label>
+                    <p className="text-sm font-bold text-primary leading-relaxed">{viewingTransaction.description}</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-8">
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Tanggal</Label>
+                      <div className="flex items-center gap-2 text-sm font-medium">
+                        <Calendar className="h-4 w-4 text-primary" />
+                        {new Date(viewingTransaction.transactionDate).toLocaleDateString('id-ID', { dateStyle: 'long' })}
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Status Buku</Label>
+                      <div className="flex items-center gap-2">
+                        {viewingTransaction.isClosed ? (
+                          <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-green-200 text-[10px] font-bold">TERKUNCI</Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-[10px] font-bold">TERBUKA</Badge>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t">
+                    <p className="text-[9px] text-muted-foreground font-mono uppercase text-center">
+                      Dicatat pada: {new Date(viewingTransaction.createdAt).toLocaleString('id-ID')}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <DialogFooter className="p-6 bg-muted/20 border-t">
+                <Button onClick={() => setViewingTransaction(null)} className="w-full bg-primary text-white rounded-full font-bold h-11 shadow-lg">
+                  Tutup Rincian
+                </Button>
+              </DialogFooter>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </div>
