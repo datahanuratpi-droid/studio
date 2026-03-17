@@ -184,17 +184,17 @@ export default function PustakaHanuraPage() {
         </div>
       )}
 
-      {/* Dialog Tambah Item Pustaka */}
+      {/* Dialog Tambah Item Pustaka - Fixed Cut Off Issues */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent className="sm:max-w-[500px] rounded-3xl p-0 overflow-hidden border-none shadow-2xl">
-          <form onSubmit={handleAddItem}>
-            <DialogHeader className="p-6 bg-primary text-white">
+        <DialogContent className="sm:max-w-[500px] rounded-3xl p-0 overflow-hidden border-none shadow-2xl max-h-[90vh] flex flex-col">
+          <form onSubmit={handleAddItem} className="flex flex-col overflow-hidden">
+            <DialogHeader className="p-6 bg-primary text-white shrink-0">
               <DialogTitle className="text-2xl font-headline font-bold">Tambah Pustaka Hanura</DialogTitle>
               <DialogDescription className="text-white/70">
                 Masukkan judul dan tautan Google Drive untuk berkas administrasi.
               </DialogDescription>
             </DialogHeader>
-            <div className="grid gap-6 p-6">
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
               <div className="grid gap-2">
                 <Label htmlFor="title" className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Judul Berkas</Label>
                 <Input id="title" name="title" placeholder="Contoh: AD/ART Partai Hanura 2024" required className="h-11 rounded-xl bg-muted/20 border-none" />
@@ -206,24 +206,24 @@ export default function PustakaHanuraPage() {
                   <Input id="driveUrl" name="driveUrl" type="url" placeholder="https://drive.google.com/..." required className="h-11 pl-10 rounded-xl bg-muted/20 border-none" />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="category" className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Kategori</Label>
                   <Input id="category" name="category" placeholder="Contoh: Regulasi" className="h-11 rounded-xl bg-muted/20 border-none" />
                 </div>
                 <div className="grid gap-2">
                    <Label className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Informasi</Label>
-                   <div className="flex items-center h-11 text-[10px] text-muted-foreground bg-muted/10 px-3 rounded-xl border border-dashed italic">
+                   <div className="flex items-center min-h-[44px] text-[10px] text-muted-foreground bg-muted/10 px-3 rounded-xl border border-dashed italic leading-relaxed">
                      Pastikan link Google Drive bersifat 'Publik' atau 'Dapat Dilihat'.
                    </div>
                 </div>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="description" className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Deskripsi Singkat</Label>
-                <Textarea id="description" name="description" placeholder="Penjelasan singkat isi berkas..." className="min-h-[80px] rounded-xl bg-muted/20 border-none" />
+                <Textarea id="description" name="description" placeholder="Penjelasan singkat isi berkas..." className="min-h-[100px] rounded-xl bg-muted/20 border-none" />
               </div>
             </div>
-            <DialogFooter className="p-6 bg-muted/20 gap-2">
+            <DialogFooter className="p-6 bg-muted/20 gap-2 shrink-0">
               <Button type="button" variant="ghost" onClick={() => setIsCreateOpen(false)} className="flex-1 rounded-full font-bold">Batal</Button>
               <Button type="submit" className="flex-1 bg-primary text-white hover:bg-primary/90 rounded-full font-bold px-8 shadow-lg">
                 Simpan ke Pustaka
