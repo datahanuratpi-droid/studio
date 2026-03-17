@@ -10,7 +10,8 @@ import {
   Loader2,
   Inbox,
   ArrowRight,
-  AlertCircle
+  AlertCircle,
+  Library
 } from "lucide-react"
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -28,14 +29,17 @@ export default function DashboardPage() {
   const reportsRef = useMemoFirebase(() => collection(firestore, "activity_reports"), [firestore])
   const transRef = useMemoFirebase(() => collection(firestore, "financial_transactions"), [firestore])
   const usersRef = useMemoFirebase(() => collection(firestore, "users"), [firestore])
+  const libraryRef = useMemoFirebase(() => collection(firestore, "library_items"), [firestore])
 
   const { data: letters, isLoading: loadingLetters } = useCollection(lettersRef)
   const { data: reports, isLoading: loadingReports } = useCollection(reportsRef)
   const { data: transactions, isLoading: loadingTrans } = useCollection(transRef)
   const { data: users, isLoading: loadingUsers } = useCollection(usersRef)
+  const { data: library, isLoading: loadingLibrary } = useCollection(libraryRef)
 
   const suratMasukCount = letters?.filter(l => l.type === 'Incoming').length || 0
   const laporanCount = reports?.length || 0
+  const pustakaCount = library?.length || 0
   const totalSaldo = transactions?.reduce((acc, curr) => {
     return curr.type === 'Receipt' ? acc + curr.amount : acc - curr.amount
   }, 0) || 0
@@ -46,20 +50,22 @@ export default function DashboardPage() {
     { label: "Surat Masuk", value: suratMasukCount.toString(), icon: <Inbox />, color: "text-blue-600", bg: "bg-blue-100", href: "/dashboard/surat/masuk" },
     { label: "Laporan Kegiatan", value: laporanCount.toString(), icon: <FileText />, color: "text-green-600", bg: "bg-green-100", href: "/dashboard/laporan" },
     { label: "Saldo Kas Office", value: `Rp ${totalSaldo.toLocaleString('id-ID')}`, icon: <Wallet />, color: "text-amber-600", bg: "bg-amber-100", href: "/dashboard/kas" },
+    { label: "Pustaka Hanura", value: pustakaCount.toString(), icon: <Library />, color: "text-purple-600", bg: "bg-purple-100", href: "/dashboard/pustaka" },
   ]
 
   const recentActivities = React.useMemo(() => {
     const all = [
       ...(letters || []).map(l => ({ id: l.id, type: 'Surat', title: l.subject, time: l.createdAt, status: l.status })),
       ...(reports || []).map(r => ({ id: r.id, type: 'Laporan', title: r.title, time: r.createdAt, status: r.status })),
-      ...(transactions || []).map(t => ({ id: t.id, type: 'Keuangan', title: t.description, time: t.createdAt, status: 'Recorded' }))
+      ...(transactions || []).map(t => ({ id: t.id, type: 'Keuangan', title: t.description, time: t.createdAt, status: 'Recorded' })),
+      ...(library || []).map(lib => ({ id: lib.id, type: 'Pustaka', title: lib.title, time: lib.createdAt, status: 'Added' }))
     ]
     return all
       .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
       .slice(0, 6)
-  }, [letters, reports, transactions])
+  }, [letters, reports, transactions, library])
 
-  if (loadingLetters || loadingReports || loadingTrans || loadingUsers) {
+  if (loadingLetters || loadingReports || loadingTrans || loadingUsers || loadingLibrary) {
     return (
       <div className="flex h-[60vh] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -79,10 +85,10 @@ export default function DashboardPage() {
         </Badge>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {stats.map((stat) => (
           <Link key={stat.label} href={stat.href}>
-            <Card className="border-none shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer group rounded-2xl overflow-hidden">
+            <Card className="border-none shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer group rounded-2xl overflow-hidden h-full">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className={cn("p-2 rounded-xl transition-transform group-hover:scale-110", stat.bg)}>
@@ -123,6 +129,13 @@ export default function DashboardPage() {
               </div>
               <Progress value={Math.min(100, (suratMasukCount / 50) * 100)} className="h-3 rounded-full" />
             </div>
+            <div className="space-y-4">
+              <div className="flex justify-between text-xs font-bold uppercase tracking-wider">
+                <span className="flex items-center gap-2 text-primary"><Library className="h-4 w-4" /> Pustaka Drive</span>
+                <span>{pustakaCount} / 30</span>
+              </div>
+              <Progress value={Math.min(100, (pustakaCount / 30) * 100)} className="h-3 rounded-full bg-muted" />
+            </div>
           </CardContent>
         </Card>
 
@@ -140,6 +153,7 @@ export default function DashboardPage() {
                   <div className="h-9 w-9 rounded-full bg-primary/5 flex items-center justify-center shrink-0">
                     {activity.type === 'Surat' ? <Inbox className="h-4 w-4 text-blue-500" /> : 
                      activity.type === 'Laporan' ? <FileText className="h-4 w-4 text-green-500" /> : 
+                     activity.type === 'Pustaka' ? <Library className="h-4 w-4 text-purple-500" /> :
                      <Wallet className="h-4 w-4 text-amber-500" />}
                   </div>
                   <div className="flex-1 min-w-0">
