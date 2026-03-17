@@ -27,7 +27,6 @@ import Link from "next/link"
 export default function DashboardPage() {
   const firestore = useFirestore()
 
-  // Real-time Queries: Mendengarkan perubahan data secara langsung dari semua user
   const lettersRef = useMemoFirebase(() => collection(firestore, "correspondences"), [firestore])
   const reportsRef = useMemoFirebase(() => collection(firestore, "activity_reports"), [firestore])
   const transRef = useMemoFirebase(() => collection(firestore, "financial_transactions"), [firestore])
@@ -38,10 +37,9 @@ export default function DashboardPage() {
   const { data: transactions, isLoading: loadingTrans } = useCollection(transRef)
   const { data: users, isLoading: loadingUsers } = useCollection(usersRef)
 
-  // Hitung Statistik secara dinamis dari data real-time
   const suratMasukCount = letters?.filter(l => l.type === 'Incoming').length || 0
   const laporanCount = reports?.length || 0
-  const arsipCount = letters?.length || 0
+  const arsipCount = (letters?.length || 0) + (reports?.length || 0)
   const totalSaldo = transactions?.reduce((acc, curr) => {
     return curr.type === 'Receipt' ? acc + curr.amount : acc - curr.amount
   }, 0) || 0
@@ -50,12 +48,11 @@ export default function DashboardPage() {
 
   const stats = [
     { label: "Surat Masuk", value: suratMasukCount.toString(), icon: <Inbox />, color: "text-blue-600", bg: "bg-blue-100", href: "/dashboard/surat/masuk" },
-    { label: "Laporan Kegiatan", value: laporanCount.toString(), icon: <FileText />, color: "text-green-600", bg: "bg-green-100", href: "/dashboard/laporan" },
+    { label: "Laporan", value: laporanCount.toString(), icon: <FileText />, color: "text-green-600", bg: "bg-green-100", href: "/dashboard/laporan" },
     { label: "Total Arsip", value: arsipCount.toString(), icon: <Archive />, color: "text-purple-600", bg: "bg-purple-100", href: "/dashboard/arsip" },
     { label: "Saldo Kas", value: `Rp ${totalSaldo.toLocaleString('id-ID')}`, icon: <Wallet />, color: "text-amber-600", bg: "bg-amber-100", href: "/dashboard/kas" },
   ]
 
-  // Gabungkan aktivitas terbaru dari semua koleksi untuk monitoring real-time
   const recentActivities = React.useMemo(() => {
     const all = [
       ...(letters || []).map(l => ({ id: l.id, type: 'Surat', title: l.subject, time: l.createdAt, status: l.status })),
@@ -76,32 +73,32 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-start">
+    <div className="space-y-6 md:space-y-8 animate-in fade-in duration-700">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-headline font-bold text-primary">Dashboard Overview</h1>
-          <p className="text-muted-foreground">Monitoring operasional SITU HANURA secara real-time antar pengguna.</p>
+          <h1 className="text-2xl md:text-3xl font-headline font-bold text-primary">Dashboard</h1>
+          <p className="text-sm text-muted-foreground">Monitoring operasional SITU HANURA secara real-time.</p>
         </div>
-        <Badge variant="outline" className="flex items-center gap-2 bg-green-50 text-green-700 border-green-200 px-3 py-1">
-          <RefreshCw className="h-3 w-3 animate-spin-slow" /> Tersinkronisasi
+        <Badge variant="outline" className="flex items-center gap-2 bg-green-50 text-green-700 border-green-200 px-3 py-1 animate-pulse">
+          <RefreshCw className="h-3 w-3" /> Live
         </Badge>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Stats Grid Responsif */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6">
         {stats.map((stat) => (
           <Link key={stat.label} href={stat.href}>
-            <Card className="border-none shadow-md hover:shadow-lg transition-all cursor-pointer group">
+            <Card className="border-none shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer group rounded-2xl overflow-hidden">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <div className={cn("p-2 rounded-lg", stat.bg)}>
+                  <div className={cn("p-2 rounded-xl transition-transform group-hover:scale-110", stat.bg)}>
                     {React.cloneElement(stat.icon as React.ReactElement, { className: cn("h-6 w-6", stat.color) })}
                   </div>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{stat.label}</p>
-                  <p className="text-2xl font-bold text-primary">{stat.value}</p>
+                  <p className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest">{stat.label}</p>
+                  <p className="text-xl md:text-2xl font-bold text-primary truncate" title={stat.value}>{stat.value}</p>
                 </div>
               </CardContent>
             </Card>
@@ -109,61 +106,60 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <Card className="lg:col-span-2 border-none shadow-md">
-          <CardHeader>
-            <CardTitle className="font-headline font-bold flex items-center gap-2 text-xl">
-              <TrendingUp className="h-5 w-5 text-accent" /> Progres Operasional Real-time
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+        <Card className="lg:col-span-2 border-none shadow-md rounded-3xl overflow-hidden">
+          <CardHeader className="bg-muted/10">
+            <CardTitle className="font-headline font-bold flex items-center gap-2 text-lg md:text-xl">
+              <TrendingUp className="h-5 w-5 text-accent" /> Progres Operasional
             </CardTitle>
-            <CardDescription>Visualisasi pencapaian target administrasi kantor bulan ini.</CardDescription>
+            <CardDescription className="text-xs">Pencapaian target administrasi bulan ini.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-8">
-            <div className="space-y-3">
-              <div className="flex justify-between text-sm font-bold">
-                <span className="flex items-center gap-2"><FileText className="h-4 w-4 text-primary" /> Laporan Kegiatan</span>
-                <span className="text-primary">{laporanCount} / 20</span>
+          <CardContent className="p-6 space-y-8">
+            <div className="space-y-4">
+              <div className="flex justify-between text-xs font-bold uppercase tracking-wider">
+                <span className="flex items-center gap-2 text-primary"><FileText className="h-4 w-4" /> Laporan</span>
+                <span>{laporanCount} / 20</span>
               </div>
-              <Progress value={Math.min(100, (laporanCount / 20) * 100)} className="h-3" />
+              <Progress value={Math.min(100, (laporanCount / 20) * 100)} className="h-3 rounded-full" />
             </div>
-            <div className="space-y-3">
-              <div className="flex justify-between text-sm font-bold">
-                <span className="flex items-center gap-2"><Inbox className="h-4 w-4 text-primary" /> Registrasi Surat</span>
-                <span className="text-primary">{suratMasukCount} / 50</span>
+            <div className="space-y-4">
+              <div className="flex justify-between text-xs font-bold uppercase tracking-wider">
+                <span className="flex items-center gap-2 text-primary"><Inbox className="h-4 w-4" /> Registrasi Surat</span>
+                <span>{suratMasukCount} / 50</span>
               </div>
-              <Progress value={Math.min(100, (suratMasukCount / 50) * 100)} className="h-3" />
+              <Progress value={Math.min(100, (suratMasukCount / 50) * 100)} className="h-3 rounded-full" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-md">
-          <CardHeader>
-            <CardTitle className="font-headline font-bold flex items-center gap-2 text-xl">
-              <Clock className="h-5 w-5 text-accent" /> Aktivitas Terkini
+        <Card className="border-none shadow-md rounded-3xl overflow-hidden">
+          <CardHeader className="bg-muted/10">
+            <CardTitle className="font-headline font-bold flex items-center gap-2 text-lg md:text-xl">
+              <Clock className="h-5 w-5 text-accent" /> Aktivitas
             </CardTitle>
-            <CardDescription>Input terbaru dari seluruh petugas.</CardDescription>
+            <CardDescription className="text-xs">Rekaman aktivitas terbaru sistem.</CardDescription>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="divide-y max-h-[420px] overflow-y-auto">
+            <div className="divide-y divide-border/50 max-h-[400px] overflow-y-auto">
               {recentActivities.map((activity) => (
-                <div key={activity.id} className="flex items-center gap-4 p-4 hover:bg-muted/30 transition-colors">
-                  <div className="h-10 w-10 rounded-full bg-primary/5 flex items-center justify-center shrink-0">
-                    {activity.type === 'Surat' ? <Inbox className="h-5 w-5 text-blue-500" /> : 
-                     activity.type === 'Laporan' ? <FileText className="h-5 w-5 text-green-500" /> : 
-                     <Wallet className="h-5 w-5 text-amber-500" />}
+                <div key={activity.id} className="flex items-center gap-4 p-4 hover:bg-muted/10 transition-colors">
+                  <div className="h-9 w-9 rounded-full bg-primary/5 flex items-center justify-center shrink-0">
+                    {activity.type === 'Surat' ? <Inbox className="h-4 w-4 text-blue-500" /> : 
+                     activity.type === 'Laporan' ? <FileText className="h-4 w-4 text-green-500" /> : 
+                     <Wallet className="h-4 w-4 text-amber-500" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold truncate text-primary">{activity.title}</p>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
-                      {activity.type} • {new Date(activity.time).toLocaleTimeString('id-ID')}
+                    <p className="text-xs font-bold truncate text-primary">{activity.title}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-tighter">
+                      {activity.type} • {new Date(activity.time).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})}
                     </p>
                   </div>
-                  <Badge variant="outline" className="text-[9px] uppercase font-bold shrink-0">{activity.status}</Badge>
+                  <Badge variant="outline" className="text-[8px] uppercase font-bold shrink-0 py-0 px-1.5 h-5">{activity.status}</Badge>
                 </div>
               ))}
               {recentActivities.length === 0 && (
-                <div className="p-12 text-center text-sm text-muted-foreground">
-                  <Archive className="h-10 w-10 mx-auto mb-2 opacity-20" />
-                  Belum ada aktivitas tercatat hari ini.
+                <div className="p-12 text-center text-xs text-muted-foreground opacity-50">
+                  Belum ada aktivitas.
                 </div>
               )}
             </div>
@@ -171,29 +167,20 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="p-5 bg-white rounded-xl border-l-4 border-l-accent shadow-sm flex items-start gap-4">
-          <div className="p-2 bg-accent/10 rounded-full">
-            <CheckCircle2 className="h-6 w-6 text-accent" />
-          </div>
-          <div>
-            <h4 className="font-bold text-primary">Server SITU HANURA Online</h4>
-            <p className="text-sm text-muted-foreground">Seluruh data tersinkronisasi antar user secara real-time.</p>
-          </div>
-        </div>
-        {pendingUsers > 0 && (
-          <Link href="/dashboard/users" className="p-5 bg-amber-50 rounded-xl border-l-4 border-l-amber-400 shadow-sm flex items-start gap-4 hover:bg-amber-100 transition-colors group">
-            <div className="p-2 bg-amber-200 rounded-full animate-pulse">
-              <AlertCircle className="h-6 w-6 text-amber-600" />
+      {pendingUsers > 0 && (
+        <Link href="/dashboard/users" className="block animate-in zoom-in duration-500">
+          <div className="p-4 md:p-6 bg-amber-50 rounded-2xl border-l-4 border-l-amber-500 shadow-sm flex items-center gap-4 hover:bg-amber-100 transition-all group">
+            <div className="p-3 bg-amber-200 rounded-xl text-amber-600 group-hover:scale-110 transition-transform">
+              <AlertCircle className="h-6 w-6" />
             </div>
-            <div className="flex-1">
-              <h4 className="font-bold text-amber-700">{pendingUsers} User Baru Menunggu Verifikasi</h4>
-              <p className="text-sm text-amber-600/80">Klik di sini untuk memberikan akses ke pendaftar baru.</p>
+            <div className="flex-1 min-w-0">
+              <h4 className="font-bold text-amber-900 text-sm md:text-base">{pendingUsers} User Baru Menunggu Verifikasi</h4>
+              <p className="text-xs text-amber-700/80 truncate">Segera beri akses pendaftar untuk menggunakan sistem.</p>
             </div>
-            <ArrowRight className="h-5 w-5 text-amber-400 self-center opacity-0 group-hover:opacity-100 transition-opacity" />
-          </Link>
-        )}
-      </div>
+            <ArrowRight className="h-5 w-5 text-amber-500 group-hover:translate-x-1 transition-transform" />
+          </div>
+        </Link>
+      )}
     </div>
   )
 }

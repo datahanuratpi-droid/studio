@@ -24,7 +24,7 @@
     --border: 209 30% 85%;
     --input: 209 30% 85%;
     --ring: 209 60% 35%;
-    --radius: 0.75rem;
+    --radius: 1rem;
     --chart-1: 209 60% 35%;
     --chart-2: 229 91% 65%;
     --chart-3: 197 37% 24%;
@@ -57,12 +57,35 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border transition-colors duration-200;
   }
   body {
     @apply bg-background text-foreground font-body;
+    -webkit-tap-highlight-color: transparent;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-headline;
   }
+}
+
+/* Custom Scrollbar for smoother feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/40 transition-colors;
+}
+
+/* Smooth Table Container */
+.table-container {
+  @apply overflow-x-auto rounded-2xl border border-border/50 bg-card;
+}
+
+/* Modern Hover Effects */
+.hover-card {
+  @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
 }
