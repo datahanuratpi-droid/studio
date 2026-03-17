@@ -23,12 +23,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { UserProfile } from "@/lib/types"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
+import { cn } from "@/lib/utils"
 
 export default function UserManagementPage() {
   const firestore = useFirestore()
@@ -73,7 +68,7 @@ export default function UserManagementPage() {
   )
 
   return (
-    <div className="space-y-6 md:space-y-8 animate-in fade-in duration-500 overflow-x-hidden">
+    <div className="space-y-6 md:space-y-8 animate-in fade-in duration-500 max-w-full overflow-x-hidden">
       <div className="px-1">
         <h1 className="text-2xl md:text-3xl font-headline font-bold text-primary">Manajemen User</h1>
         <p className="text-xs md:text-sm text-muted-foreground">Kelola akses, verifikasi, dan pantau pengguna sistem.</p>
@@ -83,20 +78,20 @@ export default function UserManagementPage() {
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input 
           placeholder="Cari nama atau email..." 
-          className="pl-11 h-12 rounded-full bg-white border shadow-sm text-sm"
+          className="pl-11 h-12 rounded-full bg-white border shadow-sm text-sm md:max-w-md"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
 
       <div className="bg-white rounded-3xl border border-border/50 overflow-hidden shadow-sm mx-1">
-        <div className="overflow-x-auto custom-scrollbar">
-          <Table className="w-full">
+        <div className="overflow-x-auto custom-scrollbar w-full">
+          <Table className="w-full min-w-[500px] md:min-w-full">
             <TableHeader className="bg-muted/30">
               <TableRow className="border-none">
-                <TableHead className="font-black text-[9px] uppercase py-4 pl-6 min-w-[180px]">User</TableHead>
-                <TableHead className="font-black text-[9px] uppercase py-4 min-w-[120px]">Role</TableHead>
-                <TableHead className="font-black text-[9px] uppercase py-4 min-w-[100px]">Status</TableHead>
+                <TableHead className="font-black text-[9px] uppercase py-4 pl-6">User</TableHead>
+                <TableHead className="font-black text-[9px] uppercase py-4">Role</TableHead>
+                <TableHead className="font-black text-[9px] uppercase py-4">Status</TableHead>
                 <TableHead className="text-right font-black text-[9px] uppercase py-4 pr-6">Aksi</TableHead>
               </TableRow>
             </TableHeader>
@@ -117,8 +112,8 @@ export default function UserManagementPage() {
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col min-w-0">
-                        <span className="font-black text-primary text-[11px] uppercase tracking-tight truncate">{u.fullName}</span>
-                        <span className="text-[8px] text-muted-foreground uppercase font-bold tracking-widest truncate">{u.email}</span>
+                        <span className="font-black text-primary text-[11px] uppercase tracking-tight truncate max-w-[100px] md:max-w-[200px]">{u.fullName}</span>
+                        <span className="text-[8px] text-muted-foreground uppercase font-bold tracking-widest truncate max-w-[100px] md:max-w-[200px]">{u.email}</span>
                       </div>
                     </div>
                   </TableCell>

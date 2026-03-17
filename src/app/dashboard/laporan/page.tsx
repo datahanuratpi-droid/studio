@@ -102,14 +102,14 @@ export default function LaporanKegiatanPage() {
   }, [reports, searchQuery])
 
   return (
-    <div className="space-y-6 md:space-y-8 pb-10 animate-in fade-in duration-500">
+    <div className="space-y-6 md:space-y-8 pb-10 animate-in fade-in duration-500 max-w-full overflow-x-hidden">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl md:text-3xl font-bold text-primary">Laporan Kegiatan</h1>
         <p className="text-xs md:text-sm text-muted-foreground">Arsip digital laporan kegiatan operasional partai.</p>
       </div>
 
       <Button 
-        className="w-full bg-secondary hover:bg-secondary/90 text-white rounded-full py-6 text-sm font-bold shadow-md"
+        className="w-full bg-secondary hover:bg-secondary/90 text-white rounded-full py-6 text-sm font-bold shadow-md md:max-w-xs"
         onClick={() => {
           setFileStatus({ absensi: false, spanduk: false, fotoBersama: false, fotoPendukung: false })
           setIsCreateOpen(true)
@@ -122,7 +122,7 @@ export default function LaporanKegiatanPage() {
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input 
           placeholder="Cari judul laporan..." 
-          className="pl-11 h-12 rounded-full bg-white border shadow-sm text-sm"
+          className="pl-11 h-12 rounded-full bg-white border shadow-sm text-sm md:max-w-md"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -134,7 +134,7 @@ export default function LaporanKegiatanPage() {
           <p className="text-muted-foreground font-bold text-xs uppercase tracking-widest">Memuat arsip...</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredReports.map((report) => (
             <Card 
               key={report.id} 
@@ -176,7 +176,7 @@ export default function LaporanKegiatanPage() {
 
       {/* Dialog Detail Laporan */}
       <Dialog open={!!selectedReport} onOpenChange={() => setSelectedReport(null)}>
-        <DialogContent className="sm:max-w-[650px] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-[2.5rem]">
+        <DialogContent className="w-[95vw] md:max-w-[650px] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-[2.5rem]">
           {selectedReport && (
             <>
               <div className="bg-primary p-8 text-white relative">
@@ -188,7 +188,7 @@ export default function LaporanKegiatanPage() {
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
-                <h2 className="text-2xl font-black uppercase tracking-tight leading-tight">{selectedReport.title}</h2>
+                <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight leading-tight">{selectedReport.title}</h2>
                 <div className="flex flex-wrap gap-4 pt-6 text-white/80 text-[10px] font-bold uppercase tracking-widest">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
@@ -215,7 +215,7 @@ export default function LaporanKegiatanPage() {
                   <Label className="text-[10px] font-black text-primary uppercase tracking-[0.2em] flex items-center gap-2">
                     <FileCheck className="h-4 w-4" /> Dokumentasi
                   </Label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {[
                       { label: "Absensi", file: selectedReport.absensiFile },
                       { label: "Spanduk", file: selectedReport.spandukFile },
@@ -266,14 +266,14 @@ export default function LaporanKegiatanPage() {
 
       {/* Dialog Buat Laporan */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent className="sm:max-w-[600px] max-h-[95vh] overflow-y-auto rounded-[2.5rem] p-0 border-none shadow-2xl">
+        <DialogContent className="w-[95vw] md:max-w-[600px] max-h-[95vh] overflow-y-auto rounded-[2.5rem] p-0 border-none shadow-2xl">
           <form onSubmit={handleSubmit}>
             <DialogHeader className="p-8 bg-primary text-white">
               <DialogTitle className="text-2xl font-black uppercase tracking-tight">Buat Laporan</DialogTitle>
               <DialogDescription className="text-white/80 font-medium text-xs">Dokumentasikan kegiatan operasional partai.</DialogDescription>
             </DialogHeader>
             <div className="p-8 space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-[9px] font-black uppercase text-muted-foreground tracking-widest">Tanggal</Label>
                   <Input name="reportDate" type="date" required className="rounded-2xl h-12 font-bold" />

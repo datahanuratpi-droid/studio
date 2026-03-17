@@ -158,15 +158,15 @@ export default function KasOfficePage() {
   )
 
   return (
-    <div className="space-y-6 md:space-y-8 pb-10 animate-in fade-in duration-500 overflow-x-hidden">
+    <div className="space-y-6 md:space-y-8 pb-10 animate-in fade-in duration-500 max-w-full overflow-x-hidden">
       <div className="flex flex-col gap-1 px-1">
         <h1 className="text-2xl md:text-3xl font-bold text-primary">Kas Office</h1>
         <p className="text-xs md:text-sm text-muted-foreground">Catat Pemasukan dan Pengeluaran Operasional Kantor.</p>
       </div>
 
-      <div className="flex flex-col gap-4 px-1">
+      <div className="flex flex-col gap-4 px-1 md:flex-row md:items-center">
         <Button 
-          className="w-full bg-secondary hover:bg-secondary/90 text-white rounded-full py-6 text-sm font-bold shadow-md h-12"
+          className="w-full bg-secondary hover:bg-secondary/90 text-white rounded-full py-6 text-sm font-bold shadow-md h-12 md:w-auto md:px-8"
           onClick={() => {
             setSelectedType("Payment")
             setIsDialogOpen(true)
@@ -178,7 +178,7 @@ export default function KasOfficePage() {
         {isAdmin && isFirstDayOfMonth && (
           <Button 
             variant="outline" 
-            className="w-full border-amber-500 text-amber-700 hover:bg-amber-50 rounded-full h-11"
+            className="w-full border-amber-500 text-amber-700 hover:bg-amber-50 rounded-full h-11 md:w-auto md:px-6"
             onClick={handleTutupBuku}
             disabled={isClosingBook}
           >
@@ -188,9 +188,9 @@ export default function KasOfficePage() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 gap-4 px-1">
+      <div className="grid grid-cols-1 gap-4 px-1 md:grid-cols-12">
         {/* Main Balance Card - Orange */}
-        <Card className="bg-primary text-white border-none shadow-xl relative overflow-hidden rounded-3xl h-32 flex flex-col justify-center">
+        <Card className="bg-primary text-white border-none shadow-xl relative overflow-hidden rounded-3xl h-32 flex flex-col justify-center md:col-span-6 lg:col-span-4">
           <CardContent className="p-6 relative z-10">
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 bg-white/20 rounded-xl">
@@ -205,9 +205,9 @@ export default function KasOfficePage() {
           </div>
         </Card>
         
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 md:col-span-6 lg:col-span-8">
           {/* Total Pemasukan Card */}
-          <Card className="border-none shadow-sm bg-white rounded-3xl h-24 flex flex-col justify-center border border-border/50">
+          <Card className="border-none shadow-sm bg-white rounded-3xl h-32 flex flex-col justify-center border border-border/50">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <div className="p-1.5 bg-green-50 rounded-lg text-green-600">
@@ -215,14 +215,14 @@ export default function KasOfficePage() {
                 </div>
                 <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Masuk</span>
               </div>
-              <p className="text-sm font-bold text-primary truncate">
+              <p className="text-base md:text-xl font-bold text-primary truncate">
                 Rp {transactions?.filter(t => t.type === 'Receipt').reduce((a, b) => a + b.amount, 0).toLocaleString('id-ID') || 0}
               </p>
             </CardContent>
           </Card>
 
           {/* Total Pengeluaran Card */}
-          <Card className="border-none shadow-sm bg-white rounded-3xl h-24 flex flex-col justify-center border border-border/50">
+          <Card className="border-none shadow-sm bg-white rounded-3xl h-32 flex flex-col justify-center border border-border/50">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <div className="p-1.5 bg-red-50 rounded-lg text-red-600">
@@ -230,7 +230,7 @@ export default function KasOfficePage() {
                 </div>
                 <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Keluar</span>
               </div>
-              <p className="text-sm font-bold text-primary truncate">
+              <p className="text-base md:text-xl font-bold text-primary truncate">
                 Rp {transactions?.filter(t => t.type !== 'Receipt').reduce((a, b) => a + b.amount, 0).toLocaleString('id-ID') || 0}
               </p>
             </CardContent>
@@ -240,7 +240,7 @@ export default function KasOfficePage() {
 
       <div className="space-y-6 px-1">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="bg-white border p-1 rounded-full shadow-sm h-12 w-full grid grid-cols-3 mb-6">
+          <TabsList className="bg-white border p-1 rounded-full shadow-sm h-12 w-full grid grid-cols-3 mb-6 md:max-w-md">
             <TabsTrigger value="all" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-white text-[10px] font-bold">Semua</TabsTrigger>
             <TabsTrigger value="pemasukkan" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-white text-[10px] font-bold">Masuk</TabsTrigger>
             <TabsTrigger value="pengeluaran" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-white text-[10px] font-bold">Keluar</TabsTrigger>
@@ -250,20 +250,20 @@ export default function KasOfficePage() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input 
               placeholder="Cari transaksi..." 
-              className="pl-11 h-12 rounded-full bg-white border shadow-sm text-sm"
+              className="pl-11 h-12 rounded-full bg-white border shadow-sm text-sm md:max-w-md"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
 
           <div className="bg-white rounded-3xl border border-border/50 overflow-hidden shadow-sm">
-            <div className="overflow-x-auto custom-scrollbar">
-              <Table className="w-full">
+            <div className="overflow-x-auto custom-scrollbar w-full">
+              <Table className="w-full min-w-[600px] md:min-w-full">
                 <TableHeader className="bg-muted/30">
                   <TableRow className="border-none">
-                    <TableHead className="font-black text-[9px] uppercase py-4 pl-6 min-w-[100px]">Tanggal</TableHead>
-                    <TableHead className="font-black text-[9px] uppercase py-4 min-w-[150px]">Keterangan</TableHead>
-                    <TableHead className="font-black text-[9px] uppercase py-4 min-w-[120px]">Jumlah</TableHead>
+                    <TableHead className="font-black text-[9px] uppercase py-4 pl-6">Tanggal</TableHead>
+                    <TableHead className="font-black text-[9px] uppercase py-4">Keterangan</TableHead>
+                    <TableHead className="font-black text-[9px] uppercase py-4">Jumlah</TableHead>
                     <TableHead className="text-right font-black text-[9px] uppercase py-4 pr-6">Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -319,7 +319,7 @@ export default function KasOfficePage() {
 
       {/* Input Dialog Kantor */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="w-[95vw] sm:max-w-[480px] rounded-3xl p-0 overflow-hidden border-none shadow-2xl">
+        <DialogContent className="w-[95vw] md:max-w-[480px] rounded-3xl p-0 overflow-hidden border-none shadow-2xl">
           <form onSubmit={handleSubmit} className="flex flex-col">
             <DialogHeader className="p-6 bg-primary text-white">
               <DialogTitle className="text-xl font-black uppercase tracking-tight">Catat Transaksi</DialogTitle>
@@ -355,7 +355,7 @@ export default function KasOfficePage() {
 
       {/* Dialog Detail Transaksi */}
       <Dialog open={!!viewingTransaction} onOpenChange={() => setViewingTransaction(null)}>
-        <DialogContent className="w-[95vw] sm:max-w-[420px] rounded-3xl p-0 overflow-hidden border-none shadow-2xl">
+        <DialogContent className="w-[95vw] md:max-w-[420px] rounded-3xl p-0 overflow-hidden border-none shadow-2xl">
           {viewingTransaction && (
             <div className="bg-white flex flex-col">
               <DialogHeader className="p-6 bg-primary text-white relative">
