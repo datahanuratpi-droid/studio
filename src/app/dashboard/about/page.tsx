@@ -142,7 +142,7 @@ export default function AboutPage() {
       </Card>
 
       <footer className="text-center pt-8 text-sm text-muted-foreground border-t">
-        © 2024 SITU HANURA - DPC Partai Hanura Kota Tanjungpinang. All rights reserved.
+        © 2026 SITU HANURA - DPC Partai Hanura Kota Tanjungpinang. All rights reserved.
       </footer>
     </div>
   )
