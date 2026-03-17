@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -34,32 +35,32 @@ export default function LoginPage() {
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!auth) return;
+    console.log("Memulai proses masuk...");
+    
+    if (!auth) {
+      console.error("Firebase Auth belum siap.");
+      toast({ variant: 'destructive', title: 'Sistem Belum Siap', description: 'Silakan muat ulang halaman.' });
+      return;
+    }
     
     setLoading(true);
     const formData = new FormData(e.currentTarget);
-    const emailInput = formData.get('email') as string;
+    const emailInput = (formData.get('email') as string)?.trim();
     const password = formData.get('password') as string;
     
     if (!emailInput || !password) {
-      toast({
-        variant: 'destructive',
-        title: 'Input Kosong',
-        description: 'Silakan isi username dan password.'
-      });
+      toast({ variant: 'destructive', title: 'Input Kosong', description: 'Silakan isi username dan password.' });
       setLoading(false);
       return;
     }
 
     const email = formatEmail(emailInput);
+    console.log(`Mencoba masuk dengan: ${email}`);
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      toast({ 
-        title: 'Login Berhasil', 
-        description: 'Mengarahkan Anda ke Dashboard...' 
-      });
-      // Redirect handled by useEffect
+      console.log("Masuk berhasil.");
+      toast({ title: 'Login Berhasil', description: 'Mengarahkan Anda ke Dashboard...' });
     } catch (err: any) {
       console.error("Login error:", err);
       let message = "Username atau password salah.";
@@ -69,20 +70,24 @@ export default function LoginPage() {
         message = "Password yang Anda masukkan salah.";
       } else if (err.code === 'auth/invalid-credential') {
         message = "Kredensial tidak valid. Periksa kembali username/password.";
+      } else if (err.code === 'auth/too-many-requests') {
+        message = "Terlalu banyak percobaan. Silakan coba lagi nanti.";
       }
       
-      toast({ 
-        variant: 'destructive', 
-        title: 'Gagal Masuk', 
-        description: message 
-      });
+      toast({ variant: 'destructive', title: 'Gagal Masuk', description: message });
       setLoading(false);
     }
   };
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!auth || !firestore) return;
+    console.log("Memulai proses pendaftaran...");
+    
+    if (!auth || !firestore) {
+      console.error("Firebase Auth atau Firestore belum siap.");
+      toast({ variant: 'destructive', title: 'Sistem Belum Siap', description: 'Silakan muat ulang halaman.' });
+      return;
+    }
 
     setLoading(true);
     const formData = new FormData(e.currentTarget);
@@ -90,20 +95,24 @@ export default function LoginPage() {
     const password = formData.get('password') as string;
     
     if (!emailInput || !password) {
-      toast({
-        variant: 'destructive',
-        title: 'Input Kosong',
-        description: 'Silakan isi username dan password baru.'
-      });
+      toast({ variant: 'destructive', title: 'Input Kosong', description: 'Silakan isi username dan password baru.' });
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      toast({ variant: 'destructive', title: 'Password Lemah', description: 'Password minimal harus 6 karakter.' });
       setLoading(false);
       return;
     }
 
     const email = formatEmail(emailInput);
+    console.log(`Mencoba mendaftar dengan: ${email}`);
     
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const newUser = userCredential.user;
+      console.log("Pendaftaran di Firebase Auth berhasil.");
 
       // Special check for primary admin AGUS (case insensitive)
       const isAdminAgus = emailInput.toLowerCase() === 'agus';
@@ -118,6 +127,7 @@ export default function LoginPage() {
         updatedAt: new Date().toISOString(),
       };
 
+      console.log(`Menyimpan profil ke Firestore: Status=${userProfile.status}`);
       setDocumentNonBlocking(doc(firestore, 'users', newUser.uid), userProfile, { merge: true });
       
       if (isAdminAgus) {
@@ -132,21 +142,21 @@ export default function LoginPage() {
           description: 'Akun Anda sedang menunggu verifikasi dari Admin.' 
         });
       }
-      setLoading(false);
+      
+      // Berikan waktu sedikit agar toast terlihat sebelum loading dihentikan (atau router pindah)
+      setTimeout(() => setLoading(false), 1000);
     } catch (err: any) {
       console.error("Signup error:", err);
       let message = "Terjadi kesalahan saat mendaftar.";
       if (err.code === 'auth/email-already-in-use') {
         message = "Username ini sudah terdaftar. Silakan gunakan menu Masuk.";
+      } else if (err.code === 'auth/operation-not-allowed') {
+        message = "Metode pendaftaran ini belum diaktifkan di Firebase Console.";
       } else if (err.code === 'auth/weak-password') {
         message = "Password minimal harus 6 karakter.";
       }
       
-      toast({ 
-        variant: 'destructive', 
-        title: 'Pendaftaran Gagal', 
-        description: message 
-      });
+      toast({ variant: 'destructive', title: 'Pendaftaran Gagal', description: message });
       setLoading(false);
     }
   };
@@ -169,7 +179,7 @@ export default function LoginPage() {
           <h1 className="mt-6 text-3xl font-headline font-bold text-primary">SITU HANURA</h1>
           <div className="mt-2 space-y-1">
             <p className="text-muted-foreground font-medium">Sistem Informasi Terpadu Partai Hanura</p>
-            <p className="text-xs text-muted-foreground/60 uppercase tracking-widest">Kota Tanjungpinang</p>
+            <p className="text-xs text-muted-foreground/60 uppercase tracking-widest text-center">Kota Tanjungpinang</p>
           </div>
         </div>
 
@@ -240,7 +250,7 @@ export default function LoginPage() {
             <Card className="border-none shadow-xl">
               <CardHeader>
                 <CardTitle>Buat Akun Baru</CardTitle>
-                <CardDescription>Daftarkan diri Anda untuk akses aplikasi.</CardDescription>
+                <CardDescription>Daftarkan diri Anda untuk akses aplikasi SITU HANURA.</CardDescription>
               </CardHeader>
               <form onSubmit={handleSignUp}>
                 <CardContent className="space-y-4">
