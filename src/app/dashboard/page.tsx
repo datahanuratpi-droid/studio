@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -113,7 +112,7 @@ export default function DashboardPage() {
         <Card className="lg:col-span-2 border-none shadow-md rounded-3xl overflow-hidden bg-white">
           <CardHeader className="bg-primary text-white">
             <CardTitle className="font-headline font-bold flex items-center gap-2 text-lg md:text-xl">
-              <Users className="h-5 w-5" /> PENGURUS DPC HANURA KOTA TANJUNGPINANG
+              <Users className="h-5 w-5" /> DPC HANURA KOTA TANJUNGPINANG
             </CardTitle>
             <CardDescription className="text-white/70 text-[10px] uppercase tracking-[0.2em] font-bold">Struktur Organisasi Inti</CardDescription>
           </CardHeader>
