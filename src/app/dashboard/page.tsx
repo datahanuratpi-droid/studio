@@ -1,19 +1,16 @@
-
 "use client"
 
 import * as React from "react"
 import { 
   FileText, 
-  Archive, 
   Wallet, 
   TrendingUp, 
   Clock,
-  CheckCircle2,
-  AlertCircle,
+  RefreshCw,
+  Loader2,
   Inbox,
   ArrowRight,
-  RefreshCw,
-  Loader2
+  AlertCircle
 } from "lucide-react"
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -39,7 +36,6 @@ export default function DashboardPage() {
 
   const suratMasukCount = letters?.filter(l => l.type === 'Incoming').length || 0
   const laporanCount = reports?.length || 0
-  const arsipCount = (letters?.length || 0) + (reports?.length || 0)
   const totalSaldo = transactions?.reduce((acc, curr) => {
     return curr.type === 'Receipt' ? acc + curr.amount : acc - curr.amount
   }, 0) || 0
@@ -48,9 +44,8 @@ export default function DashboardPage() {
 
   const stats = [
     { label: "Surat Masuk", value: suratMasukCount.toString(), icon: <Inbox />, color: "text-blue-600", bg: "bg-blue-100", href: "/dashboard/surat/masuk" },
-    { label: "Laporan", value: laporanCount.toString(), icon: <FileText />, color: "text-green-600", bg: "bg-green-100", href: "/dashboard/laporan" },
-    { label: "Total Arsip", value: arsipCount.toString(), icon: <Archive />, color: "text-purple-600", bg: "bg-purple-100", href: "/dashboard/arsip" },
-    { label: "Saldo Kas", value: `Rp ${totalSaldo.toLocaleString('id-ID')}`, icon: <Wallet />, color: "text-amber-600", bg: "bg-amber-100", href: "/dashboard/kas" },
+    { label: "Laporan Kegiatan", value: laporanCount.toString(), icon: <FileText />, color: "text-green-600", bg: "bg-green-100", href: "/dashboard/laporan" },
+    { label: "Saldo Kas Office", value: `Rp ${totalSaldo.toLocaleString('id-ID')}`, icon: <Wallet />, color: "text-amber-600", bg: "bg-amber-100", href: "/dashboard/kas" },
   ]
 
   const recentActivities = React.useMemo(() => {
@@ -84,8 +79,7 @@ export default function DashboardPage() {
         </Badge>
       </div>
 
-      {/* Stats Grid Responsif */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {stats.map((stat) => (
           <Link key={stat.label} href={stat.href}>
             <Card className="border-none shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer group rounded-2xl overflow-hidden">

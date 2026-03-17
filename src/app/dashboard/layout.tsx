@@ -7,7 +7,6 @@ import {
   LayoutDashboard, 
   Mail, 
   FileText, 
-  Archive, 
   Wallet, 
   Users, 
   Settings, 
@@ -78,7 +77,7 @@ function SidebarItem({ href, icon, label, active, onClick, subItems }: SidebarIt
           <Button
             variant="ghost"
             className={cn(
-              "w-full justify-between px-3 py-2 h-10 font-medium transition-all hover-text-primary",
+              "w-full justify-between px-3 py-2 h-10 font-medium transition-all hover:text-primary",
               active && "bg-accent/5 text-primary"
             )}
           >
@@ -96,7 +95,7 @@ function SidebarItem({ href, icon, label, active, onClick, subItems }: SidebarIt
                 variant="ghost"
                 size="sm"
                 className={cn(
-                  "w-full justify-start h-9 text-muted-foreground font-normal hover-text-primary hover:bg-accent/5",
+                  "w-full justify-start h-9 text-muted-foreground font-normal hover:text-primary hover:bg-accent/5",
                   pathname === subItem.href && "text-primary font-medium bg-accent/5"
                 )}
               >
@@ -115,7 +114,7 @@ function SidebarItem({ href, icon, label, active, onClick, subItems }: SidebarIt
       variant="ghost"
       onClick={onClick}
       className={cn(
-        "w-full justify-start px-3 py-2 h-10 font-medium transition-all hover-text-primary",
+        "w-full justify-start px-3 py-2 h-10 font-medium transition-all hover:text-primary",
         active && "bg-accent/10 text-primary border-r-2 border-primary rounded-none"
       )}
     >
@@ -226,7 +225,6 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       ]
     },
     { href: "/dashboard/laporan", icon: <FileText className="h-5 w-5" />, label: "Laporan Kegiatan", roles: ["Admin", "KSB", "Staff"] },
-    { href: "/dashboard/arsip", icon: <Archive className="h-5 w-5" />, label: "Arsip", roles: ["Admin", "KSB", "Staff"] },
     { href: "/dashboard/kas", icon: <Wallet className="h-5 w-5" />, label: "Kas Office", roles: ["Admin", "KSB", "Staff"] },
     { href: "/dashboard/users", icon: <Users className="h-5 w-5" />, label: "Manajemen User", roles: ["Admin"] },
     { href: "/dashboard/pengaturan", icon: <Settings className="h-5 w-5" />, label: "Pengaturan", roles: ["Admin", "KSB", "Staff"] },
@@ -340,8 +338,8 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild className="cursor-pointer hover-text-primary"><Link href="/dashboard/pengaturan"><UserIcon className="mr-2 h-4 w-4" /> Profil</Link></DropdownMenuItem>
-                <DropdownMenuItem asChild className="cursor-pointer hover-text-primary"><Link href="/dashboard/pengaturan"><Settings className="mr-2 h-4 w-4" /> Pengaturan</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer hover:text-primary"><Link href="/dashboard/pengaturan"><UserIcon className="mr-2 h-4 w-4" /> Profil</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer hover:text-primary"><Link href="/dashboard/pengaturan"><Settings className="mr-2 h-4 w-4" /> Pengaturan</Link></DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-destructive font-bold cursor-pointer" onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" /> Keluar
@@ -358,7 +356,6 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         </main>
       </div>
 
-      {/* About Pop-out Dialog */}
       <Dialog open={isAboutOpen} onOpenChange={setIsAboutOpen}>
         <DialogContent className="max-w-4xl p-0 border-none rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in duration-300">
           <DialogHeader className="sr-only">
