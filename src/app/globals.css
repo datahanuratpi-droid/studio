@@ -11,7 +11,7 @@
     --card-foreground: 209 60% 10%;
     --popover: 0 0% 100%;
     --popover-foreground: 209 60% 10%;
-    --primary: 209 60% 35%;
+    --primary: 209 60% 35%; /* Default Blue */
     --primary-foreground: 0 0% 100%;
     --secondary: 198 15% 85%;
     --secondary-foreground: 209 60% 25%;
@@ -31,6 +31,14 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
   }
+
+  /* Theme Color Variations */
+  .theme-red { --primary: 0 84% 60%; --ring: 0 84% 60%; }
+  .theme-blue { --primary: 209 60% 35%; --ring: 209 60% 35%; }
+  .theme-orange { --primary: 24 95% 53%; --ring: 24 95% 53%; }
+  .theme-magenta { --primary: 327 73% 53%; --ring: 327 73% 53%; }
+  .theme-purple { --primary: 262 83% 58%; --ring: 262 83% 58%; }
+  .theme-yellow { --primary: 47 95% 55%; --ring: 47 95% 55%; }
 
   .dark {
     --background: 209 60% 5%;
@@ -68,7 +76,15 @@
   }
 }
 
-/* Custom Scrollbar for smoother feel */
+/* Mouse Hover Indicator - Black Text */
+.hover\:text-black:hover {
+  color: #000 !important;
+}
+.dark .hover\:text-white:hover {
+  color: #fff !important;
+}
+
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -78,11 +94,6 @@
 }
 ::-webkit-scrollbar-thumb {
   @apply bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/40 transition-colors;
-}
-
-/* Smooth Table Container */
-.table-container {
-  @apply overflow-x-auto rounded-2xl border border-border/50 bg-card;
 }
 
 /* Modern Hover Effects */

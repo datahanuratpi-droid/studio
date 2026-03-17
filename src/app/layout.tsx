@@ -23,10 +23,17 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{
           __html: `
             try {
+              // Handle Theme Preference (Dark/Light)
               if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.classList.add('dark')
               } else {
                 document.documentElement.classList.remove('dark')
+              }
+
+              // Handle Theme Color
+              const savedColor = localStorage.getItem('themeColor');
+              if (savedColor) {
+                document.documentElement.classList.add('theme-' + savedColor);
               }
             } catch (_) {}
           `,

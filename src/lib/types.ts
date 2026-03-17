@@ -80,6 +80,8 @@ export interface DigitalArchive {
   createdAt: string;
 }
 
+export type AppThemeColor = 'red' | 'blue' | 'orange' | 'magenta' | 'purple' | 'yellow';
+
 export interface UserProfile {
   id: string;
   email: string;
@@ -89,6 +91,7 @@ export interface UserProfile {
   phoneNumber?: string;
   passwordDisplay?: string;
   themePreference?: 'light' | 'dark';
+  themeColor?: AppThemeColor;
   createdAt: string;
   updatedAt: string;
 }
