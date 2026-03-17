@@ -28,13 +28,14 @@ export default function LoginPage() {
   }, [user, isUserLoading, router]);
 
   const formatEmail = (input: string) => {
-    const email = input.trim();
-    return email.includes('@') ? email : `${email.toLowerCase()}@hanura.id`;
+    const email = input.trim().toLowerCase();
+    return email.includes('@') ? email : `${email}@hanura.id`;
   };
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!auth) return;
+    
     setLoading(true);
     const formData = new FormData(e.currentTarget);
     const emailInput = formData.get('email') as string;
@@ -44,8 +45,18 @@ export default function LoginPage() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      toast({ 
+        title: 'Login Berhasil', 
+        description: 'Mengarahkan Anda ke Dashboard...' 
+      });
+      // setLoading(false) is handled by navigation or can be called here
     } catch (err: any) {
-      toast({ variant: 'destructive', title: 'Login Gagal', description: "Email/Username atau password salah." });
+      console.error("Login error:", err);
+      toast({ 
+        variant: 'destructive', 
+        title: 'Login Gagal', 
+        description: "Username/Email atau password salah. Pastikan Anda sudah terdaftar." 
+      });
       setLoading(false);
     }
   };
@@ -53,6 +64,7 @@ export default function LoginPage() {
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!auth || !firestore) return;
+
     setLoading(true);
     const formData = new FormData(e.currentTarget);
     const emailInput = formData.get('email') as string;
@@ -64,13 +76,13 @@ export default function LoginPage() {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const newUser = userCredential.user;
 
-      // Special check for primary admin AGUS
-      const isAdminAgus = email.toLowerCase() === 'agus@hanura.id';
+      // Special check for primary admin AGUS (case insensitive)
+      const isAdminAgus = email.split('@')[0] === 'agus';
 
       const userProfile = {
         id: newUser.uid,
         email: newUser.email,
-        fullName: isAdminAgus ? 'AGUS (Super Admin)' : emailInput.split('@')[0],
+        fullName: isAdminAgus ? 'AGUS (Super Admin)' : emailInput,
         role: isAdminAgus ? 'Admin' : 'Employee',
         status: isAdminAgus ? 'Active' : 'Pending Verification',
         createdAt: new Date().toISOString(),
@@ -83,17 +95,29 @@ export default function LoginPage() {
         setDocumentNonBlocking(doc(firestore, 'roles_admin', newUser.uid), { active: true }, { merge: true });
         toast({ 
           title: 'Akun Admin Berhasil Dibuat', 
-          description: 'Selamat datang, Bapak Agus. Anda memiliki akses penuh.' 
+          description: 'Selamat datang, Bapak Agus. Akun Anda otomatis aktif.' 
         });
       } else {
         toast({ 
-          title: 'Akun Berhasil Dibuat', 
-          description: 'Mohon tunggu admin memverifikasi akun Anda sebelum bisa masuk.' 
+          title: 'Pendaftaran Berhasil', 
+          description: 'Akun Anda sedang menunggu verifikasi dari Admin.' 
         });
       }
       setLoading(false);
     } catch (err: any) {
-      toast({ variant: 'destructive', title: 'Pendaftaran Gagal', description: err.message });
+      console.error("Signup error:", err);
+      let message = "Terjadi kesalahan saat mendaftar.";
+      if (err.code === 'auth/email-already-in-use') {
+        message = "Username/Email ini sudah terdaftar.";
+      } else if (err.code === 'auth/weak-password') {
+        message = "Password minimal harus 6 karakter.";
+      }
+      
+      toast({ 
+        variant: 'destructive', 
+        title: 'Pendaftaran Gagal', 
+        description: message 
+      });
       setLoading(false);
     }
   };
@@ -138,21 +162,45 @@ export default function LoginPage() {
                     <Label htmlFor="email">Username / Email</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input id="email" name="email" placeholder="Contoh: AGUS" className="pl-10" required />
+                      <Input 
+                        id="email" 
+                        name="email" 
+                        placeholder="Contoh: AGUS" 
+                        className="pl-10" 
+                        required 
+                        disabled={loading}
+                      />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="password">Password</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input id="password" name="password" type="password" placeholder="••••••••" className="pl-10" required />
+                      <Input 
+                        id="password" 
+                        name="password" 
+                        type="password" 
+                        placeholder="••••••••" 
+                        className="pl-10" 
+                        required 
+                        disabled={loading}
+                      />
                     </div>
                   </div>
                 </CardContent>
                 <CardFooter>
                   <Button type="submit" className="w-full bg-primary text-white" disabled={loading}>
-                    {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="mr-2 h-4 w-4" />}
-                    Masuk ke Sistem
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Memproses...
+                      </>
+                    ) : (
+                      <>
+                        <LogIn className="mr-2 h-4 w-4" />
+                        Masuk ke Sistem
+                      </>
+                    )}
                   </Button>
                 </CardFooter>
               </form>
@@ -171,21 +219,45 @@ export default function LoginPage() {
                     <Label htmlFor="reg-email">Pilih Username / Email</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input id="reg-email" name="email" placeholder="Contoh: AGUS" className="pl-10" required />
+                      <Input 
+                        id="reg-email" 
+                        name="email" 
+                        placeholder="Contoh: AGUS" 
+                        className="pl-10" 
+                        required 
+                        disabled={loading}
+                      />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="reg-password">Password Baru</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input id="reg-password" name="password" type="password" placeholder="Minimal 6 karakter" className="pl-10" required />
+                      <Input 
+                        id="reg-password" 
+                        name="password" 
+                        type="password" 
+                        placeholder="Minimal 6 karakter" 
+                        className="pl-10" 
+                        required 
+                        disabled={loading}
+                      />
                     </div>
                   </div>
                 </CardContent>
                 <CardFooter>
                   <Button type="submit" className="w-full bg-accent text-white hover:bg-accent/90" disabled={loading}>
-                    {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
-                    Daftar Akun
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Mendaftarkan...
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus className="mr-2 h-4 w-4" />
+                        Daftar Akun
+                      </>
+                    )}
                   </Button>
                 </CardFooter>
               </form>
