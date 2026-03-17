@@ -12,7 +12,9 @@ import {
   ClipboardList,
   Image as ImageIcon,
   FileCheck,
-  CheckCircle2
+  CheckCircle2,
+  X,
+  Search
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -36,6 +38,7 @@ import { useToast } from "@/hooks/use-toast"
 export default function LaporanKegiatanPage() {
   const [isCreateOpen, setIsCreateOpen] = React.useState(false)
   const [selectedReport, setSelectedReport] = React.useState<any>(null)
+  const [searchQuery, setSearchQuery] = React.useState("")
   const [fileStatus, setFileStatus] = React.useState({
     absensi: false,
     spanduk: false,
@@ -91,69 +94,80 @@ export default function LaporanKegiatanPage() {
     })
   }
 
-  const sortedReports = React.useMemo(() => {
-    return reports?.sort((a, b) => new Date(b.reportDate).getTime() - new Date(a.reportDate).getTime())
-  }, [reports])
+  const filteredReports = React.useMemo(() => {
+    if (!reports) return []
+    return reports
+      .filter(r => r.title.toLowerCase().includes(searchQuery.toLowerCase()))
+      .sort((a, b) => new Date(b.reportDate).getTime() - new Date(a.reportDate).getTime())
+  }, [reports, searchQuery])
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-headline font-bold text-primary">Laporan Kegiatan</h1>
-          <p className="text-muted-foreground">Arsip digital laporan kegiatan operasional partai.</p>
-        </div>
-        <Button 
-          className="bg-accent hover:bg-accent/90 text-white rounded-full px-6"
-          onClick={() => {
-            setFileStatus({ absensi: false, spanduk: false, fotoBersama: false, fotoPendukung: false })
-            setIsCreateOpen(true)
-          }}
-        >
-          <Plus className="mr-2 h-4 w-4" /> Buat Laporan
-        </Button>
+    <div className="space-y-6 md:space-y-8 pb-10 animate-in fade-in duration-500">
+      <div className="flex flex-col gap-1">
+        <h1 className="text-2xl md:text-3xl font-bold text-primary">Laporan Kegiatan</h1>
+        <p className="text-xs md:text-sm text-muted-foreground">Arsip digital laporan kegiatan operasional partai.</p>
+      </div>
+
+      <Button 
+        className="w-full bg-secondary hover:bg-secondary/90 text-white rounded-full py-6 text-sm font-bold shadow-md"
+        onClick={() => {
+          setFileStatus({ absensi: false, spanduk: false, fotoBersama: false, fotoPendukung: false })
+          setIsCreateOpen(true)
+        }}
+      >
+        <Plus className="mr-2 h-4 w-4" /> Buat Laporan Baru
+      </Button>
+
+      <div className="relative">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input 
+          placeholder="Cari judul laporan..." 
+          className="pl-11 h-12 rounded-full bg-white border shadow-sm text-sm"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
       </div>
 
       {isLoading ? (
         <div className="flex flex-col items-center justify-center p-24 space-y-4">
           <Loader2 className="h-10 w-10 animate-spin text-primary" />
-          <p className="text-muted-foreground font-medium">Memuat arsip laporan...</p>
+          <p className="text-muted-foreground font-bold text-xs uppercase tracking-widest">Memuat arsip...</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-          {sortedReports?.map((report) => (
-            <div 
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredReports.map((report) => (
+            <Card 
               key={report.id} 
-              className="group flex flex-col items-center space-y-3 p-4 rounded-2xl transition-all hover:bg-white hover:shadow-xl cursor-pointer border border-transparent hover:border-border/50"
+              className="group rounded-[2rem] hover:shadow-xl transition-all cursor-pointer border border-border/50 overflow-hidden bg-white"
               onClick={() => setSelectedReport(report)}
             >
-              <div className="relative p-6 bg-primary/5 rounded-3xl group-hover:bg-primary/10 transition-colors">
-                <FileText className="h-12 w-12 text-primary" />
-                <div className="absolute -top-1 -right-1">
-                  <Badge className={cn("h-5 w-5 rounded-full p-0 flex items-center justify-center border-2 border-background", 
-                    report.status === 'Approved' ? "bg-green-500" : "bg-amber-500"
-                  )}>
-                    <div className="h-1 w-1 rounded-full bg-white" />
-                  </Badge>
+              <CardContent className="p-6 flex items-center gap-4">
+                <div className="relative p-4 bg-primary/10 rounded-2xl group-hover:bg-primary/20 transition-colors">
+                  <FileText className="h-8 w-8 text-primary" />
+                  <div className="absolute -top-1 -right-1">
+                    <div className={cn("h-3 w-3 rounded-full border-2 border-white shadow-sm", 
+                      report.status === 'Approved' ? "bg-green-500" : "bg-amber-500"
+                    )} />
+                  </div>
                 </div>
-              </div>
-              <div className="text-center space-y-1 w-full">
-                <p className="text-sm font-bold text-primary truncate px-2" title={report.title}>{report.title}</p>
-                <div className="flex items-center justify-center gap-1.5 text-[10px] text-muted-foreground font-medium uppercase tracking-tighter">
-                  <Calendar className="h-3 w-3" />
-                  {new Date(report.reportDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-black text-primary truncate uppercase tracking-tight" title={report.title}>{report.title}</p>
+                  <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-bold uppercase mt-1">
+                    <Calendar className="h-3 w-3" />
+                    {new Date(report.reportDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
+                  </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           ))}
           
-          {(!sortedReports || sortedReports.length === 0) && (
-            <div className="col-span-full py-32 text-center space-y-4 bg-muted/10 rounded-3xl border-2 border-dashed border-border/50">
-              <div className="p-5 bg-white w-20 h-20 rounded-full flex items-center justify-center mx-auto text-muted-foreground/30 shadow-sm">
+          {filteredReports.length === 0 && !isLoading && (
+            <div className="col-span-full py-32 text-center space-y-4 bg-white/50 rounded-[2.5rem] border-2 border-dashed">
+              <div className="p-5 bg-white w-20 h-20 rounded-full flex items-center justify-center mx-auto text-muted-foreground/30 shadow-sm border">
                 <ClipboardList className="h-10 w-10" />
               </div>
               <div className="space-y-1">
-                <p className="text-muted-foreground font-bold">Belum Ada Laporan</p>
-                <p className="text-xs text-muted-foreground/60 max-w-xs mx-auto uppercase tracking-widest">Silakan buat laporan baru untuk mendokumentasikan kegiatan.</p>
+                <p className="text-muted-foreground font-black uppercase text-xs tracking-widest opacity-50">Belum Ada Laporan</p>
               </div>
             </div>
           )}
@@ -162,65 +176,64 @@ export default function LaporanKegiatanPage() {
 
       {/* Dialog Detail Laporan */}
       <Dialog open={!!selectedReport} onOpenChange={() => setSelectedReport(null)}>
-        <DialogContent className="sm:max-w-[650px] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl">
-          <DialogHeader className="sr-only">
-            <DialogTitle>Detail Laporan Kegiatan</DialogTitle>
-            <DialogDescription>Rincian lengkap mengenai laporan kegiatan operasional.</DialogDescription>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-[650px] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-[2.5rem]">
           {selectedReport && (
             <>
               <div className="bg-primary p-8 text-white relative">
-                <div className="space-y-2">
-                  <Badge variant="secondary" className="bg-white/20 text-white border-none text-[10px] uppercase font-bold tracking-widest px-3">
-                    Detail Laporan Kegiatan
+                <div className="flex justify-between items-start mb-4">
+                  <Badge variant="secondary" className="bg-white/20 text-white border-none text-[9px] uppercase font-black tracking-widest px-3">
+                    Laporan Kegiatan
                   </Badge>
-                  <h2 className="text-3xl font-headline font-bold">{selectedReport.title}</h2>
-                  <div className="flex flex-wrap gap-4 pt-4 text-primary-foreground/80 text-sm font-medium">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
-                      {new Date(selectedReport.reportDate).toLocaleDateString('id-ID', { dateStyle: 'long' })}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
-                      {selectedReport.location}
-                    </div>
+                  <Button variant="ghost" size="icon" onClick={() => setSelectedReport(null)} className="h-8 w-8 text-white hover:bg-white/20 rounded-full">
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                <h2 className="text-2xl font-black uppercase tracking-tight leading-tight">{selectedReport.title}</h2>
+                <div className="flex flex-wrap gap-4 pt-6 text-white/80 text-[10px] font-bold uppercase tracking-widest">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    {new Date(selectedReport.reportDate).toLocaleDateString('id-ID', { dateStyle: 'long' })}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4" />
+                    {selectedReport.location}
                   </div>
                 </div>
               </div>
 
               <div className="p-8 space-y-8 bg-white">
                 <div className="space-y-3">
-                  <h4 className="text-xs font-bold text-primary uppercase tracking-widest flex items-center gap-2">
+                  <Label className="text-[10px] font-black text-primary uppercase tracking-[0.2em] flex items-center gap-2">
                     <FileText className="h-4 w-4" /> Deskripsi Kegiatan
-                  </h4>
-                  <div className="p-5 bg-muted/30 rounded-2xl text-sm leading-relaxed text-muted-foreground border border-border/50 whitespace-pre-wrap">
+                  </Label>
+                  <div className="p-5 bg-muted/20 rounded-2xl text-xs font-bold leading-relaxed text-slate-700 border border-border/50 whitespace-pre-wrap uppercase">
                     {selectedReport.description}
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <h4 className="text-xs font-bold text-primary uppercase tracking-widest flex items-center gap-2">
-                    <FileCheck className="h-4 w-4" /> Lampiran Dokumentasi
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Label className="text-[10px] font-black text-primary uppercase tracking-[0.2em] flex items-center gap-2">
+                    <FileCheck className="h-4 w-4" /> Dokumentasi
+                  </Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {[
-                      { label: "Foto Absensi", file: selectedReport.absensiFile, type: "IMG" },
-                      { label: "Foto Spanduk", file: selectedReport.spandukFile, type: "IMG" },
-                      { label: "Foto Bersama", file: selectedReport.fotoBersamaFile, type: "IMG" },
-                      { label: "Dokumentasi Pendukung", file: selectedReport.fotoPendukungFile, type: "IMG" }
+                      { label: "Absensi", file: selectedReport.absensiFile },
+                      { label: "Spanduk", file: selectedReport.spandukFile },
+                      { label: "Foto Bersama", file: selectedReport.fotoBersamaFile },
+                      { label: "Pendukung", file: selectedReport.fotoPendukungFile }
                     ].map((item, idx) => (
                       <div key={idx} className={cn(
-                        "flex items-center justify-between p-4 rounded-xl border transition-colors",
-                        item.file ? "bg-green-50 border-green-100" : "bg-muted/30 border-dashed border-muted-foreground/20 opacity-60"
+                        "flex items-center justify-between p-4 rounded-2xl border transition-colors",
+                        item.file ? "bg-green-50 border-green-100" : "bg-muted/20 border-dashed opacity-50"
                       )}>
                         <div className="flex items-center gap-3">
-                          <div className={cn("p-2 rounded-lg", item.file ? "bg-green-100 text-green-600" : "bg-muted text-muted-foreground")}>
+                          <div className={cn("p-2 rounded-xl", item.file ? "bg-green-100 text-green-600" : "bg-muted text-muted-foreground")}>
                             <ImageIcon className="h-4 w-4" />
                           </div>
                           <div className="flex flex-col">
-                            <span className="text-xs font-bold text-primary leading-tight">{item.label}</span>
-                            <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">
-                              {item.file || "Belum diunggah"}
+                            <span className="text-[10px] font-black text-primary uppercase leading-tight">{item.label}</span>
+                            <span className="text-[8px] font-mono text-muted-foreground truncate max-w-[100px] mt-0.5">
+                              {item.file || "KOSONG"}
                             </span>
                           </div>
                         </div>
@@ -236,13 +249,13 @@ export default function LaporanKegiatanPage() {
 
                 <div className="pt-6 border-t flex justify-between items-center">
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">Status Laporan</span>
-                    <Badge className={cn("mt-1", selectedReport.status === 'Approved' ? "bg-green-500" : "bg-amber-500")}>
+                    <span className="text-[9px] text-muted-foreground uppercase font-black tracking-[0.2em]">Status</span>
+                    <Badge className={cn("mt-1 font-black text-[9px] uppercase", selectedReport.status === 'Approved' ? "bg-green-500" : "bg-amber-500")}>
                       {selectedReport.status}
                     </Badge>
                   </div>
-                  <Button variant="outline" onClick={() => setSelectedReport(null)} className="rounded-full px-6">
-                    Tutup Detail
+                  <Button onClick={() => setSelectedReport(null)} className="rounded-full px-8 bg-primary font-black text-xs uppercase shadow-lg">
+                    Tutup
                   </Button>
                 </div>
               </div>
@@ -253,47 +266,47 @@ export default function LaporanKegiatanPage() {
 
       {/* Dialog Buat Laporan */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl">
+        <DialogContent className="sm:max-w-[600px] max-h-[95vh] overflow-y-auto rounded-[2.5rem] p-0 border-none shadow-2xl">
           <form onSubmit={handleSubmit}>
-            <DialogHeader>
-              <DialogTitle>Buat Laporan Kegiatan</DialogTitle>
-              <DialogDescription>Input rincian kegiatan dan unggah dokumentasi foto yang diperlukan.</DialogDescription>
+            <DialogHeader className="p-8 bg-primary text-white">
+              <DialogTitle className="text-2xl font-black uppercase tracking-tight">Buat Laporan</DialogTitle>
+              <DialogDescription className="text-white/80 font-medium text-xs">Dokumentasikan kegiatan operasional partai.</DialogDescription>
             </DialogHeader>
-            <div className="grid gap-6 py-6">
+            <div className="p-8 space-y-6">
               <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="reportDate">Tanggal Kegiatan</Label>
-                  <Input id="reportDate" name="reportDate" type="date" required className="rounded-xl" />
+                <div className="space-y-2">
+                  <Label className="text-[9px] font-black uppercase text-muted-foreground tracking-widest">Tanggal</Label>
+                  <Input name="reportDate" type="date" required className="rounded-2xl h-12 font-bold" />
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="location">Lokasi Kegiatan</Label>
-                  <Input id="location" name="location" placeholder="Contoh: Kantor DPC / Kelurahan..." required className="rounded-xl" />
+                <div className="space-y-2">
+                  <Label className="text-[9px] font-black uppercase text-muted-foreground tracking-widest">Lokasi</Label>
+                  <Input name="location" placeholder="Lokasi..." required className="rounded-2xl h-12 font-bold uppercase" />
                 </div>
               </div>
               
-              <div className="grid gap-2">
-                <Label htmlFor="title">Judul Kegiatan</Label>
-                <Input id="title" name="title" placeholder="Contoh: Musyawarah Ranting Tanjungpinang Barat" required className="rounded-xl" />
+              <div className="space-y-2">
+                <Label className="text-[9px] font-black uppercase text-muted-foreground tracking-widest">Judul Kegiatan</Label>
+                <Input name="title" placeholder="Contoh: Musyawarah Ranting..." required className="rounded-2xl h-12 font-black uppercase" />
               </div>
 
-              <div className="grid gap-2">
-                <Label htmlFor="description">Deskripsi Kegiatan</Label>
-                <Textarea id="description" name="description" placeholder="Ceritakan detail kegiatan, agenda, dan hasil..." className="min-h-[120px] rounded-xl" required />
+              <div className="space-y-2">
+                <Label className="text-[9px] font-black uppercase text-muted-foreground tracking-widest">Deskripsi</Label>
+                <Textarea name="description" placeholder="Detail kegiatan..." className="min-h-[120px] rounded-2xl font-bold uppercase" required />
               </div>
 
-              <div className="grid gap-4 p-4 bg-muted/20 rounded-2xl border border-dashed">
-                <h4 className="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2">
-                  <FileUp className="h-4 w-4" /> Unggah Foto Dokumentasi (Hanya Gambar)
-                </h4>
+              <div className="space-y-4 p-6 bg-muted/20 rounded-[2rem] border border-dashed">
+                <Label className="text-[9px] font-black uppercase text-primary tracking-widest flex items-center gap-2">
+                  <FileUp className="h-4 w-4" /> Unggah Foto Dokumentasi
+                </Label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[
                     { id: "absensi", label: "1. Foto Absensi", field: "absensi" as const },
                     { id: "spanduk", label: "2. Foto Spanduk", field: "spanduk" as const },
                     { id: "fotoBersama", label: "3. Foto Bersama", field: "fotoBersama" as const },
-                    { id: "fotoPendukung", label: "4. Dokumentasi Pendukung", field: "fotoPendukung" as const }
+                    { id: "fotoPendukung", label: "4. Pendukung", field: "fotoPendukung" as const }
                   ].map((item) => (
-                    <div key={item.id} className="grid gap-1.5 relative">
-                      <Label htmlFor={item.id} className="text-xs font-bold flex items-center justify-between">
+                    <div key={item.id} className="space-y-1.5">
+                      <Label className="text-[8px] font-black uppercase flex items-center justify-between pl-1">
                         {item.label}
                         {fileStatus[item.field] && <CheckCircle2 className="h-3 w-3 text-green-500" />}
                       </Label>
@@ -301,7 +314,7 @@ export default function LaporanKegiatanPage() {
                         id={item.id} 
                         name={item.id} 
                         type="file" 
-                        className={cn("h-10 text-[11px] py-2 cursor-pointer rounded-xl", fileStatus[item.field] && "border-green-500 bg-green-50")}
+                        className={cn("h-10 text-[10px] p-2 rounded-xl cursor-pointer bg-white", fileStatus[item.field] && "border-green-500")}
                         accept="image/*"
                         onChange={(e) => handleFileChange(e, item.field)}
                       />
@@ -310,9 +323,9 @@ export default function LaporanKegiatanPage() {
                 </div>
               </div>
             </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)} className="rounded-full">Batal</Button>
-              <Button type="submit" className="bg-primary text-white hover:bg-primary/90 rounded-full">Simpan & Submit Laporan</Button>
+            <DialogFooter className="p-8 bg-muted/30 gap-2">
+              <Button type="button" variant="ghost" onClick={() => setIsCreateOpen(false)} className="flex-1 rounded-full font-bold">Batal</Button>
+              <Button type="submit" className="flex-1 bg-secondary text-white rounded-full font-black text-xs uppercase shadow-lg h-12">Simpan & Kirim</Button>
             </DialogFooter>
           </form>
         </DialogContent>

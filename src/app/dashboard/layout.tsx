@@ -1,4 +1,3 @@
-
 'use client'
 
 import * as React from "react"
@@ -35,7 +34,6 @@ import {
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -81,7 +79,7 @@ function SidebarItem({ href, icon, label, active, onClick, subItems }: SidebarIt
             variant="ghost"
             className={cn(
               "w-full justify-between px-3 py-2 h-10 font-medium transition-all hover:text-primary",
-              active && "bg-accent/5 text-primary"
+              active && "bg-primary/5 text-primary"
             )}
           >
             <div className="flex items-center gap-3">
@@ -98,8 +96,8 @@ function SidebarItem({ href, icon, label, active, onClick, subItems }: SidebarIt
                 variant="ghost"
                 size="sm"
                 className={cn(
-                  "w-full justify-start h-9 text-muted-foreground font-normal hover:text-primary hover:bg-accent/5",
-                  pathname === subItem.href && "text-primary font-medium bg-accent/5"
+                  "w-full justify-start h-9 text-muted-foreground font-normal hover:text-primary hover:bg-primary/5",
+                  pathname === subItem.href && "text-primary font-medium bg-primary/5"
                 )}
               >
                 {subItem.icon}
@@ -118,7 +116,7 @@ function SidebarItem({ href, icon, label, active, onClick, subItems }: SidebarIt
       onClick={onClick}
       className={cn(
         "w-full justify-start px-3 py-2 h-10 font-medium transition-all hover:text-primary",
-        active && "bg-accent/10 text-primary border-r-2 border-primary rounded-none"
+        active && "bg-primary/10 text-primary border-r-2 border-primary rounded-none"
       )}
     >
       <div className="flex items-center gap-3">
@@ -243,7 +241,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
-      <aside className="w-64 border-r bg-card hidden lg:flex flex-col sticky top-0 h-screen z-40 print:hidden">
+      <aside className="w-64 border-r bg-card hidden lg:flex flex-col sticky top-0 h-screen z-40 print:hidden shadow-sm">
         <div className="p-6">
           <Link href="/dashboard" className="flex flex-col items-center justify-center gap-1 mb-8 text-center group">
             <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
@@ -312,25 +310,20 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       )}
 
       <div className="flex-1 flex flex-col min-h-screen">
-        <header className="h-16 border-b bg-card/80 backdrop-blur-md flex items-center justify-between px-4 md:px-6 sticky top-0 z-30 print:hidden">
-          <div className="flex items-center gap-4 flex-1">
-            <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setIsMobileMenuOpen(true)}>
-              <Menu className="h-5 w-5" />
-            </Button>
-            <div className="relative w-full max-w-xs hidden sm:block">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Cari data..." className="pl-10 h-9 rounded-full bg-background/50 border-none" />
-            </div>
-          </div>
+        <header className="h-14 bg-white/80 backdrop-blur-md flex items-center justify-between px-4 md:px-6 sticky top-0 z-30 print:hidden border-b">
+          <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(true)} className="lg:hidden h-9 w-9">
+            <Menu className="h-5 w-5" />
+          </Button>
+          
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="relative hidden sm:flex">
+            <Button variant="ghost" size="icon" className="relative hidden sm:flex h-9 w-9">
               <Bell className="h-5 w-5" />
-              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-accent rounded-full border-2 border-white"></span>
+              <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full border-2 border-white"></span>
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="p-1 rounded-full border">
-                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase">
+                <Button variant="ghost" className="p-0.5 rounded-full h-8 w-8 overflow-hidden bg-primary/10">
+                   <div className="w-full h-full flex items-center justify-center text-primary font-bold text-xs uppercase">
                      {profile?.fullName?.charAt(0)}
                    </div>
                 </Button>
@@ -355,7 +348,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         </header>
 
         <main className="flex-1 p-4 md:p-8 overflow-y-auto print:p-0 print:overflow-visible">
-          <div className="max-w-7xl mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-500 print:max-w-none">
+          <div className="max-w-7xl mx-auto w-full animate-in fade-in duration-500 print:max-w-none">
             {children}
           </div>
         </main>

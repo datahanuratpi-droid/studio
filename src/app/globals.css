@@ -4,25 +4,25 @@
 
 @layer base {
   :root {
-    --background: 198 21% 94%;
+    --background: 210 20% 98%;
     --foreground: 209 60% 10%;
     --card: 0 0% 100%;
     --card-foreground: 209 60% 10%;
     --popover: 0 0% 100%;
     --popover-foreground: 209 60% 10%;
-    --primary: 209 60% 35%;
+    --primary: 24 95% 53%; /* Hanura Orange */
     --primary-foreground: 0 0% 100%;
-    --secondary: 198 15% 85%;
-    --secondary-foreground: 209 60% 25%;
-    --muted: 198 15% 85%;
-    --muted-foreground: 209 30% 40%;
-    --accent: 229 91% 65%;
+    --secondary: 226 70% 55%; /* Hanura Blue */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 210 20% 96%;
+    --muted-foreground: 209 30% 45%;
+    --accent: 24 95% 53%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 209 30% 85%;
-    --input: 209 30% 85%;
-    --ring: 209 60% 35%;
+    --border: 210 20% 90%;
+    --input: 210 20% 90%;
+    --ring: 24 95% 53%;
     --radius: 1rem;
   }
 
@@ -33,27 +33,20 @@
     --card-foreground: 198 21% 94%;
     --popover: 209 60% 10%;
     --popover-foreground: 198 21% 94%;
-    --primary: 209 60% 45%;
+    --primary: 24 95% 53%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 209 40% 15%;
-    --secondary-foreground: 198 21% 80%;
+    --secondary: 226 70% 55%;
+    --secondary-foreground: 0 0% 100%;
     --muted: 209 40% 15%;
     --muted-foreground: 209 20% 60%;
-    --accent: 229 91% 65%;
+    --accent: 24 95% 53%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 209 40% 20%;
     --input: 209 40% 20%;
-    --ring: 209 60% 45%;
+    --ring: 24 95% 53%;
   }
-
-  .theme-red { --primary: 0 84% 60%; --ring: 0 84% 60%; }
-  .theme-blue { --primary: 209 60% 35%; --ring: 209 60% 35%; }
-  .theme-orange { --primary: 24 95% 53%; --ring: 24 95% 53%; }
-  .theme-magenta { --primary: 327 73% 53%; --ring: 327 73% 53%; }
-  .theme-purple { --primary: 262 83% 58%; --ring: 262 83% 58%; }
-  .theme-yellow { --primary: 47 95% 55%; --ring: 47 95% 55%; --primary-foreground: 209 60% 10%; }
 }
 
 @layer base {
@@ -65,6 +58,22 @@
   }
 }
 
-.hover-text-primary:hover {
-  color: hsl(var(--primary)) !important;
+/* Custom Scrollbar for better look */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-muted rounded-full;
+}
+
+/* Hide horizontal scrollbar but keep functionality */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
