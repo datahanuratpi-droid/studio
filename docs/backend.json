@@ -1,0 +1,509 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user account in the office application, managing access and personal details.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address, used for login and notifications.",
+          "format": "email"
+        },
+        "fullName": {
+          "type": "string",
+          "description": "The full name of the user."
+        },
+        "role": {
+          "type": "string",
+          "description": "The role or permission level of the user within the application (e.g., 'Admin', 'Officer', 'Employee')."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current verification status of the user's account (e.g., 'Pending Verification', 'Active', 'Inactive')."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user account was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user account was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "fullName",
+        "role",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Document": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Document",
+      "type": "object",
+      "description": "Represents a digital file or document uploaded to the system, used for archiving or as attachments to other entities.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Document entity."
+        },
+        "title": {
+          "type": "string",
+          "description": "A descriptive title for the document."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the document's content or purpose."
+        },
+        "fileUrl": {
+          "type": "string",
+          "description": "The URL or URI where the document file can be accessed or downloaded.",
+          "format": "uri"
+        },
+        "mimeType": {
+          "type": "string",
+          "description": "The MIME type of the file (e.g., 'application/pdf', 'image/jpeg')."
+        },
+        "fileSizeKb": {
+          "type": "number",
+          "description": "The size of the document file in kilobytes."
+        },
+        "uploadDate": {
+          "type": "string",
+          "description": "Timestamp indicating when the document was uploaded.",
+          "format": "date-time"
+        },
+        "uploadedById": {
+          "type": "string",
+          "description": "Reference to the User who uploaded the document. (Relationship: User 1:N Document)"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "fileUrl",
+        "mimeType",
+        "fileSizeKb",
+        "uploadDate",
+        "uploadedById"
+      ]
+    },
+    "Correspondence": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Correspondence",
+      "type": "object",
+      "description": "Represents official incoming or outgoing correspondence (Surat Menyurat) for the office.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Correspondence entity."
+        },
+        "subject": {
+          "type": "string",
+          "description": "The subject line of the correspondence."
+        },
+        "body": {
+          "type": "string",
+          "description": "The main content or body of the correspondence."
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of correspondence, either 'Incoming' (Surat Masuk) or 'Outgoing' (Surat Keluar)."
+        },
+        "correspondenceNumber": {
+          "type": "string",
+          "description": "The official registration number or reference code for the correspondence."
+        },
+        "correspondenceDate": {
+          "type": "string",
+          "description": "The date officially assigned to the correspondence (e.g., date received or date sent).",
+          "format": "date-time"
+        },
+        "senderRecipientName": {
+          "type": "string",
+          "description": "The name of the sender for incoming mail, or the recipient for outgoing mail."
+        },
+        "senderRecipientContact": {
+          "type": "string",
+          "description": "Contact details of the sender or recipient (e.g., address, email, phone number)."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the correspondence (e.g., 'Draft', 'Sent', 'Received', 'Reviewed', 'Archived', 'Replied')."
+        },
+        "createdByUserId": {
+          "type": "string",
+          "description": "Reference to the User who created or registered this correspondence. (Relationship: User 1:N Correspondence)"
+        },
+        "attachmentIds": {
+          "type": "array",
+          "description": "References to Documents attached to this correspondence. (Relationship: Document N:N Correspondence)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when this record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when this record was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "subject",
+        "body",
+        "type",
+        "correspondenceNumber",
+        "correspondenceDate",
+        "senderRecipientName",
+        "status",
+        "createdByUserId",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ActivityReport": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ActivityReport",
+      "type": "object",
+      "description": "Represents an official activity report (Laporan Kegiatan) submitted by an officer.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ActivityReport entity."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the activity report."
+        },
+        "description": {
+          "type": "string",
+          "description": "The detailed content and findings of the activity report."
+        },
+        "reportDate": {
+          "type": "string",
+          "description": "The date when the activity report was conducted or written.",
+          "format": "date-time"
+        },
+        "reporterId": {
+          "type": "string",
+          "description": "Reference to the User who submitted this activity report. (Relationship: User 1:N ActivityReport)"
+        },
+        "status": {
+          "type": "string",
+          "description": "The submission status of the report (e.g., 'Draft', 'Submitted', 'Approved', 'Rejected')."
+        },
+        "attachmentIds": {
+          "type": "array",
+          "description": "References to Documents providing supporting evidence or documentation for the report. (Relationship: Document N:N ActivityReport)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when this report record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when this report record was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "description",
+        "reportDate",
+        "reporterId",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "FinancialCategory": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "FinancialCategory",
+      "type": "object",
+      "description": "Defines categories for financial transactions, helping organize income and expenses.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the FinancialCategory entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the financial category (e.g., 'Office Supplies', 'Salary', 'Project Income')."
+        },
+        "type": {
+          "type": "string",
+          "description": "Indicates whether the category is for 'Income' or 'Expense'."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of what this financial category covers."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "type"
+      ]
+    },
+    "FinancialTransaction": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "FinancialTransaction",
+      "type": "object",
+      "description": "Records all financial movements of the office, including routine income/expenses, cash advances (Kasbon), and salary slips (Slip Gaji).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the FinancialTransaction entity."
+        },
+        "amount": {
+          "type": "number",
+          "description": "The monetary value of the transaction."
+        },
+        "transactionDate": {
+          "type": "string",
+          "description": "The date and time when the transaction occurred.",
+          "format": "date-time"
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed explanation or notes about the financial transaction."
+        },
+        "type": {
+          "type": "string",
+          "description": "The specific type of financial activity (e.g., 'Payment', 'Receipt', 'CashAdvance', 'SalarySlip')."
+        },
+        "categoryId": {
+          "type": "string",
+          "description": "Reference to the FinancialCategory that this transaction belongs to. (Relationship: FinancialCategory 1:N FinancialTransaction)"
+        },
+        "recordedByUserId": {
+          "type": "string",
+          "description": "Reference to the User who recorded this financial transaction. (Relationship: User 1:N FinancialTransaction)"
+        },
+        "involvedPartyId": {
+          "type": "string",
+          "description": "Optional reference to a User involved in the transaction, such as the recipient of a cash advance or salary. (Relationship: User 1:N FinancialTransaction)"
+        },
+        "attachmentIds": {
+          "type": "array",
+          "description": "References to Documents like receipts, invoices, or salary slips associated with this transaction. (Relationship: Document N:N FinancialTransaction)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when this transaction record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when this transaction record was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "amount",
+        "transactionDate",
+        "description",
+        "type",
+        "categoryId",
+        "recordedByUserId",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "OfficeTask": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "OfficeTask",
+      "type": "object",
+      "description": "Represents a task or work assignment within the office, adapted from the original TaskFlow Pro features.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the OfficeTask entity."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title or brief summary of the task."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the task, including objectives and requirements."
+        },
+        "dueDate": {
+          "type": "string",
+          "description": "The target date and time by which the task is expected to be completed.",
+          "format": "date-time"
+        },
+        "priority": {
+          "type": "string",
+          "description": "The urgency or importance level of the task (e.g., 'Low', 'Medium', 'High', 'Urgent')."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current progress status of the task (e.g., 'To Do', 'In Progress', 'Done', 'On Hold', 'Cancelled')."
+        },
+        "assignedToUserId": {
+          "type": "string",
+          "description": "Reference to the User who is responsible for completing this task. (Relationship: User 1:N OfficeTask)"
+        },
+        "createdById": {
+          "type": "string",
+          "description": "Reference to the User who created this task. (Relationship: User 1:N OfficeTask)"
+        },
+        "attachmentIds": {
+          "type": "array",
+          "description": "References to Documents that provide context or resources for the task. (Relationship: Document N:N OfficeTask)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when this task record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when this task record was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "description",
+        "priority",
+        "status",
+        "createdById",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "user",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores individual user profiles. Access is restricted to the user themselves (owner) for personal details, and Administrators for managing roles and verification status. Includes denormalized 'role' and 'status' fields for clarity and simplified rule logic for user profile management. Supports secure read/update for the owner and broad management for Admins."
+        }
+      },
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": {
+          "entityName": "user",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "An auxiliary collection to quickly verify if a user has 'Admin' privileges. Documents in this collection act as markers (existence over content) where the document ID matches the userId. This enables robust, authorization-independent role checks in security rules using `exists()` without requiring a 'get()' call on the full user profile. Only Admins can write to this collection."
+        }
+      },
+      {
+        "path": "/roles_officer/{userId}",
+        "definition": {
+          "entityName": "user",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "An auxiliary collection to quickly verify if a user has 'Officer' privileges. Similar to '/roles_admin', this supports authorization-independent role checks for 'Officer' users in security rules using `exists()`. Only Admins can write to this collection."
+        }
+      },
+      {
+        "path": "/correspondences/{correspondenceId}",
+        "definition": {
+          "entityName": "correspondence",
+          "schema": {
+            "$ref": "#/backend/entities/Correspondence"
+          },
+          "description": "Manages both incoming (Surat Masuk) and outgoing (Surat Keluar) office correspondence. Includes denormalized 'createdByUserId' to enable ownership-based security rules and 'type' for categorization. Access is granted to the creator for managing their own entries, and to authorized roles (Officer, Admin) for broader read/write access. Supports secure 'list' operations for all authorized users."
+        }
+      },
+      {
+        "path": "/activity_reports/{activityReportId}",
+        "definition": {
+          "entityName": "activityreport",
+          "schema": {
+            "$ref": "#/backend/entities/ActivityReport"
+          },
+          "description": "Stores activity reports submitted by officers. Each report includes denormalized 'reporterId' for ownership-based authorization. This structure enables officers to create and manage their own reports and administrators to view/manage all reports. The 'status' field explicitly models workflow state. Supports secure 'list' queries based on reporterId or role."
+        }
+      },
+      {
+        "path": "/documents/{documentId}",
+        "definition": {
+          "entityName": "document",
+          "schema": {
+            "$ref": "#/backend/entities/Document"
+          },
+          "description": "A central repository for all digital documents and attachments. Each document includes 'uploadedById' and explicitly requires an 'accessScope' field (e.g., 'personal', 'office_wide', 'admin_only') within the document itself to ensure Authorization Independence. This allows security rules to determine read/write access based on the document's own data and the user's role/ID without 'get()' calls on parent entities, thus enabling secure 'list' operations for archive search and linked attachments."
+        }
+      },
+      {
+        "path": "/financial_categories/{categoryId}",
+        "definition": {
+          "entityName": "financialcategory",
+          "schema": {
+            "$ref": "#/backend/entities/FinancialCategory"
+          },
+          "description": "Defines categories for financial transactions (e.g., 'Office Supplies', 'Salary'). These are typically managed by administrators (create/update/delete) and read by officers for categorizing transactions. Access is role-based for the entire collection."
+        }
+      },
+      {
+        "path": "/financial_transactions/{transactionId}",
+        "definition": {
+          "entityName": "financialtransaction",
+          "schema": {
+            "$ref": "#/backend/entities/FinancialTransaction"
+          },
+          "description": "Records all office financial movements, including routine income/expenses, cash advances (Kasbon), and salary slips. Includes denormalized 'recordedByUserId' for the officer who input the transaction, and 'involvedPartyId' for specific transaction types (e.g., salary/cash advance recipients). This supports secure 'list' operations for the recorder, the involved party, and administrators."
+        }
+      },
+      {
+        "path": "/office_tasks/{taskId}",
+        "definition": {
+          "entityName": "officetask",
+          "schema": {
+            "$ref": "#/backend/entities/OfficeTask"
+          },
+          "description": "Manages internal office tasks. Each task includes denormalized 'createdById' for the task creator and 'assignedToUserId' for the person responsible for completion. This enables ownership-based and assignment-based authorization. Supports users managing their own tasks and admins overseeing all tasks, enabling secure 'list' operations for personalized dashboards."
+        }
+      }
+    ],
+    "reasoning": "The recommended Firestore structure prioritizes security, scalability, and debuggability by adhering strictly to the core design principles. \n\n**Authorization Independence (CRITICAL):** This design eliminates the need for `get()` calls in security rules to determine authorization for subcollections or related documents. For entities like `Correspondence`, `ActivityReport`, `FinancialTransaction`, and `OfficeTask`, owner IDs (`createdByUserId`, `reporterId`, `recordedByUserId`, `assignedToUserId`, `createdById`) are explicitly denormalized within each document. This means a document carries its own authorization context, allowing atomic operations and simplified rule logic. For user roles, dedicated 'marker' collections (`/roles_admin/{userId}`, `/roles_officer/{userId}`) are used. The existence of a document in these collections grants the respective role, enabling `exists()` checks in rules instead of reading full user profiles, thus preserving authorization independence for role verification.\n\n**QAPs (Rules are not Filters):** Secure `list` operations are enabled through a combination of structural segregation and denormalized authorization fields:\n*   **Role-based Access:** Collections like `/correspondences`, `/activity_reports`, `/financial_transactions`, and `/office_tasks` are designed for authorized users (e.g., Officers, Admins) to list and manage. Rules check `request.auth.uid` against denormalized owner IDs or global role collections, allowing client-side queries to include `where` clauses (e.g., `reporterId == request.auth.uid`) that are directly enforceable by security rules, without requiring the server to filter unauthorized results.\n*   **Structural Segregation for Documents:** The `/documents/{documentId}` collection mandates an `accessScope` field (e.g., 'personal', 'office_wide', 'admin_only') within each document. This denormalized field allows security rules to validate read access purely based on the document's own data and the `request.auth.uid`'s roles, directly supporting queries like 'list all `office_wide` documents' or 'list all `personal` documents uploaded by `request.auth.uid`', thus avoiding `get()` calls on parent entities for attached documents and fulfilling QAP.\n*   **Clear Ownership:** For personal data or records, path-based ownership (`/users/{userId}`) or explicit `ownerId` fields allow for efficient and secure queries for 'my data'.\n\n**Structural Segregation and Access Modeling:** Data with different security postures is either placed in separate collections (e.g., general documents vs. potentially more private ones are differentiated by `accessScope` within the `/documents` collection) or handled by explicit `status` fields within a single collection where rules can differentiate (e.g., `Correspondence` `type` or `ActivityReport` `status`). Standardized access patterns are used: path-based ownership for user profiles, dedicated marker collections for global roles, and denormalized `ownerId`/`member` fields (where applicable) for shared entities."
+  }
+}
