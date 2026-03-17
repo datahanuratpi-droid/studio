@@ -16,7 +16,11 @@ import {
   Banknote,
   Receipt,
   AlertCircle,
-  Info
+  Info,
+  Printer,
+  ChevronRight,
+  Download,
+  CheckCircle2
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -45,12 +49,14 @@ import { useFirestore, useUser, addDocumentNonBlocking, useCollection, useMemoFi
 import { collection } from "firebase/firestore"
 import { FinancialTransaction } from "@/lib/types"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { cn } from "@/lib/utils"
 
 export default function KasOfficePage() {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
   const [selectedType, setSelectedType] = React.useState<string>("Payment")
   const [activeTab, setActiveTab] = React.useState("all")
   const [recipientName, setRecipientName] = React.useState("")
+  const [viewingSlip, setViewingSlip] = React.useState<FinancialTransaction | null>(null)
   
   const firestore = useFirestore()
   const { user } = useUser()
@@ -130,17 +136,33 @@ export default function KasOfficePage() {
     new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime()
   )
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="space-y-8 print:p-0">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 print:hidden">
         <div>
           <h1 className="text-3xl font-headline font-bold text-primary">Kas Office</h1>
           <p className="text-muted-foreground">Monitoring Slip Gaji, Transaksi Rutin, dan Kasbon Sekretariat.</p>
         </div>
         <div className="flex gap-2">
            <Button 
+            variant="outline"
+            className="rounded-full px-6 border-primary text-primary hover:bg-primary/5"
+            onClick={() => {
+              setSelectedType("SalarySlip")
+              setRecipientName("")
+              setIsDialogOpen(true)
+            }}
+           >
+            <Printer className="mr-2 h-4 w-4" /> Buat Slip Gaji
+           </Button>
+           <Button 
             className="bg-accent hover:bg-accent/90 text-white rounded-full px-6 shadow-lg transition-transform hover:scale-105"
             onClick={() => {
+              setSelectedType("Payment")
               setRecipientName("")
               setIsDialogOpen(true)
             }}
@@ -150,7 +172,7 @@ export default function KasOfficePage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 print:hidden">
         <Card className="bg-primary text-white border-none shadow-xl overflow-hidden relative group">
           <CardContent className="p-6">
             <div className="flex items-center gap-4 mb-4">
@@ -189,7 +211,7 @@ export default function KasOfficePage() {
         </Card>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full print:hidden">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <TabsList className="bg-white border p-1 rounded-2xl shadow-sm h-12">
             <TabsTrigger value="all" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-white">Semua</TabsTrigger>
@@ -213,7 +235,7 @@ export default function KasOfficePage() {
                   <TableHead className="font-bold text-xs uppercase tracking-widest py-5">Keterangan Transaksi</TableHead>
                   <TableHead className="font-bold text-xs uppercase tracking-widest py-5">Jumlah (Rp)</TableHead>
                   <TableHead className="font-bold text-xs uppercase tracking-widest py-5">Kategori / Tipe</TableHead>
-                  <TableHead className="text-right font-bold text-xs uppercase tracking-widest py-5">Oleh</TableHead>
+                  <TableHead className="text-right font-bold text-xs uppercase tracking-widest py-5">Aksi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -249,7 +271,18 @@ export default function KasOfficePage() {
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm" className="rounded-full text-[10px] font-bold uppercase tracking-tighter">Buka Detail</Button>
+                        {t.type === 'SalarySlip' ? (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="rounded-full text-[10px] font-bold uppercase tracking-tighter border-primary text-primary hover:bg-primary/10 h-8"
+                            onClick={() => setViewingSlip(t)}
+                          >
+                            <Printer className="mr-1.5 h-3 w-3" /> Cetak Slip
+                          </Button>
+                        ) : (
+                          <Button variant="ghost" size="sm" className="rounded-full text-[10px] font-bold uppercase tracking-tighter h-8">Buka Detail</Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))
@@ -269,6 +302,106 @@ export default function KasOfficePage() {
         </TabsContent>
       </Tabs>
 
+      {/* Dialog Preview Slip Gaji */}
+      <Dialog open={!!viewingSlip} onOpenChange={() => setViewingSlip(null)}>
+        <DialogContent className="sm:max-w-[650px] p-0 border-none rounded-3xl overflow-hidden print:shadow-none">
+          {viewingSlip && (
+            <div className="bg-white">
+              <div className="p-8 space-y-8 print:p-0">
+                <div className="flex flex-col items-center text-center space-y-2 border-b-2 border-primary pb-6">
+                   <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mb-2">
+                     <FileText className="h-10 w-10 text-white" />
+                   </div>
+                   <h2 className="text-2xl font-headline font-bold text-primary">SLIP GAJI KARYAWAN</h2>
+                   <p className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em]">DPC PARTAI HANURA KOTA TANJUNGPINANG</p>
+                   <p className="text-[10px] text-muted-foreground">Jalan Gatot Subroto Km 5 Tanjungpinang</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-8 text-sm">
+                  <div className="space-y-4">
+                    <div className="space-y-1">
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Detail Penerima</p>
+                      <p className="font-bold text-primary text-lg">{viewingSlip.description.split(' - ')[0].replace('Slip Gaji: ', '')}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Tanggal Pembayaran</p>
+                      <p className="font-medium">{new Date(viewingSlip.transactionDate).toLocaleDateString('id-ID', { dateStyle: 'long' })}</p>
+                    </div>
+                  </div>
+                  <div className="space-y-4 text-right">
+                    <div className="space-y-1">
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">ID Transaksi</p>
+                      <p className="font-mono text-xs uppercase">{viewingSlip.id.substring(0, 8)}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Status</p>
+                      <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-none text-[9px] font-bold">LUNAS / DIBAYARKAN</Badge>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-muted/30 rounded-2xl p-6 space-y-4">
+                  <div className="flex justify-between items-center border-b border-white pb-4">
+                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Keterangan Item</span>
+                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Jumlah</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <div className="flex flex-col">
+                      <span className="font-bold text-primary">Gaji Pokok & Tunjangan</span>
+                      <span className="text-[10px] text-muted-foreground uppercase">{viewingSlip.description.split(' - ')[1]?.split(' (Potongan')[0] || "Periode Berjalan"}</span>
+                    </div>
+                    <span className="font-bold">Rp {(viewingSlip.amount + (viewingSlip.description.includes('Potongan Kasbon') ? parseInt(viewingSlip.description.match(/Rp ([\d.]+)/)?.[1].replace(/\./g, '') || "0") : 0)).toLocaleString('id-ID')}</span>
+                  </div>
+
+                  {viewingSlip.description.includes('Potongan Kasbon') && (
+                    <div className="flex justify-between items-center text-red-600">
+                      <div className="flex flex-col">
+                        <span className="font-bold">Potongan Kasbon / Pinjaman</span>
+                        <span className="text-[10px] opacity-70 uppercase">Pengurangan Otomatis</span>
+                      </div>
+                      <span className="font-bold">- Rp {viewingSlip.description.match(/Rp ([\d.]+)/)?.[1] || "0"}</span>
+                    </div>
+                  )}
+
+                  <div className="pt-4 border-t-2 border-primary flex justify-between items-center">
+                    <span className="text-sm font-bold text-primary uppercase tracking-[0.2em]">Total Gaji Bersih (Take Home Pay)</span>
+                    <span className="text-2xl font-headline font-bold text-primary">Rp {viewingSlip.amount.toLocaleString('id-ID')}</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-8 pt-12 text-center text-xs">
+                  <div className="space-y-16">
+                    <p className="font-bold text-muted-foreground uppercase tracking-widest">Penerima,</p>
+                    <div className="space-y-1">
+                      <p className="font-bold border-b border-primary inline-block min-w-[150px]">{viewingSlip.description.split(' (')[0].replace('Slip Gaji: ', '').split(' - ')[0]}</p>
+                      <p className="text-[10px] text-muted-foreground">Petugas Terkait</p>
+                    </div>
+                  </div>
+                  <div className="space-y-16">
+                    <p className="font-bold text-muted-foreground uppercase tracking-widest">Bendahara DPC,</p>
+                    <div className="space-y-1">
+                      <p className="font-bold border-b border-primary inline-block min-w-[150px]">BENDAHARA DPC</p>
+                      <p className="text-[10px] text-muted-foreground">Hanura Tanjungpinang</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-center pt-8">
+                  <p className="text-[9px] text-muted-foreground font-medium italic">"Terima kasih atas dedikasi Anda untuk kemajuan Partai Hanura Kota Tanjungpinang."</p>
+                </div>
+              </div>
+              <DialogFooter className="bg-muted/20 p-6 print:hidden">
+                <Button variant="outline" onClick={() => setViewingSlip(null)} className="rounded-full">Tutup</Button>
+                <Button onClick={handlePrint} className="bg-primary text-white hover:bg-primary/90 rounded-full px-8 font-bold">
+                  <Printer className="mr-2 h-4 w-4" /> Cetak Sekarang
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[480px] rounded-3xl">
           <form onSubmit={handleSubmit}>
@@ -281,7 +414,7 @@ export default function KasOfficePage() {
             <div className="grid gap-6 py-6">
               <div className="grid gap-2">
                 <Label htmlFor="type" className="font-bold text-sm">Kategori Transaksi</Label>
-                <Select onValueChange={setSelectedType} defaultValue={selectedType}>
+                <Select onValueChange={setSelectedType} value={selectedType}>
                   <SelectTrigger className="h-12 rounded-2xl">
                     <SelectValue placeholder="Pilih kategori" />
                   </SelectTrigger>
