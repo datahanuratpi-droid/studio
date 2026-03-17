@@ -22,7 +22,13 @@ import {
   Menu,
   X,
   Loader2,
-  Clock
+  Clock,
+  MessageSquare,
+  MapPin,
+  Heart,
+  Code,
+  Phone,
+  Mail as MailIcon
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -41,12 +47,20 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { useUser, useAuth, useDoc, useFirestore, useMemoFirebase } from "@/firebase"
 import { signOut } from "firebase/auth"
 import { doc } from "firebase/firestore"
+import { Card, CardContent } from "@/components/ui/card"
 
 interface SidebarItemProps {
-  href: string
+  href?: string
   icon: React.ReactNode
   label: string
   active?: boolean
@@ -97,22 +111,31 @@ function SidebarItem({ href, icon, label, active, onClick, subItems }: SidebarIt
     )
   }
 
-  return (
-    <Link href={href} className="w-full" onClick={onClick}>
-      <Button
-        variant="ghost"
-        className={cn(
-          "w-full justify-start px-3 py-2 h-10 font-medium transition-all hover-text-primary",
-          active && "bg-accent/10 text-primary border-r-2 border-primary rounded-none"
-        )}
-      >
-        <div className="flex items-center gap-3">
-          {icon}
-          <span className="text-sm">{label}</span>
-        </div>
-      </Button>
-    </Link>
+  const content = (
+    <Button
+      variant="ghost"
+      onClick={onClick}
+      className={cn(
+        "w-full justify-start px-3 py-2 h-10 font-medium transition-all hover-text-primary",
+        active && "bg-accent/10 text-primary border-r-2 border-primary rounded-none"
+      )}
+    >
+      <div className="flex items-center gap-3">
+        {icon}
+        <span className="text-sm">{label}</span>
+      </div>
+    </Button>
   )
+
+  if (href) {
+    return (
+      <Link href={href} className="w-full" onClick={onClick}>
+        {content}
+      </Link>
+    )
+  }
+
+  return content
 }
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
@@ -122,6 +145,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const auth = useAuth()
   const firestore = useFirestore()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
+  const [isAboutOpen, setIsAboutOpen] = React.useState(false)
   const [currentDateTime, setCurrentDateTime] = React.useState<{date: string, time: string} | null>(null)
 
   React.useEffect(() => {
@@ -207,7 +231,12 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     { href: "/dashboard/kas", icon: <Wallet className="h-5 w-5" />, label: "Kas Office", roles: ["Admin", "KSB", "Staff"] },
     { href: "/dashboard/users", icon: <Users className="h-5 w-5" />, label: "Manajemen User", roles: ["Admin"] },
     { href: "/dashboard/pengaturan", icon: <Settings className="h-5 w-5" />, label: "Pengaturan", roles: ["Admin", "KSB", "Staff"] },
-    { href: "/dashboard/about", icon: <Info className="h-5 w-5" />, label: "About", roles: ["Admin", "KSB", "Staff"] },
+    { 
+      label: "About", 
+      icon: <Info className="h-5 w-5" />, 
+      roles: ["Admin", "KSB", "Staff"],
+      onClick: () => setIsAboutOpen(true)
+    },
   ].filter(item => profile && item.roles.includes(profile.role))
 
   return (
@@ -237,8 +266,9 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 icon={item.icon}
                 label={item.label}
-                active={pathname === item.href || (item.subItems && pathname.startsWith(item.href))}
+                active={item.href ? (pathname === item.href || (item.subItems && pathname.startsWith(item.href))) : false}
                 subItems={item.subItems}
+                onClick={item.onClick}
               />
             ))}
           </nav>
@@ -267,8 +297,11 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                   href={item.href}
                   icon={item.icon}
                   label={item.label}
-                  active={pathname === item.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  active={item.href ? pathname === item.href : false}
+                  onClick={() => {
+                    if (item.onClick) item.onClick()
+                    setIsMobileMenuOpen(false)
+                  }}
                 />
               ))}
             </nav>
@@ -325,6 +358,106 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           </div>
         </main>
       </div>
+
+      {/* About Pop-out Dialog */}
+      <Dialog open={isAboutOpen} onOpenChange={setIsAboutOpen}>
+        <DialogContent className="max-w-4xl p-0 border-none rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in duration-300">
+          <div className="max-h-[85vh] overflow-y-auto">
+            <div className="space-y-8 py-8 px-6">
+              <div className="text-center space-y-4">
+                <div className="inline-flex items-center justify-center p-4 bg-primary/10 rounded-2xl mb-2">
+                  <Info className="h-10 w-10 text-primary" />
+                </div>
+                <h1 className="text-2xl md:text-3xl font-bold text-primary leading-tight">
+                  Selamat datang di SITU HANURA
+                </h1>
+                <p className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-widest font-bold">
+                  Sistem Informasi Terpadu Hanura Kota Tanjungpinang
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-0 rounded-3xl overflow-hidden border bg-card">
+                <div className="p-6 md:p-10 space-y-6 flex flex-col justify-center">
+                  <h2 className="text-xl font-bold text-primary">Tentang Aplikasi</h2>
+                  <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
+                    Aplikasi ini dibuat dan dikembangkan untuk digunakan di sekretariat dalam pengelolaan data baik laporan maupun surat menyurat.
+                  </p>
+                  <div className="pt-4 space-y-4">
+                    <div className="flex gap-4 p-4 bg-muted/30 rounded-2xl border border-border/50">
+                      <div className="p-3 bg-white rounded-xl text-primary h-fit shadow-sm">
+                        <MessageSquare className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-primary text-sm">Kritik & Saran</h4>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          Aplikasi ini masih perlu banyak pengembangan. Kritik dan saran sangat diharapkan untuk kemajuan sistem ini.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-primary p-6 md:p-10 text-white flex flex-col justify-center space-y-6 md:space-y-8">
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-bold uppercase tracking-wider border-b border-white/20 pb-2">Informasi Sistem</h3>
+                    <p className="text-primary-foreground/90 font-medium text-base">
+                      Digitalisasi Administrasi <br />
+                      <span className="font-bold">DPC HANURA KOTA TANJUNGPINANG</span>
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                        <Code className="h-4 w-4" />
+                      </div>
+                      <span className="text-xs font-bold tracking-wide">Versi 2.0</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                        <MapPin className="h-4 w-4" />
+                      </div>
+                      <span className="text-xs leading-snug">Jalan Gatot Subroto Km 5 Tanjungpinang</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                        <Heart className="h-4 w-4 fill-white" />
+                      </div>
+                      <span className="text-xs leading-tight font-medium">
+                        Dibuat oleh Sekretariat DPC Hanura Kota Tanjungpinang
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-white/70">Hubungi Administrator:</p>
+                    <div className="grid grid-cols-1 gap-2">
+                      <a href="https://wa.me/62817319885" target="_blank" className="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-all border border-white/10">
+                        <div className="p-1.5 bg-green-500 text-white rounded-lg"><Phone className="h-3.5 w-3.5" /></div>
+                        <div className="flex flex-col">
+                          <span className="text-[8px] font-bold text-white/60 uppercase">WhatsApp</span>
+                          <span className="text-xs font-bold text-white">0817 319 885</span>
+                        </div>
+                      </a>
+                      <a href="mailto:agussuriyadipunya@gmail.com" className="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-all border border-white/10">
+                        <div className="p-1.5 bg-blue-500 text-white rounded-lg"><MailIcon className="h-3.5 w-3.5" /></div>
+                        <div className="flex flex-col">
+                          <span className="text-[8px] font-bold text-white/60 uppercase">Email</span>
+                          <span className="text-xs font-bold text-white">agussuriyadipunya@gmail.com</span>
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <footer className="text-center pt-8 pb-4 text-[9px] font-bold text-muted-foreground border-t uppercase tracking-[0.2em]">
+                © 2026 SITU HANURA - DPC Partai Hanura Kota Tanjungpinang
+              </footer>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
