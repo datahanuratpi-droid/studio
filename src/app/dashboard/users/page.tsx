@@ -1,8 +1,8 @@
 
-"use client"
+'use client'
 
 import * as React from "react"
-import { Search, UserCheck, UserX, Shield, User, Mail, MoreVertical } from "lucide-react"
+import { Search, Shield, User, Mail, MoreVertical, Loader2, UserCheck, UserX } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { 
@@ -14,15 +14,52 @@ import {
   TableRow 
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { useFirestore, useCollection, useMemoFirebase, updateDocumentNonBlocking, setDocumentNonBlocking } from "@/firebase"
+import { collection, doc } from "firebase/firestore"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { UserProfile } from "@/lib/types"
 
 export default function UserManagementPage() {
-  const users = [
-    { id: "1", name: "John Doe", email: "john@office.com", role: "Admin", status: "Active" },
-    { id: "2", name: "Siti Fatimah", email: "siti@office.com", role: "Officer", status: "Active" },
-    { id: "3", name: "Ahmad Dani", email: "ahmad@gmail.com", role: "Employee", status: "Pending Verification" },
-    { id: "4", name: "Maria Rosa", email: "maria@office.com", role: "Officer", status: "Inactive" },
-  ]
+  const { firestore } = useFirestore()
+  
+  const usersRef = useMemoFirebase(() => {
+    if (!firestore) return null
+    return collection(firestore, 'users')
+  }, [firestore])
+
+  const { data: users, isLoading } = useCollection<UserProfile>(usersRef)
+
+  const handleVerify = (userId: string, role: 'Admin' | 'Officer' | 'Employee') => {
+    if (!firestore) return
+
+    // Update main profile status
+    updateDocumentNonBlocking(doc(firestore, 'users', userId), {
+      status: 'Active',
+      role: role,
+      updatedAt: new Date().toISOString()
+    })
+
+    // Create marker documents for security rules checks
+    if (role === 'Admin') {
+      setDocumentNonBlocking(doc(firestore, 'roles_admin', userId), { active: true }, { merge: true })
+    } else if (role === 'Officer') {
+      setDocumentNonBlocking(doc(firestore, 'roles_officer', userId), { active: true }, { merge: true })
+    }
+  }
+
+  const handleDeactivate = (userId: string) => {
+    if (!firestore) return
+    updateDocumentNonBlocking(doc(firestore, 'users', userId), {
+      status: 'Inactive',
+      updatedAt: new Date().toISOString()
+    })
+  }
 
   return (
     <div className="space-y-8">
@@ -31,12 +68,11 @@ export default function UserManagementPage() {
         <p className="text-muted-foreground">Kelola akses dan verifikasi pendaftar aplikasi.</p>
       </div>
 
-      <div className="flex items-center gap-4 bg-white p-4 rounded-xl border">
+      <div className="flex items-center gap-4 bg-white p-4 rounded-xl border shadow-sm">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input placeholder="Cari nama atau email..." className="pl-10" />
         </div>
-        <Button className="bg-primary text-white">Tambah User</Button>
       </div>
 
       <div className="bg-white rounded-xl border overflow-hidden shadow-sm">
@@ -50,15 +86,23 @@ export default function UserManagementPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.map((user) => (
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+                </TableCell>
+              </TableRow>
+            ) : users?.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>
                   <div className="flex items-center gap-3">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-primary/10 text-primary text-xs">{user.name.charAt(0)}</AvatarFallback>
+                    <Avatar className="h-10 w-10">
+                      <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                        {user.fullName?.charAt(0) || user.email?.charAt(0)}
+                      </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
-                      <span className="font-bold text-sm">{user.name}</span>
+                      <span className="font-bold text-sm">{user.fullName}</span>
                       <span className="text-xs text-muted-foreground">{user.email}</span>
                     </div>
                   </div>
@@ -70,18 +114,46 @@ export default function UserManagementPage() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={user.status === 'Active' ? 'default' : user.status === 'Pending Verification' ? 'secondary' : 'destructive'} className="text-[10px]">
+                  <Badge 
+                    variant={user.status === 'Active' ? 'default' : user.status === 'Pending Verification' ? 'secondary' : 'destructive'} 
+                    className="text-[10px]"
+                  >
                     {user.status}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-right space-x-2">
-                  {user.status === 'Pending Verification' && (
-                    <Button size="sm" variant="outline" className="h-8 text-xs border-green-200 text-green-600 hover:bg-green-50 hover:text-green-700">Verifikasi</Button>
-                  )}
-                  <Button variant="ghost" size="icon" className="h-8 w-8"><MoreVertical className="h-4 w-4" /></Button>
+                <TableCell className="text-right">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon"><MoreVertical className="h-4 w-4" /></Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      {user.status === 'Pending Verification' && (
+                        <>
+                          <DropdownMenuItem onClick={() => handleVerify(user.id, 'Officer')} className="text-green-600">
+                            <UserCheck className="mr-2 h-4 w-4" /> Verifikasi (Officer)
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleVerify(user.id, 'Admin')} className="text-blue-600">
+                            <Shield className="mr-2 h-4 w-4" /> Verifikasi (Admin)
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                      {user.status === 'Active' && (
+                        <DropdownMenuItem onClick={() => handleDeactivate(user.id)} className="text-destructive">
+                          <UserX className="mr-2 h-4 w-4" /> Nonaktifkan
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))}
+            {!isLoading && users?.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-12 text-muted-foreground">
+                  Tidak ada user terdaftar.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>

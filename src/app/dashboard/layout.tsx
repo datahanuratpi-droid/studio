@@ -1,3 +1,4 @@
+
 'use client'
 
 import * as React from "react"
@@ -16,12 +17,13 @@ import {
   Bell,
   Search,
   LogOut,
-  User,
+  User as UserIcon,
   Inbox,
   Send,
   Menu,
   X,
-  Loader2
+  Loader2,
+  Clock
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -40,8 +42,9 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
-import { useUser, useAuth } from "@/firebase"
+import { useUser, useAuth, useDoc, useFirestore, useMemoFirebase } from "@/firebase"
 import { signOut } from "firebase/auth"
+import { doc } from "firebase/firestore"
 
 interface SidebarItemProps {
   href: string
@@ -117,7 +120,17 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const { user, isUserLoading } = useUser()
   const { auth } = useAuth()
+  const { firestore } = useFirestore()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
+
+  // Memoize user doc reference
+  const userDocRef = useMemoFirebase(() => {
+    if (!firestore || !user?.uid) return null
+    return doc(firestore, 'users', user.uid)
+  }, [firestore, user?.uid])
+
+  // Fetch profile to check status
+  const { data: profile, isLoading: isProfileLoading } = useDoc(userDocRef)
 
   React.useEffect(() => {
     if (!isUserLoading && !user) {
@@ -125,7 +138,14 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     }
   }, [user, isUserLoading, router])
 
-  if (isUserLoading || !user) {
+  const handleLogout = async () => {
+    if (auth) {
+      await signOut(auth);
+      router.push('/login');
+    }
+  }
+
+  if (isUserLoading || isProfileLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -133,11 +153,27 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     )
   }
 
-  const handleLogout = async () => {
-    if (auth) {
-      await signOut(auth);
-      router.push('/login');
-    }
+  // Handle case where user is logged in but profile is not verified
+  if (user && profile && profile.status !== 'Active') {
+    return (
+      <div className="flex h-screen flex-col items-center justify-center bg-background p-6 text-center space-y-6">
+        <div className="p-4 bg-amber-100 rounded-full text-amber-600 animate-pulse">
+          <Clock className="h-12 w-12" />
+        </div>
+        <div className="max-w-md space-y-2">
+          <h1 className="text-2xl font-headline font-bold text-primary">Akun Menunggu Verifikasi</h1>
+          <p className="text-muted-foreground">
+            Terima kasih telah mendaftar, <strong>{user.email}</strong>. Saat ini akun Anda sedang dalam proses verifikasi oleh Admin.
+          </p>
+          <p className="text-sm text-muted-foreground pt-4">
+            Anda akan bisa mengakses fitur aplikasi setelah Admin memberikan peran (Role) pada akun Anda.
+          </p>
+        </div>
+        <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2">
+          <LogOut className="h-4 w-4" /> Keluar
+        </Button>
+      </div>
+    )
   }
 
   const menuItems = [
@@ -260,7 +296,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild><Link href="/dashboard/pengaturan"><User className="mr-2 h-4 w-4" /> Profil</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link href="/dashboard/pengaturan"><UserIcon className="mr-2 h-4 w-4" /> Profil</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link href="/dashboard/pengaturan"><Settings className="mr-2 h-4 w-4" /> Pengaturan</Link></DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-destructive" onClick={handleLogout}>

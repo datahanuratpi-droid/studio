@@ -9,11 +9,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAuth, useUser, initiateEmailSignIn, initiateEmailSignUp } from '@/firebase';
+import { useAuth, useUser, useFirestore, setDocumentNonBlocking } from '@/firebase';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { doc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 
 export default function LoginPage() {
   const { auth } = useAuth();
+  const { firestore } = useFirestore();
   const { user, isUserLoading } = useUser();
   const router = useRouter();
   const { toast } = useToast();
@@ -25,7 +28,7 @@ export default function LoginPage() {
     }
   }, [user, isUserLoading, router]);
 
-  const handleSignIn = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!auth) return;
     setLoading(true);
@@ -34,26 +37,44 @@ export default function LoginPage() {
     const password = formData.get('password') as string;
     
     try {
-      initiateEmailSignIn(auth, email, password);
-      // Auth state change will be handled by the useUser hook listener
+      await signInWithEmailAndPassword(auth, email, password);
     } catch (err: any) {
-      toast({ variant: 'destructive', title: 'Error', description: err.message });
+      toast({ variant: 'destructive', title: 'Login Gagal', description: "Email atau password salah." });
       setLoading(false);
     }
   };
 
-  const handleSignUp = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!auth) return;
+    if (!auth || !firestore) return;
     setLoading(true);
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
     
     try {
-      initiateEmailSignUp(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const newUser = userCredential.user;
+
+      // Create initial profile in Firestore
+      const userProfile = {
+        id: newUser.uid,
+        email: newUser.email,
+        fullName: email.split('@')[0], // Default name
+        role: 'Employee',
+        status: 'Pending Verification',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      setDocumentNonBlocking(doc(firestore, 'users', newUser.uid), userProfile, { merge: true });
+      
+      toast({ 
+        title: 'Akun Berhasil Dibuat', 
+        description: 'Mohon tunggu admin memverifikasi akun Anda sebelum bisa masuk.' 
+      });
     } catch (err: any) {
-      toast({ variant: 'destructive', title: 'Error', description: err.message });
+      toast({ variant: 'destructive', title: 'Pendaftaran Gagal', description: err.message });
       setLoading(false);
     }
   };
