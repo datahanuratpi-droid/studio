@@ -1,101 +1,64 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    /**
-     * CORE PHILOSOPHY:
-     * This ruleset enforces a strict user-ownership model where all data is private by default. 
-     * Access is strictly governed by the user's authenticated identity (UID) matching the 
-     * hierarchical path of the document.
-     *
-     * DATA STRUCTURE:
-     * All application data is nested under the `/users/{userId}` root. 
-     * - User profiles are stored at the root of the user's tree.
-     * - Tasks are subcollections of the user.
-     * - Subtasks are further nested within specific tasks.
-     *
-     * KEY SECURITY DECISIONS:
-     * 1. Path-Based Authorization: We primarily use the `{userId}` variable in the document 
-     *    path to determine ownership, providing high performance and simplicity.
-     * 2. Denormalization for Integrity: Relational fields like `userProfileId` and `taskId` 
-     *    are required within the document data. Rules enforce that these internal IDs match 
-     *    the document's path during creation and remain immutable thereafter.
-     * 3. Prototyping Flexibility: While authorization is strictly enforced, the rules do 
-     *    not validate specific data types or schemas for non-relational fields (e.g., descriptions, 
-     *    titles, dates), allowing for rapid frontend iteration.
-     * 4. Safe Deletion: All destructive operations (update/delete) explicitly verify the 
-     *    document's existence and ownership before proceeding.
-     */
-
-    // --- Global Helper Functions ---
-
-    /**
-     * @description Checks if the request is made by an authenticated user.
-     */
+    // --- Helpers ---
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /**
-     * @description Checks if the authenticated user's UID matches the provided userId.
-     */
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
+    function isAgus() {
+      return isSignedIn() && request.auth.token.email == 'agus@hanura.id';
     }
 
-    /**
-     * @description Combines ownership check with a check for document existence. 
-     * Used for update and delete operations.
-     */
-    function isExistingOwner(userId) {
-      return resource != null && isOwner(userId);
+    function isAdmin() {
+      return isSignedIn() && (exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid)) || isAgus());
     }
 
-    // --- Collection Rules ---
+    function isOfficer() {
+      return isSignedIn() && (exists(/databases/$(database)/documents/roles_officer/$(request.auth.uid)) || isAdmin());
+    }
 
-    /**
-     * @description Rules for UserProfile documents.
-     * @path /users/{userId}
-     * @allow (get) If the user is signed in and requesting their own profile document.
-     * @deny (list) If a user tries to list all user profiles in the system.
-     * @principle Restricts access to a user's own data tree and enforces self-creation.
-     */
+    function isActive() {
+      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'Active';
+    }
+
+    // --- User Profiles ---
     match /users/{userId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId) && request.resource.data.id == userId;
-      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
-      allow delete: if isExistingOwner(userId);
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if isAdmin() || (isSignedIn() && request.auth.uid == userId);
+      allow delete: if isAdmin();
+    }
 
-      /**
-       * @description Rules for Task documents.
-       * @path /users/{userId}/tasks/{taskId}
-       * @allow (create) If the user is the owner of the path and provides matching userProfileId.
-       * @deny (update) If the user attempts to change the userProfileId (ownership) of a task.
-       * @principle Enforces document ownership for writes and ensures relational integrity.
-       */
-      match /tasks/{taskId} {
-        allow get: if isOwner(userId);
-        allow list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.userProfileId == userId;
-        allow update: if isExistingOwner(userId) && request.resource.data.userProfileId == resource.data.userProfileId;
-        allow delete: if isExistingOwner(userId);
+    // --- Role Markers ---
+    match /roles_admin/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin() || isAgus();
+    }
 
-        /**
-         * @description Rules for SubTask documents.
-         * @path /users/{userId}/tasks/{taskId}/subTasks/{subTaskId}
-         * @allow (list) If the authenticated user is the owner of the parent task path.
-         * @deny (create) If the taskId in the data does not match the taskId in the path.
-         * @principle Hierarchical ownership and path-to-data consistency.
-         */
-        match /subTasks/{subTaskId} {
-          allow get: if isOwner(userId);
-          allow list: if isOwner(userId);
-          allow create: if isOwner(userId) && request.resource.data.userProfileId == userId && request.resource.data.taskId == taskId;
-          allow update: if isExistingOwner(userId) && request.resource.data.userProfileId == resource.data.userProfileId && request.resource.data.taskId == resource.data.taskId;
-          allow delete: if isExistingOwner(userId);
-        }
-      }
+    match /roles_officer/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // --- Correspondences (Surat) ---
+    match /correspondences/{id} {
+      allow read: if isOfficer() && isActive();
+      allow write: if isOfficer() && isActive();
+    }
+
+    // --- Activity Reports ---
+    match /activity_reports/{id} {
+      allow read: if isOfficer() && isActive();
+      allow write: if isOfficer() && isActive();
+    }
+
+    // --- Financial Transactions (Kas) ---
+    match /financial_transactions/{id} {
+      allow read: if isOfficer() && isActive();
+      allow write: if isOfficer() && isActive();
     }
   }
 }
