@@ -13,7 +13,6 @@ import {
   Info,
   ChevronDown,
   Bell,
-  Search,
   LogOut,
   User as UserIcon,
   Inbox,
@@ -22,12 +21,6 @@ import {
   X,
   Loader2,
   Clock,
-  MessageSquare,
-  MapPin,
-  Heart,
-  Code,
-  Phone,
-  Mail as MailIcon,
   Library,
   Briefcase
 } from "lucide-react"
@@ -240,9 +233,10 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   ].filter(item => profile && item.roles.includes(profile.role))
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground max-w-full overflow-x-hidden">
-      <aside className="w-64 border-r bg-card hidden md:flex flex-col sticky top-0 h-screen z-40 print:hidden shadow-sm">
-        {/* Fixed Header Section (Nama, Logo, Jam) */}
+    <div className="flex h-screen bg-background text-foreground max-w-full overflow-hidden">
+      {/* SIDEBAR */}
+      <aside className="w-64 border-r bg-card hidden md:flex flex-col h-full sticky top-0 z-40 print:hidden shadow-sm">
+        {/* Sidebar Header - FIXED */}
         <div className="p-6 pb-4 border-b bg-card shrink-0">
           <Link href="/dashboard" className="flex flex-col items-center justify-center gap-1 text-center group">
             <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
@@ -254,7 +248,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
                   {currentDateTime?.date || "..."}
                 </span>
-                <span className="text-[11px] font-bold text-primary">
+                <span className="text-[11px] font-bold text-primary mt-0.5">
                   {currentDateTime?.time || "00:00"}
                 </span>
               </div>
@@ -262,7 +256,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           </Link>
         </div>
 
-        {/* Scrollable Nav Section */}
+        {/* Sidebar Navigation - SCROLLABLE */}
         <div className="flex-1 overflow-y-auto custom-scrollbar p-6 pt-4">
           <nav className="space-y-1">
             {menuItems.map((item) => (
@@ -279,7 +273,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           </nav>
         </div>
 
-        {/* Fixed Footer Section (Logout) */}
+        {/* Sidebar Footer - FIXED */}
         <div className="mt-auto p-6 border-t text-center shrink-0">
           <Button variant="ghost" className="w-full justify-start text-destructive font-bold hover:bg-destructive/10" onClick={handleLogout}>
             <LogOut className="mr-3 h-5 w-5" /> Keluar
@@ -287,6 +281,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
+      {/* MOBILE MENU */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 md:hidden print:hidden" onClick={() => setIsMobileMenuOpen(false)}>
           <div className="w-72 h-full bg-card p-6 shadow-2xl animate-in slide-in-from-left duration-300 flex flex-col" onClick={e => e.stopPropagation()}>
@@ -322,8 +317,10 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      <div className="flex-1 flex flex-col min-h-screen min-w-0 overflow-x-hidden">
-        <header className="h-14 bg-white/80 backdrop-blur-md flex items-center justify-between px-4 md:px-6 sticky top-0 z-30 print:hidden border-b w-full">
+      {/* CONTENT AREA */}
+      <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
+        {/* Top Header - FIXED */}
+        <header className="h-14 bg-white/80 backdrop-blur-md flex items-center justify-between px-4 md:px-6 shrink-0 z-30 print:hidden border-b w-full">
           <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(true)} className="md:hidden h-9 w-9 hover:bg-primary/5">
             <Menu className="h-5 w-5 text-primary" />
           </Button>
@@ -360,13 +357,15 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="flex-1 p-4 md:p-8 overflow-y-auto print:p-0 print:overflow-visible w-full">
+        {/* Main Content - SCROLLABLE */}
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto print:p-0 print:overflow-visible w-full custom-scrollbar">
           <div className="max-w-7xl mx-auto w-full animate-in fade-in duration-500 print:max-w-none">
             {children}
           </div>
         </main>
       </div>
 
+      {/* ABOUT DIALOG */}
       <Dialog open={isAboutOpen} onOpenChange={setIsAboutOpen}>
         <DialogContent className="w-[90vw] sm:max-w-[380px] p-0 border-none rounded-[2.5rem] overflow-hidden shadow-2xl animate-in zoom-in duration-300 print:hidden bg-[#f8f9fb]">
           <DialogHeader className="sr-only">
