@@ -1,4 +1,3 @@
-
 'use client'
 
 import * as React from "react"
@@ -72,7 +71,7 @@ function SidebarItem({ href, icon, label, active, onClick, subItems }: SidebarIt
           <Button
             variant="ghost"
             className={cn(
-              "w-full justify-between px-3 py-2 h-10 font-bold transition-all hover:bg-primary/10 hover:text-primary",
+              "w-full justify-between px-3 py-2 h-10 font-bold transition-all hover:bg-primary/10 hover:text-primary rounded-xl",
               active && "bg-primary/5 text-primary"
             )}
           >
@@ -90,8 +89,8 @@ function SidebarItem({ href, icon, label, active, onClick, subItems }: SidebarIt
                 variant="ghost"
                 size="sm"
                 className={cn(
-                  "w-full justify-start h-9 text-muted-foreground font-medium transition-all hover:text-primary hover:bg-primary/5",
-                  pathname === subItem.href && "bg-primary text-white hover:bg-primary hover:text-white rounded-xl shadow-sm font-bold"
+                  "w-full justify-start h-9 text-muted-foreground font-medium transition-all hover:text-primary hover:bg-primary/5 rounded-xl",
+                  pathname === subItem.href && "bg-primary text-white hover:bg-primary hover:text-white shadow-sm font-bold"
                 )}
               >
                 {subItem.icon}
@@ -109,8 +108,8 @@ function SidebarItem({ href, icon, label, active, onClick, subItems }: SidebarIt
       variant="ghost"
       onClick={onClick}
       className={cn(
-        "w-full justify-start px-3 py-2 h-10 font-bold transition-all hover:bg-primary/10 hover:text-primary",
-        active && "bg-primary text-white hover:bg-primary hover:text-white rounded-xl shadow-md shadow-primary/20"
+        "w-full justify-start px-3 py-2 h-10 font-bold transition-all hover:bg-primary/10 hover:text-primary rounded-xl",
+        active && "bg-primary text-white hover:bg-primary hover:text-white shadow-md shadow-primary/20"
       )}
     >
       <div className="flex items-center gap-3">
@@ -200,9 +199,9 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         </div>
         <div className="max-w-md space-y-2">
           <h1 className="text-2xl font-bold text-primary">Akun Menunggu Verifikasi</h1>
-          <p className="text-muted-foreground">Akun Anda sedang diverifikasi oleh Admin.</p>
+          <p className="text-muted-foreground font-medium">Akun Anda sedang diverifikasi oleh Admin.</p>
         </div>
-        <Button variant="outline" onClick={handleLogout} className="rounded-full">Keluar</Button>
+        <Button variant="outline" onClick={handleLogout} className="rounded-full px-8 h-12 font-bold">Keluar</Button>
       </div>
     )
   }
@@ -234,22 +233,22 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   ].filter(item => profile && item.roles.includes(profile.role))
 
   return (
-    <div className="flex h-screen text-foreground max-w-full overflow-hidden">
+    <div className="flex h-screen text-foreground max-w-full overflow-hidden bg-background">
       {/* SIDEBAR */}
       <aside className="w-64 border-r bg-white/40 backdrop-blur-xl hidden md:flex flex-col h-full sticky top-0 z-40 print:hidden shadow-2xl">
         {/* Sidebar Header - FIXED */}
         <div className="p-6 pb-4 border-b bg-transparent shrink-0">
           <Link href="/dashboard" className="flex flex-col items-center justify-center gap-1 text-center group">
-            <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+            <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300">
               <FileText className="h-7 w-7 text-white" />
             </div>
             <div className="flex flex-col items-center mt-2">
-              <span className="text-xl font-bold text-primary uppercase tracking-tighter">SITU HANURA</span>
+              <span className="text-xl font-black text-primary uppercase tracking-tighter">SITU HANURA</span>
               <div className="flex flex-col items-center leading-none mt-1">
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                <span className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">
                   {currentDateTime?.date || "..."}
                 </span>
-                <span className="text-[11px] font-bold text-primary mt-0.5">
+                <span className="text-[11px] font-black text-primary mt-0.5">
                   {currentDateTime?.time || "00:00"}
                 </span>
               </div>
@@ -258,26 +257,24 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Sidebar Navigation - SCROLLABLE */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-6 pt-4">
-          <nav className="space-y-1">
-            {menuItems.map((item) => (
-              <SidebarItem 
-                key={item.label}
-                href={item.href}
-                icon={item.icon}
-                label={item.label}
-                active={item.href ? (pathname === item.href || (item.subItems && pathname.startsWith(item.href))) : (item.label === 'About' && isAboutOpen)}
-                subItems={item.subItems}
-                onClick={item.onClick}
-              />
-            ))}
-          </nav>
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 pt-4 space-y-1">
+          {menuItems.map((item) => (
+            <SidebarItem 
+              key={item.label}
+              href={item.href}
+              icon={item.icon}
+              label={item.label}
+              active={item.href ? (pathname === item.href || (item.subItems && pathname.startsWith(item.href))) : (item.label === 'About' && isAboutOpen)}
+              subItems={item.subItems}
+              onClick={item.onClick}
+            />
+          ))}
         </div>
 
         {/* Sidebar Footer - FIXED */}
-        <div className="mt-auto p-6 border-t text-center shrink-0">
-          <Button variant="ghost" className="w-full justify-start text-destructive font-bold hover:bg-destructive/10" onClick={handleLogout}>
-            <LogOut className="mr-3 h-5 w-5" /> Keluar
+        <div className="mt-auto p-4 border-t text-center shrink-0">
+          <Button variant="ghost" className="w-full justify-start text-destructive font-black hover:bg-destructive/10 rounded-xl" onClick={handleLogout}>
+            <LogOut className="mr-3 h-5 w-5" /> KELUAR
           </Button>
         </div>
       </aside>
@@ -285,13 +282,13 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       {/* MOBILE MENU */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 md:hidden print:hidden" onClick={() => setIsMobileMenuOpen(false)}>
-          <div className="w-72 h-full bg-card/95 backdrop-blur-md p-6 shadow-2xl animate-in slide-in-from-left duration-300 flex flex-col" onClick={e => e.stopPropagation()}>
+          <div className="w-[85vw] max-w-[320px] h-full bg-card/95 backdrop-blur-md p-6 shadow-2xl animate-in slide-in-from-left duration-300 flex flex-col" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-8 shrink-0">
               <div className="flex flex-col">
-                <span className="text-lg font-bold text-primary">SITU HANURA</span>
-                <span className="text-[10px] text-muted-foreground font-bold uppercase">{currentDateTime?.date} {currentDateTime?.time}</span>
+                <span className="text-lg font-black text-primary uppercase tracking-tighter">SITU HANURA</span>
+                <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">{currentDateTime?.date}</span>
               </div>
-              <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)} className="rounded-full"><X className="h-5 w-5" /></Button>
+              <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)} className="rounded-full bg-muted/20"><X className="h-5 w-5 text-primary" /></Button>
             </div>
             <nav className="space-y-1 overflow-y-auto custom-scrollbar flex-1 pr-2">
               {menuItems.map((item) => (
@@ -310,8 +307,8 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
               ))}
             </nav>
             <div className="mt-auto pt-6 border-t shrink-0">
-               <Button variant="ghost" className="w-full justify-start text-destructive font-bold" onClick={handleLogout}>
-                <LogOut className="mr-3 h-5 w-5" /> Keluar
+               <Button variant="ghost" className="w-full justify-start text-destructive font-black rounded-xl hover:bg-destructive/10" onClick={handleLogout}>
+                <LogOut className="mr-3 h-5 w-5" /> KELUAR
               </Button>
             </div>
           </div>
@@ -319,39 +316,42 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       )}
 
       {/* CONTENT AREA */}
-      <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
+      <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden relative">
         {/* Top Header - FIXED */}
-        <header className="h-14 bg-white/60 backdrop-blur-xl flex items-center justify-between px-4 md:px-6 shrink-0 z-30 print:hidden border-b w-full shadow-md sticky top-0">
-          <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(true)} className="md:hidden h-9 w-9 hover:bg-primary/5">
-            <Menu className="h-5 w-5 text-primary" />
-          </Button>
+        <header className="h-14 bg-white/60 backdrop-blur-xl flex items-center justify-between px-4 md:px-8 shrink-0 z-30 print:hidden border-b w-full shadow-sm sticky top-0">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(true)} className="md:hidden h-9 w-9 hover:bg-primary/5 rounded-full">
+              <Menu className="h-5 w-5 text-primary" />
+            </Button>
+            <h2 className="hidden md:block text-xs font-black uppercase tracking-[0.2em] text-muted-foreground/60">Sistem Informasi Terpadu</h2>
+          </div>
           
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="relative hidden sm:flex h-9 w-9 hover:bg-primary/5">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" className="relative h-9 w-9 hover:bg-primary/5 rounded-full hidden sm:flex">
               <Bell className="h-5 w-5 text-muted-foreground" />
               <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full border-2 border-white"></span>
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="p-0.5 rounded-full h-9 w-9 overflow-hidden bg-primary/10 hover:bg-primary/20 transition-colors">
-                   <div className="w-full h-full flex items-center justify-center text-primary font-black text-xs uppercase">
+                <Button variant="ghost" className="p-0.5 rounded-full h-10 w-10 overflow-hidden bg-primary/10 hover:bg-primary/20 transition-all duration-300">
+                   <div className="w-full h-full flex items-center justify-center text-primary font-black text-sm uppercase">
                      {profile?.fullName?.charAt(0)}
                    </div>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 shadow-xl border-none">
-                <DropdownMenuLabel className="px-3 py-2">
+              <DropdownMenuContent align="end" className="w-56 rounded-[1.5rem] p-2 shadow-2xl border-none animate-in zoom-in-95 duration-200">
+                <DropdownMenuLabel className="px-3 py-3">
                   <div className="flex flex-col">
                     <span className="truncate text-sm font-black text-primary uppercase tracking-tight">{profile?.fullName}</span>
-                    <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{profile?.role}</span>
+                    <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">{profile?.role}</span>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="mx-2 my-1" />
-                <DropdownMenuItem asChild className="cursor-pointer rounded-xl font-bold text-xs"><Link href="/dashboard/pengaturan"><UserIcon className="mr-2 h-4 w-4" /> Profil Saya</Link></DropdownMenuItem>
-                <DropdownMenuItem asChild className="cursor-pointer rounded-xl font-bold text-xs"><Link href="/dashboard/pengaturan"><Settings className="mr-2 h-4 w-4" /> Pengaturan</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer rounded-xl font-bold text-xs p-3"><Link href="/dashboard/pengaturan"><UserIcon className="mr-2 h-4 w-4" /> Profil Saya</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer rounded-xl font-bold text-xs p-3"><Link href="/dashboard/pengaturan"><Settings className="mr-2 h-4 w-4" /> Pengaturan</Link></DropdownMenuItem>
                 <DropdownMenuSeparator className="mx-2 my-1" />
-                <DropdownMenuItem className="text-destructive font-black text-xs cursor-pointer rounded-xl" onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" /> Keluar
+                <DropdownMenuItem className="text-destructive font-black text-xs cursor-pointer rounded-xl p-3 hover:bg-destructive/10" onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" /> KELUAR
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -359,8 +359,8 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Main Content - SCROLLABLE */}
-        <main className="flex-1 p-4 md:p-8 overflow-y-auto print:p-0 print:overflow-visible w-full custom-scrollbar bg-transparent">
-          <div className="max-w-7xl mx-auto w-full animate-in fade-in duration-500 print:max-w-none">
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto print:p-0 print:overflow-visible w-full custom-scrollbar bg-muted/5">
+          <div className="max-w-7xl mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-700 print:max-w-none">
             {children}
           </div>
         </main>
@@ -368,7 +368,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
       {/* ABOUT DIALOG - INTERACTIVE & FLOATING */}
       <Dialog open={isAboutOpen} onOpenChange={setIsAboutOpen}>
-        <DialogContent className="w-[95vw] sm:max-w-[380px] p-0 border-none rounded-[2.5rem] overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] animate-in zoom-in duration-300 print:hidden bg-white fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] focus-visible:outline-none">
+        <DialogContent className="w-[90vw] sm:max-w-[380px] p-0 border-none rounded-[2.5rem] overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] animate-in zoom-in-95 duration-300 print:hidden bg-white fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] focus-visible:outline-none focus:outline-none">
           <DialogHeader className="sr-only">
             <DialogTitle>TENTANG APLIKASI</DialogTitle>
             <DialogDescription>Informasi mengenai sistem dan pengembang aplikasi SITU HANURA.</DialogDescription>
@@ -377,13 +377,13 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             {/* Elegant Close Button */}
             <button 
               onClick={() => setIsAboutOpen(false)} 
-              className="absolute right-6 top-6 h-9 w-9 rounded-full flex items-center justify-center text-primary/60 border border-primary/10 hover:bg-primary/5 hover:text-primary transition-all duration-300 hover:rotate-90"
+              className="absolute right-6 top-6 h-10 w-10 rounded-full flex items-center justify-center text-primary/60 border border-primary/10 hover:bg-primary/5 hover:text-primary transition-all duration-300 hover:rotate-90"
             >
               <X className="h-5 w-5" />
             </button>
 
             <div className="space-y-6 w-full flex flex-col items-center">
-              {/* Header Title with Primary Color Gradient feel */}
+              {/* Header Title with Primary Color */}
               <div className="relative">
                 <h1 className="text-2xl font-black text-primary uppercase tracking-tight text-center relative z-10">
                   TENTANG APLIKASI
@@ -391,37 +391,37 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 <div className="absolute -bottom-1 left-0 w-full h-1 bg-primary/10 rounded-full"></div>
               </div>
               
-              {/* Welcome Description centered and refined */}
+              {/* Welcome Description */}
               <div className="text-slate-600 leading-relaxed text-sm font-medium text-center px-4">
                 <p>
-                  Selamat datang di Aplikasi <span className="text-primary font-bold">SITU HANURA</span> versi 2.0. 
+                  Selamat datang di Aplikasi <span className="text-primary font-black">SITU HANURA</span> versi 2.0. 
                   Aplikasi ini dikembangkan dan dirancang untuk mempermudah pengecekkan dan penginputan data. 
-                  Aplikasi ini masih perlu pengembangan kedepannya, kritik dan saran Anda sangat kami hargai.
+                  Aplikasi ini masih perlu pengembangan kedepannya.
                 </p>
               </div>
 
               {/* Enhanced Notice Box */}
               <div className="w-full p-4 bg-[#fffcf0] border border-[#fff3bf] rounded-[1.5rem] shadow-sm flex items-start gap-3">
-                <div className="mt-0.5 p-1 bg-[#fff3bf] rounded-full shrink-0">
+                <div className="mt-0.5 p-1.5 bg-[#fff3bf] rounded-full shrink-0">
                    <Clock className="h-3.5 w-3.5 text-[#e67e22]" />
                 </div>
-                <p className="text-[#e67e22] font-bold text-[11px] leading-relaxed">
+                <p className="text-[#e67e22] font-black text-[10px] leading-relaxed uppercase">
                   Proses Verifikasi Admin maksimal 1x24jam kerja jika berkas telah lengkap dan jelas terbaca.
                 </p>
               </div>
 
-              {/* Contact Info Section with light blue background and refined typography */}
-              <div className="w-full p-6 bg-[#f5faff] rounded-[2rem] border border-blue-100 shadow-inner group transition-colors hover:bg-[#edf5ff]">
-                <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+              {/* Contact Info Section */}
+              <div className="w-full p-6 bg-[#f5faff] rounded-[2rem] border border-blue-100 shadow-inner group transition-all hover:shadow-md">
+                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                   <div className="w-4 h-px bg-slate-300"></div> KONTAK & SARAN
                 </h4>
                 <div className="space-y-5">
                   <div className="group/item cursor-pointer">
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5 group-hover/item:text-primary transition-colors">EMAIL:</span>
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1 group-hover/item:text-primary transition-colors">EMAIL:</span>
                     <p className="text-sm font-black text-slate-700 hover:text-primary transition-colors truncate">agussuriyadipunya@gmail.com</p>
                   </div>
                   <div className="group/item cursor-pointer">
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5 group-hover/item:text-primary transition-colors">WHATSAPP:</span>
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1 group-hover/item:text-primary transition-colors">WHATSAPP:</span>
                     <p className="text-sm font-black text-slate-700 hover:text-primary transition-colors">0817319885</p>
                   </div>
                 </div>
@@ -430,7 +430,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
             {/* Refined Italicized Footer */}
             <footer className="text-center w-full pt-4 opacity-60">
-              <p className="text-[11px] font-medium italic text-slate-400">
+              <p className="text-[11px] font-bold italic text-slate-400">
                 Terima kasih atas kontribusi Anda membangun SITU.
               </p>
             </footer>
