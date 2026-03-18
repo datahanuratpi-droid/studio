@@ -242,8 +242,9 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen bg-background text-foreground max-w-full overflow-x-hidden">
       <aside className="w-64 border-r bg-card hidden md:flex flex-col sticky top-0 h-screen z-40 print:hidden shadow-sm">
-        <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
-          <Link href="/dashboard" className="flex flex-col items-center justify-center gap-1 mb-8 text-center group">
+        {/* Fixed Header Section (Nama, Logo, Jam) */}
+        <div className="p-6 pb-4 border-b bg-card shrink-0">
+          <Link href="/dashboard" className="flex flex-col items-center justify-center gap-1 text-center group">
             <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
               <FileText className="h-7 w-7 text-white" />
             </div>
@@ -259,6 +260,10 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
               </div>
             </div>
           </Link>
+        </div>
+
+        {/* Scrollable Nav Section */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-6 pt-4">
           <nav className="space-y-1">
             {menuItems.map((item) => (
               <SidebarItem 
@@ -273,6 +278,8 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             ))}
           </nav>
         </div>
+
+        {/* Fixed Footer Section (Logout) */}
         <div className="mt-auto p-6 border-t text-center shrink-0">
           <Button variant="ghost" className="w-full justify-start text-destructive font-bold hover:bg-destructive/10" onClick={handleLogout}>
             <LogOut className="mr-3 h-5 w-5" /> Keluar
