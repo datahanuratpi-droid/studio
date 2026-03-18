@@ -72,7 +72,7 @@ function SidebarItem({ href, icon, label, active, onClick, subItems }: SidebarIt
           <Button
             variant="ghost"
             className={cn(
-              "w-full justify-between px-3 py-2 h-10 font-bold transition-all hover:bg-primary/5 hover:text-primary",
+              "w-full justify-between px-3 py-2 h-10 font-bold transition-all hover:bg-primary/10 hover:text-primary",
               active && "bg-primary/5 text-primary"
             )}
           >
@@ -109,7 +109,7 @@ function SidebarItem({ href, icon, label, active, onClick, subItems }: SidebarIt
       variant="ghost"
       onClick={onClick}
       className={cn(
-        "w-full justify-start px-3 py-2 h-10 font-bold transition-all hover:bg-primary/5 hover:text-primary",
+        "w-full justify-start px-3 py-2 h-10 font-bold transition-all hover:bg-primary/10 hover:text-primary",
         active && "bg-primary text-white hover:bg-primary hover:text-white rounded-xl shadow-md shadow-primary/20"
       )}
     >
@@ -236,7 +236,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen text-foreground max-w-full overflow-hidden">
       {/* SIDEBAR */}
-      <aside className="w-64 border-r bg-card/40 backdrop-blur-lg hidden md:flex flex-col h-full sticky top-0 z-40 print:hidden shadow-xl">
+      <aside className="w-64 border-r bg-white/40 backdrop-blur-xl hidden md:flex flex-col h-full sticky top-0 z-40 print:hidden shadow-2xl">
         {/* Sidebar Header - FIXED */}
         <div className="p-6 pb-4 border-b bg-transparent shrink-0">
           <Link href="/dashboard" className="flex flex-col items-center justify-center gap-1 text-center group">
@@ -321,7 +321,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       {/* CONTENT AREA */}
       <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
         {/* Top Header - FIXED */}
-        <header className="h-14 bg-white/40 backdrop-blur-xl flex items-center justify-between px-4 md:px-6 shrink-0 z-30 print:hidden border-b w-full shadow-sm">
+        <header className="h-14 bg-white/60 backdrop-blur-xl flex items-center justify-between px-4 md:px-6 shrink-0 z-30 print:hidden border-b w-full shadow-md sticky top-0">
           <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(true)} className="md:hidden h-9 w-9 hover:bg-primary/5">
             <Menu className="h-5 w-5 text-primary" />
           </Button>
