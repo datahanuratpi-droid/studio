@@ -12,6 +12,12 @@
       "description": "Team collaborating on a project",
       "imageUrl": "https://picsum.photos/seed/taskflow2/600/400",
       "imageHint": "team collaboration"
+    },
+    {
+      "id": "reni-photo",
+      "description": "Photo of Reni, SE - Ketua DPC Hanura",
+      "imageUrl": "https://picsum.photos/seed/reni/400/500",
+      "imageHint": "woman yellow jacket"
     }
   ]
 }

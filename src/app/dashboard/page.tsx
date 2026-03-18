@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -35,6 +36,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator"
+import { PlaceHolderImages } from "@/lib/placeholder-images"
 
 // Custom Female Child Icon
 const GirlIcon = () => (
@@ -61,6 +63,8 @@ export default function DashboardPage() {
   const [isReniDetailOpen, setIsReniDetailOpen] = React.useState(false)
   const [isBeriDetailOpen, setIsBeriDetailOpen] = React.useState(false)
   const [isEndangDetailOpen, setIsEndangDetailOpen] = React.useState(false)
+
+  const reniPhoto = PlaceHolderImages.find(img => img.id === "reni-photo")?.imageUrl
 
   const lettersRef = useMemoFirebase(() => collection(firestore, "correspondences"), [firestore])
   const reportsRef = useMemoFirebase(() => collection(firestore, "activity_reports"), [firestore])
@@ -158,8 +162,17 @@ export default function DashboardPage() {
                 className="flex flex-col items-center text-center space-y-4 p-6 rounded-3xl bg-muted/10 border border-border/50 group hover:border-primary transition-all hover:bg-white hover:shadow-xl cursor-pointer"
                 onClick={() => setIsReniDetailOpen(true)}
               >
-                <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
-                  <GirlIcon />
+                <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner overflow-hidden">
+                  {reniPhoto ? (
+                    <img 
+                      src={reniPhoto} 
+                      alt="RENI, SE" 
+                      className="w-full h-full object-cover"
+                      data-ai-hint="woman yellow jacket"
+                    />
+                  ) : (
+                    <GirlIcon />
+                  )}
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Ketua</p>
@@ -256,8 +269,12 @@ export default function DashboardPage() {
         <DialogContent className="sm:max-w-[500px] p-0 border-none rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in duration-300">
           <DialogHeader className="p-8 bg-primary text-white text-left relative overflow-hidden">
             <div className="relative z-10 flex items-center gap-4">
-              <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
-                <GirlIcon />
+              <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md overflow-hidden">
+                {reniPhoto ? (
+                  <img src={reniPhoto} alt="RENI, SE" className="w-full h-full object-cover" />
+                ) : (
+                  <GirlIcon />
+                )}
               </div>
               <div className="space-y-1">
                 <DialogTitle className="text-2xl font-headline font-bold">RENI, SE</DialogTitle>
