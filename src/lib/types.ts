@@ -48,10 +48,10 @@ export interface ActivityReport {
   reportDate: string;
   reporterId: string;
   status: ReportStatus;
-  absensiFile?: string;
+  absensiFiles?: string[]; // Diubah menjadi array untuk mendukung multi-upload
   spandukFile?: string;
   fotoBersamaFile?: string;
-  fotoPendukungFiles?: string[]; // Changed from single string to array
+  fotoPendukungFiles?: string[];
   createdAt: string;
   updatedAt: string;
 }

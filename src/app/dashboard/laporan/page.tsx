@@ -56,12 +56,12 @@ export default function LaporanKegiatanPage() {
   const [previewImage, setPreviewPreviewImage] = React.useState<{url: string, title: string} | null>(null)
   
   const [fileData, setFileData] = React.useState<{
-    absensi: string;
+    absensi: string[];
     spanduk: string;
     fotoBersama: string;
     fotoPendukung: string[];
   }>({
-    absensi: "",
+    absensi: [],
     spanduk: "",
     fotoBersama: "",
     fotoPendukung: [],
@@ -89,21 +89,21 @@ export default function LaporanKegiatanPage() {
     const files = e.target.files
     if (!files) return
 
-    if (field === 'fotoPendukung') {
+    if (field === 'fotoPendukung' || field === 'absensi') {
       const selectedFiles = Array.from(files)
       selectedFiles.forEach(file => {
         const reader = new FileReader()
         reader.onloadend = () => {
           setFileData(prev => ({ 
             ...prev, 
-            fotoPendukung: [...prev.fotoPendukung, reader.result as string] 
+            [field]: [...(prev[field] as string[]), reader.result as string] 
           }))
         }
         reader.readAsDataURL(file)
       })
-      // Reset input value so same file can be selected again if needed
-      if (fileInputRefs.fotoPendukung.current) {
-        fileInputRefs.fotoPendukung.current.value = ""
+      // Reset input value
+      if ((fileInputRefs as any)[field].current) {
+        (fileInputRefs as any)[field].current!.value = ""
       }
     } else {
       const file = files[0]
@@ -118,13 +118,13 @@ export default function LaporanKegiatanPage() {
   }
 
   const handleRemoveFile = (field: keyof typeof fileData, index?: number) => {
-    if (field === 'fotoPendukung' && typeof index === 'number') {
+    if ((field === 'fotoPendukung' || field === 'absensi') && typeof index === 'number') {
       setFileData(prev => ({
         ...prev,
-        fotoPendukung: prev.fotoPendukung.filter((_, i) => i !== index)
+        [field]: (prev[field] as string[]).filter((_, i) => i !== index)
       }))
     } else {
-      setFileData(prev => ({ ...prev, [field as any]: "" }))
+      setFileData(prev => ({ ...prev, [field]: "" }))
       if ((fileInputRefs as any)[field]?.current) {
         (fileInputRefs as any)[field].current!.value = ""
       }
@@ -145,7 +145,7 @@ export default function LaporanKegiatanPage() {
       reportDate: formData.get("reportDate") as string || new Date().toISOString(),
       reporterId: user.uid,
       status: editingReport?.status || "Submitted",
-      absensiFile: fileData.absensi,
+      absensiFiles: fileData.absensi,
       spandukFile: fileData.spanduk,
       fotoBersamaFile: fileData.fotoBersama,
       fotoPendukungFiles: fileData.fotoPendukung,
@@ -163,7 +163,7 @@ export default function LaporanKegiatanPage() {
 
     setIsCreateOpen(false)
     setEditingReport(null)
-    setFileData({ absensi: "", spanduk: "", fotoBersama: "", fotoPendukung: [] })
+    setFileData({ absensi: [], spanduk: "", fotoBersama: "", fotoPendukung: [] })
   }
 
   const handleDelete = (id: string, title: string) => {
@@ -176,7 +176,7 @@ export default function LaporanKegiatanPage() {
   const handleOpenEdit = (report: ActivityReport) => {
     setEditingReport(report)
     setFileData({
-      absensi: report.absensiFile || "",
+      absensi: report.absensiFiles || [],
       spanduk: report.spandukFile || "",
       fotoBersama: report.fotoBersamaFile || "",
       fotoPendukung: report.fotoPendukungFiles || [],
@@ -204,7 +204,7 @@ export default function LaporanKegiatanPage() {
           className="w-full bg-secondary hover:bg-secondary/90 text-white rounded-full py-6 text-sm font-bold shadow-md md:max-w-xs h-12"
           onClick={() => {
             setEditingReport(null)
-            setFileData({ absensi: "", spanduk: "", fotoBersama: "", fotoPendukung: [] })
+            setFileData({ absensi: [], spanduk: "", fotoBersama: "", fotoPendukung: [] })
             setIsCreateOpen(true)
           }}
         >
@@ -335,9 +335,34 @@ export default function LaporanKegiatanPage() {
                   <Label className="text-[10px] font-black text-primary uppercase tracking-[0.2em] flex items-center gap-2">
                     <FileCheck className="h-4 w-4" /> Dokumentasi Utama
                   </Label>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  
+                  {/* Foto Absensi Section (Multi) */}
+                  <div className="space-y-4">
+                    <span className="text-[9px] font-black text-primary uppercase leading-tight">Foto Absensi</span>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      {selectedReport.absensiFiles && selectedReport.absensiFiles.length > 0 ? (
+                        selectedReport.absensiFiles.map((file, idx) => (
+                          <div 
+                            key={idx} 
+                            className="aspect-video rounded-xl border bg-green-50 border-green-100 overflow-hidden relative cursor-pointer"
+                            onClick={() => setPreviewPreviewImage({ url: file, title: `Foto Absensi ${idx + 1}` })}
+                          >
+                            <img src={file} alt={`Absensi ${idx}`} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-black/20 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <ExternalLink className="h-4 w-4 text-white" />
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="aspect-video w-full rounded-xl bg-muted/20 border-dashed border flex items-center justify-center opacity-50">
+                          <ImageIcon className="h-6 w-6 text-muted-foreground/30" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {[
-                      { label: "Foto Absensi", file: selectedReport.absensiFile },
                       { label: "Foto Spanduk", file: selectedReport.spandukFile },
                       { label: "Foto Bersama", file: selectedReport.fotoBersamaFile }
                     ].map((item, idx) => (
@@ -493,9 +518,62 @@ export default function LaporanKegiatanPage() {
                   <Label className="text-[10px] font-black uppercase text-primary tracking-widest flex items-center gap-2">
                     <ImageIcon className="h-4 w-4" /> Dokumentasi Utama
                   </Label>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  
+                  {/* Foto Absensi Multi-Upload Input */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-[8px] font-black uppercase">1. Foto Absensi (Dapat &gt; 1)</Label>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm" 
+                        className="rounded-full h-7 text-[8px] font-black uppercase border-primary/20"
+                        onClick={() => fileInputRefs.absensi.current?.click()}
+                      >
+                        <Plus className="h-3 w-3 mr-1" /> Tambah Foto
+                      </Button>
+                    </div>
+                    {fileData.absensi.length > 0 ? (
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {fileData.absensi.map((file, idx) => (
+                          <div key={idx} className="aspect-video rounded-xl border bg-white overflow-hidden relative group">
+                            <img src={file} className="w-full h-full object-cover" />
+                            <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button 
+                                type="button" 
+                                variant="destructive" 
+                                size="icon" 
+                                className="h-6 w-6 rounded-full"
+                                onClick={() => handleRemoveFile('absensi', idx)}
+                              >
+                                <X className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div 
+                        className="w-full aspect-[4/1] rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1 bg-white/50 cursor-pointer hover:bg-muted/30 transition-colors"
+                        onClick={() => fileInputRefs.absensi.current?.click()}
+                      >
+                        <FileUp className="h-5 w-5 text-muted-foreground/40" />
+                        <span className="text-[7px] font-black text-muted-foreground uppercase">Upload Foto Absensi</span>
+                      </div>
+                    )}
+                    <Input 
+                      id="absensi" 
+                      type="file" 
+                      multiple
+                      ref={fileInputRefs.absensi}
+                      className="hidden"
+                      accept="image/*"
+                      onChange={(e) => handleFileChange(e, 'absensi')}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                     {[
-                      { id: "absensi", label: "1. Foto Absensi", field: "absensi" as const },
                       { id: "spanduk", label: "2. Foto Spanduk", field: "spanduk" as const },
                       { id: "fotoBersama", label: "3. Foto Bersama", field: "fotoBersama" as const }
                     ].map((item) => (
