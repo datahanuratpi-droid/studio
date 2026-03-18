@@ -36,35 +36,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator"
-import { PlaceHolderImages } from "@/lib/placeholder-images"
-
-// Custom Female Child Icon
-const GirlIcon = () => (
-  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="7" r="4" />
-    <path d="M12 11c-3.5 0-6 2.5-6 6v2h12v-2c0-3.5-2.5-6-6-6z" />
-    <path d="M9 4.5a2 2 0 0 1 6 0" />
-    <path d="M7 9l-1 2" />
-    <path d="M17 9l1 2" />
-  </svg>
-);
-
-// Custom Male Child Icon
-const BoyIcon = () => (
-  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="7" r="4" />
-    <path d="M12 11c-3.5 0-6 2.5-6 6v2h12v-2c0-3.5-2.5-6-6-6z" />
-    <path d="M10 3.5c1 0 3 0 4 0" />
-  </svg>
-);
 
 export default function DashboardPage() {
   const firestore = useFirestore()
   const [isReniDetailOpen, setIsReniDetailOpen] = React.useState(false)
   const [isBeriDetailOpen, setIsBeriDetailOpen] = React.useState(false)
   const [isEndangDetailOpen, setIsEndangDetailOpen] = React.useState(false)
-
-  const reniPhoto = PlaceHolderImages.find(img => img.id === "reni-photo")?.imageUrl
 
   const lettersRef = useMemoFirebase(() => collection(firestore, "correspondences"), [firestore])
   const reportsRef = useMemoFirebase(() => collection(firestore, "activity_reports"), [firestore])
@@ -162,17 +139,8 @@ export default function DashboardPage() {
                 className="flex flex-col items-center text-center space-y-4 p-6 rounded-3xl bg-muted/10 border border-border/50 group hover:border-primary transition-all hover:bg-white hover:shadow-xl cursor-pointer"
                 onClick={() => setIsReniDetailOpen(true)}
               >
-                <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner overflow-hidden">
-                  {reniPhoto ? (
-                    <img 
-                      src={reniPhoto} 
-                      alt="RENI, SE" 
-                      className="w-full h-full object-cover"
-                      data-ai-hint="woman yellow jacket"
-                    />
-                  ) : (
-                    <GirlIcon />
-                  )}
+                <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner font-black text-2xl uppercase">
+                  R
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Ketua</p>
@@ -185,8 +153,8 @@ export default function DashboardPage() {
                 className="flex flex-col items-center text-center space-y-4 p-6 rounded-3xl bg-muted/10 border border-border/50 group hover:border-primary transition-all hover:bg-white hover:shadow-xl cursor-pointer"
                 onClick={() => setIsBeriDetailOpen(true)}
               >
-                <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
-                  <BoyIcon />
+                <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner font-black text-2xl uppercase">
+                  B
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Sekretaris</p>
@@ -199,8 +167,8 @@ export default function DashboardPage() {
                 className="flex flex-col items-center text-center space-y-4 p-6 rounded-3xl bg-muted/10 border border-border/50 group hover:border-primary transition-all hover:bg-white hover:shadow-xl cursor-pointer"
                 onClick={() => setIsEndangDetailOpen(true)}
               >
-                <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
-                  <BoyIcon />
+                <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner font-black text-2xl uppercase">
+                  E
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Bendahara</p>
@@ -269,12 +237,8 @@ export default function DashboardPage() {
         <DialogContent className="sm:max-w-[500px] p-0 border-none rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in duration-300">
           <DialogHeader className="p-8 bg-primary text-white text-left relative overflow-hidden">
             <div className="relative z-10 flex items-center gap-4">
-              <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md overflow-hidden">
-                {reniPhoto ? (
-                  <img src={reniPhoto} alt="RENI, SE" className="w-full h-full object-cover" />
-                ) : (
-                  <GirlIcon />
-                )}
+              <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md font-black text-xl text-white uppercase">
+                R
               </div>
               <div className="space-y-1">
                 <DialogTitle className="text-2xl font-headline font-bold">RENI, SE</DialogTitle>
@@ -367,8 +331,8 @@ export default function DashboardPage() {
         <DialogContent className="sm:max-w-[500px] p-0 border-none rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in duration-300">
           <DialogHeader className="p-8 bg-primary text-white text-left relative overflow-hidden">
             <div className="relative z-10 flex items-center gap-4">
-              <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
-                <BoyIcon />
+              <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md font-black text-xl text-white uppercase">
+                B
               </div>
               <div className="space-y-1">
                 <DialogTitle className="text-2xl font-headline font-bold uppercase">BERI KURNIAWAN</DialogTitle>
@@ -461,8 +425,8 @@ export default function DashboardPage() {
         <DialogContent className="sm:max-w-[500px] p-0 border-none rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in duration-300">
           <DialogHeader className="p-8 bg-primary text-white text-left relative overflow-hidden">
             <div className="relative z-10 flex items-center gap-4">
-              <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
-                <BoyIcon />
+              <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md font-black text-xl text-white uppercase">
+                E
               </div>
               <div className="space-y-1">
                 <DialogTitle className="text-2xl font-headline font-bold uppercase">ENDANG WIRNANTO</DialogTitle>
