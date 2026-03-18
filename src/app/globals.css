@@ -95,6 +95,17 @@
   }
 }
 
+/* Custom Background Mesh */
+.bg-mesh {
+  background-color: hsl(var(--background));
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(var(--primary), 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(var(--secondary), 0.03) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, hsla(var(--primary), 0.05) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, hsla(var(--secondary), 0.03) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
 /* Custom Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;

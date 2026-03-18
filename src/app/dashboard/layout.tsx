@@ -221,6 +221,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     { href: "/dashboard/laporan", icon: <FileText className="h-5 w-5" />, label: "Laporan Kegiatan", roles: ["Admin", "KSB", "Staff"] },
     { href: "/dashboard/kas", icon: <Wallet className="h-5 w-5" />, label: "Kas Office", roles: ["Admin", "KSB", "Staff"] },
     { href: "/dashboard/karyawan", icon: <Briefcase className="h-5 w-5" />, label: "Karyawan", roles: ["Admin"] },
+    { href: "/dashboard/arsip", icon: <FileText className="h-5 w-5" />, label: "Arsip Digital", roles: ["Admin", "KSB", "Staff"] },
     { href: "/dashboard/pustaka", icon: <Library className="h-5 w-5" />, label: "Pustaka Hanura", roles: ["Admin", "KSB", "Staff"] },
     { href: "/dashboard/users", icon: <Users className="h-5 w-5" />, label: "Manajemen User", roles: ["Admin"] },
     { href: "/dashboard/pengaturan", icon: <Settings className="h-5 w-5" />, label: "Pengaturan", roles: ["Admin", "KSB", "Staff"] },
@@ -233,11 +234,11 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   ].filter(item => profile && item.roles.includes(profile.role))
 
   return (
-    <div className="flex h-screen bg-background text-foreground max-w-full overflow-hidden">
+    <div className="flex h-screen bg-mesh text-foreground max-w-full overflow-hidden">
       {/* SIDEBAR */}
-      <aside className="w-64 border-r bg-card hidden md:flex flex-col h-full sticky top-0 z-40 print:hidden shadow-sm">
+      <aside className="w-64 border-r bg-card/80 backdrop-blur-lg hidden md:flex flex-col h-full sticky top-0 z-40 print:hidden shadow-xl">
         {/* Sidebar Header - FIXED */}
-        <div className="p-6 pb-4 border-b bg-card shrink-0">
+        <div className="p-6 pb-4 border-b bg-transparent shrink-0">
           <Link href="/dashboard" className="flex flex-col items-center justify-center gap-1 text-center group">
             <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
               <FileText className="h-7 w-7 text-white" />
@@ -284,7 +285,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       {/* MOBILE MENU */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 md:hidden print:hidden" onClick={() => setIsMobileMenuOpen(false)}>
-          <div className="w-72 h-full bg-card p-6 shadow-2xl animate-in slide-in-from-left duration-300 flex flex-col" onClick={e => e.stopPropagation()}>
+          <div className="w-72 h-full bg-card/95 backdrop-blur-md p-6 shadow-2xl animate-in slide-in-from-left duration-300 flex flex-col" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-8 shrink-0">
               <div className="flex flex-col">
                 <span className="text-lg font-bold text-primary">SITU HANURA</span>
@@ -320,7 +321,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       {/* CONTENT AREA */}
       <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
         {/* Top Header - FIXED */}
-        <header className="h-14 bg-white/80 backdrop-blur-md flex items-center justify-between px-4 md:px-6 shrink-0 z-30 print:hidden border-b w-full">
+        <header className="h-14 bg-white/40 backdrop-blur-xl flex items-center justify-between px-4 md:px-6 shrink-0 z-30 print:hidden border-b w-full shadow-sm">
           <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(true)} className="md:hidden h-9 w-9 hover:bg-primary/5">
             <Menu className="h-5 w-5 text-primary" />
           </Button>
@@ -358,7 +359,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Main Content - SCROLLABLE */}
-        <main className="flex-1 p-4 md:p-8 overflow-y-auto print:p-0 print:overflow-visible w-full custom-scrollbar">
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto print:p-0 print:overflow-visible w-full custom-scrollbar bg-transparent">
           <div className="max-w-7xl mx-auto w-full animate-in fade-in duration-500 print:max-w-none">
             {children}
           </div>
