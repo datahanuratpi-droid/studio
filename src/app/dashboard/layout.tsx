@@ -24,7 +24,9 @@ import {
   Clock,
   Library,
   Briefcase,
-  MonitorOff
+  MonitorOff,
+  UserCheck,
+  Calendar as CalendarIcon
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -263,14 +265,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             <Logo iconOnly className="w-12 h-12 group-hover:scale-105 transition-transform duration-300" />
             <div className="flex flex-col items-center mt-2">
               <span className="text-xl font-black text-primary uppercase tracking-tighter leading-none">SITU HANURA</span>
-              <div className="flex flex-col items-center leading-none mt-1">
-                <span className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">
-                  {currentDateTime?.date || "..."}
-                </span>
-                <span className="text-[11px] font-black text-primary mt-0.5">
-                  {currentDateTime?.time || "00:00"}
-                </span>
-              </div>
+              <span className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.3em] mt-1">Kota Tanjungpinang</span>
             </div>
           </Link>
         </div>
@@ -290,8 +285,52 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           ))}
         </div>
 
-        {/* Sidebar Footer - FIXED */}
-        <div className="mt-auto p-4 border-t text-center shrink-0">
+        {/* Sidebar Footer - FIXED WITH LOGIN INFO */}
+        <div className="mt-auto p-4 border-t space-y-4 shrink-0 bg-white/50 backdrop-blur-sm">
+          {/* Info Login Section */}
+          <div className="px-2 space-y-3">
+             <div className="space-y-1">
+               <div className="flex items-center gap-1.5">
+                 <MonitorOff className="h-3 w-3 text-muted-foreground/60" />
+                 <span className="text-[8px] font-black text-muted-foreground/60 uppercase tracking-widest">User ID (Device)</span>
+               </div>
+               <span className="text-[9px] font-mono font-bold text-primary truncate block leading-none" title={profile?.deviceId || 'No ID'}>
+                 {profile?.deviceId || 'NOT_LINKED'}
+               </span>
+             </div>
+             
+             <div className="space-y-1">
+               <div className="flex items-center gap-1.5">
+                 <UserCheck className="h-3 w-3 text-muted-foreground/60" />
+                 <span className="text-[8px] font-black text-muted-foreground/60 uppercase tracking-widest">Username</span>
+               </div>
+               <span className="text-[10px] font-black text-slate-700 truncate block uppercase leading-none">
+                 {profile?.fullName || 'N/A'}
+               </span>
+             </div>
+             
+             <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-200">
+               <div className="space-y-1">
+                 <div className="flex items-center gap-1">
+                   <CalendarIcon className="h-2.5 w-2.5 text-muted-foreground/60" />
+                   <span className="text-[7px] font-black text-muted-foreground/60 uppercase tracking-widest">Tanggal</span>
+                 </div>
+                 <span className="text-[9px] font-bold text-slate-700 block leading-none">
+                   {currentDateTime?.date || '...'}
+                 </span>
+               </div>
+               <div className="space-y-1">
+                 <div className="flex items-center gap-1">
+                   <Clock className="h-2.5 w-2.5 text-muted-foreground/60" />
+                   <span className="text-[7px] font-black text-muted-foreground/60 uppercase tracking-widest">Jam</span>
+                 </div>
+                 <span className="text-[9px] font-black text-primary block leading-none">
+                   {currentDateTime?.time || '00:00'}
+                 </span>
+               </div>
+             </div>
+          </div>
+          
           <Button variant="ghost" className="w-full justify-start text-destructive font-black hover:bg-destructive/10 rounded-xl" onClick={handleLogout}>
             <LogOut className="mr-3 h-5 w-5" /> KELUAR
           </Button>
