@@ -3,17 +3,18 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { Mail, Lock, UserPlus, LogIn, Loader2 } from 'lucide-react';
+import { Mail, Lock, UserPlus, LogIn, Loader2, MonitorOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAuth, useUser, useFirestore, setDocumentNonBlocking } from '@/firebase';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { doc } from 'firebase/firestore';
+import { useAuth, useUser, useFirestore, setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Logo } from '@/components/logo';
+import { UserProfile } from '@/lib/types';
 
 export default function LoginPage() {
   const auth = useAuth();
@@ -22,6 +23,17 @@ export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = React.useState(false);
+
+  // Get or Generate Device ID
+  const getDeviceId = () => {
+    if (typeof window === 'undefined') return null;
+    let deviceId = localStorage.getItem('situ_device_id');
+    if (!deviceId) {
+      deviceId = Math.random().toString(36).substring(2) + Date.now().toString(36);
+      localStorage.setItem('situ_device_id', deviceId);
+    }
+    return deviceId;
+  };
 
   React.useEffect(() => {
     if (user && !isUserLoading) {
@@ -37,7 +49,7 @@ export default function LoginPage() {
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    if (!auth) {
+    if (!auth || !firestore) {
       toast({ variant: 'destructive', title: 'Sistem Belum Siap', description: 'Silakan muat ulang halaman.' });
       return;
     }
@@ -56,7 +68,41 @@ export default function LoginPage() {
     const email = formatEmail(emailInput);
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const loggedUser = userCredential.user;
+
+      // Check Device Lock
+      const userDocRef = doc(firestore, 'users', loggedUser.uid);
+      const userDoc = await getDoc(userDocRef);
+      
+      if (userDoc.exists()) {
+        const profile = userDoc.data() as UserProfile;
+        const currentDeviceId = getDeviceId();
+
+        // 1. Check if Status is Active
+        if (profile.status !== 'Active') {
+          // Allow login if it's the specific Super Admin case or if they need to see the "Pending" screen
+          // But usually we handle this in dashboard layout.
+        }
+
+        // 2. Device Locking Logic
+        if (profile.deviceId && profile.deviceId !== currentDeviceId) {
+          await signOut(auth);
+          toast({ 
+            variant: 'destructive', 
+            title: 'Perangkat Terkunci', 
+            description: 'Akun ini sudah terikat pada perangkat lain. Silakan hubungi Admin untuk reset ID Perangkat.' 
+          });
+          setLoading(false);
+          return;
+        }
+
+        // 3. Register Device if empty and user is active
+        if (!profile.deviceId && profile.status === 'Active') {
+          await updateDocumentNonBlocking(userDocRef, { deviceId: currentDeviceId });
+        }
+      }
+
       toast({ title: 'Login Berhasil', description: 'Mengarahkan Anda ke Dashboard...' });
     } catch (err: any) {
       console.error("Login error:", err);
@@ -102,6 +148,7 @@ export default function LoginPage() {
       const newUser = userCredential.user;
 
       const isAdminAgus = emailInput.toUpperCase() === 'AGUS';
+      const currentDeviceId = getDeviceId();
 
       const userProfile = {
         id: newUser.uid,
@@ -109,6 +156,7 @@ export default function LoginPage() {
         fullName: isAdminAgus ? 'AGUS (Super Admin)' : emailInput,
         role: isAdminAgus ? 'Admin' : 'Staff',
         status: isAdminAgus ? 'Active' : 'Pending Verification',
+        deviceId: isAdminAgus ? currentDeviceId : null, // Agus directly locked to current device
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
@@ -119,7 +167,7 @@ export default function LoginPage() {
         setDocumentNonBlocking(doc(firestore, 'roles_admin', newUser.uid), { active: true }, { merge: true });
         toast({ 
           title: 'Akun Admin Aktif', 
-          description: 'Selamat datang Pak Agus. Akun Anda telah otomatis diverifikasi.' 
+          description: 'Selamat datang Pak Agus. Akun Anda telah otomatis diverifikasi dan dikunci ke perangkat ini.' 
         });
       } else {
         toast({ 

@@ -23,7 +23,8 @@ import {
   Loader2,
   Clock,
   Library,
-  Briefcase
+  Briefcase,
+  MonitorOff
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -52,6 +53,7 @@ import { useUser, useAuth, useDoc, useFirestore, useMemoFirebase } from "@/fireb
 import { signOut } from "firebase/auth"
 import { doc } from "firebase/firestore"
 import { Logo } from "@/components/logo"
+import { useToast } from "@/hooks/use-toast"
 
 interface SidebarItemProps {
   href?: string
@@ -138,6 +140,8 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const { user, isUserLoading } = useUser()
   const auth = useAuth()
   const firestore = useFirestore()
+  const { toast } = useToast()
+  
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
   const [isAboutOpen, setIsAboutOpen] = React.useState(false)
   const [currentDateTime, setCurrentDateTime] = React.useState<{date: string, time: string} | null>(null)
@@ -171,6 +175,21 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   }, [firestore, user?.uid])
 
   const { data: profile, isLoading: isProfileLoading } = useDoc(userDocRef)
+
+  // Device Security Check
+  React.useEffect(() => {
+    if (!isUserLoading && !isProfileLoading && user && profile && profile.status === 'Active') {
+      const storedDeviceId = localStorage.getItem('situ_device_id');
+      if (profile.deviceId && storedDeviceId !== profile.deviceId) {
+        toast({
+          variant: "destructive",
+          title: "Sesi Tidak Valid",
+          description: "Akun Anda terdeteksi digunakan di perangkat lain atau ID perangkat telah direset. Silakan login kembali."
+        });
+        signOut(auth).then(() => router.push('/login'));
+      }
+    }
+  }, [profile, isUserLoading, isProfileLoading, user, auth, router, toast]);
 
   React.useEffect(() => {
     if (!isUserLoading && !user) {
@@ -257,7 +276,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Sidebar Navigation - SCROLLABLE */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 pt-4 space-y-1">
+        <div className="flex-1 overflow-y-auto no-scrollbar p-4 pt-4 space-y-1">
           {menuItems.map((item) => (
             <SidebarItem 
               key={item.label}
@@ -287,7 +306,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
               <Logo className="w-auto h-12" />
               <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)} className="rounded-full bg-muted/20"><X className="h-5 w-5 text-primary" /></Button>
             </div>
-            <nav className="space-y-1 overflow-y-auto custom-scrollbar flex-1 pr-2">
+            <nav className="space-y-1 overflow-y-auto no-scrollbar flex-1 pr-2">
               {menuItems.map((item) => (
                 <SidebarItem 
                   key={item.label}
@@ -356,7 +375,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Main Content - SCROLLABLE */}
-        <main className="flex-1 p-4 md:p-8 overflow-y-auto print:p-0 print:overflow-visible w-full custom-scrollbar bg-muted/5">
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto no-scrollbar print:p-0 print:overflow-visible w-full bg-muted/5">
           <div className="max-w-7xl mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-700 print:max-w-none">
             {children}
           </div>

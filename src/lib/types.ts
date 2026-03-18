@@ -107,6 +107,7 @@ export interface UserProfile {
   passwordDisplay?: string;
   themePreference?: 'light' | 'dark';
   themeColor?: AppThemeColor;
+  deviceId?: string; // New field for device locking
   createdAt: string;
   updatedAt: string;
 }
