@@ -10,7 +10,7 @@
     --card-foreground: 209 60% 10%;
     --popover: 0 0% 100%;
     --popover-foreground: 209 60% 10%;
-    --primary: 24 95% 53%; /* Hanura Orange */
+    --primary: 24 95% 53%; /* Hanura Orange Default */
     --primary-foreground: 0 0% 100%;
     --secondary: 226 70% 55%; /* Hanura Blue */
     --secondary-foreground: 0 0% 100%;
@@ -24,6 +24,43 @@
     --input: 210 20% 90%;
     --ring: 24 95% 53%;
     --radius: 1rem;
+  }
+
+  /* Theme Overrides */
+  .theme-red {
+    --primary: 0 84% 60%;
+    --accent: 0 84% 60%;
+    --ring: 0 84% 60%;
+  }
+
+  .theme-blue {
+    --primary: 221 83% 53%;
+    --accent: 221 83% 53%;
+    --ring: 221 83% 53%;
+  }
+
+  .theme-orange {
+    --primary: 24 95% 53%;
+    --accent: 24 95% 53%;
+    --ring: 24 95% 53%;
+  }
+
+  .theme-magenta {
+    --primary: 330 81% 60%;
+    --accent: 330 81% 60%;
+    --ring: 330 81% 60%;
+  }
+
+  .theme-purple {
+    --primary: 262 83% 58%;
+    --accent: 262 83% 58%;
+    --ring: 262 83% 58%;
+  }
+
+  .theme-yellow {
+    --primary: 45 93% 47%;
+    --accent: 45 93% 47%;
+    --ring: 45 93% 47%;
   }
 
   .dark {
@@ -58,7 +95,7 @@
   }
 }
 
-/* Custom Scrollbar for better look */
+/* Custom Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
@@ -69,7 +106,6 @@
   @apply bg-muted rounded-full;
 }
 
-/* Hide horizontal scrollbar but keep functionality */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
