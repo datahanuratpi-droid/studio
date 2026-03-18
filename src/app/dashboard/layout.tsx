@@ -365,29 +365,30 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         </main>
       </div>
 
-      {/* ABOUT DIALOG */}
+      {/* ABOUT DIALOG - MATCHING THE PROVIDED IMAGE */}
       <Dialog open={isAboutOpen} onOpenChange={setIsAboutOpen}>
-        <DialogContent className="w-[90vw] sm:max-w-[380px] p-0 border-none rounded-[2.5rem] overflow-hidden shadow-2xl animate-in zoom-in duration-300 print:hidden bg-[#f8f9fb]">
+        <DialogContent className="w-[95vw] sm:max-w-[420px] p-0 border-none rounded-[1.5rem] overflow-hidden shadow-2xl animate-in zoom-in duration-300 print:hidden bg-white">
           <DialogHeader className="sr-only">
-            <DialogTitle>Tentang Aplikasi SITU HANURA</DialogTitle>
-            <DialogDescription>Informasi mengenai sistem dan pengembang aplikasi.</DialogDescription>
+            <DialogTitle>TENTANG APLIKASI</DialogTitle>
+            <DialogDescription>Informasi mengenai sistem dan pengembang aplikasi SITU HANURA.</DialogDescription>
           </DialogHeader>
-          <div className="relative p-8 pt-14 space-y-8 flex flex-col items-center">
-            <Button 
-              variant="ghost" 
-              size="icon" 
+          <div className="relative p-8 pt-12 space-y-8 flex flex-col items-center">
+            {/* Close Button matching image style */}
+            <button 
               onClick={() => setIsAboutOpen(false)} 
-              className="absolute right-6 top-6 h-10 w-10 rounded-full bg-primary/5 text-primary hover:bg-primary/10 transition-colors shadow-sm"
+              className="absolute right-4 top-4 h-8 w-8 rounded-full flex items-center justify-center text-primary border border-primary/20 hover:bg-primary/10 transition-colors"
             >
-              <X className="h-5 w-5" />
-            </Button>
+              <X className="h-4 w-4" />
+            </button>
 
-            <div className="space-y-6 w-full">
-              <h1 className="text-2xl md:text-3xl font-black text-primary uppercase tracking-tight text-center">
+            <div className="space-y-6 w-full flex flex-col items-center">
+              {/* Header Title in Primary Color */}
+              <h1 className="text-2xl font-black text-primary uppercase tracking-tight text-center">
                 TENTANG APLIKASI
               </h1>
               
-              <div className="text-slate-600 leading-relaxed text-sm font-medium text-center px-2">
+              {/* Welcome Description centered */}
+              <div className="text-slate-600 leading-relaxed text-sm font-medium text-center">
                 <p>
                   Selamat datang di Aplikasi SITU HANURA versi 2.0. 
                   Aplikasi ini dikembangkan dan dirancang untuk mempermudah dalam pengecekkan dan penginputan data. 
@@ -395,29 +396,32 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 </p>
               </div>
 
-              <div className="p-5 bg-[#fff9db] border border-[#fff3bf] rounded-[1.5rem]">
+              {/* Yellow Alert Box centered */}
+              <div className="w-full p-4 bg-[#fff9db] border border-[#fff3bf] rounded-xl">
                 <p className="text-[#e67e22] font-bold text-[11px] leading-relaxed text-center">
                   - Proses Verifikasi Admin maksimal 1x24jam kerja jika berkas telah lengkap dan jelas terbaca
                 </p>
               </div>
 
-              <div className="p-8 bg-white rounded-[2.5rem] shadow-sm border border-slate-100 space-y-6">
-                <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">KONTAK & SARAN:</h4>
-                <div className="space-y-4">
-                  <div className="space-y-1">
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Email:</span>
+              {/* Contact Info Section with light blue background */}
+              <div className="w-full p-6 bg-[#f0f7ff] rounded-2xl space-y-4">
+                <h4 className="text-[11px] font-black text-slate-500 uppercase tracking-widest">KONTAK & SARAN:</h4>
+                <div className="space-y-3">
+                  <div className="space-y-0.5">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">EMAIL:</span>
                     <p className="text-sm font-black text-primary">agussuriyadipunya@gmail.com</p>
                   </div>
-                  <div className="space-y-1">
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Whatsapp:</span>
+                  <div className="space-y-0.5">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">WHATSAPP:</span>
                     <p className="text-sm font-black text-primary">0817319885</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <footer className="text-center w-full pt-4 pb-2">
-              <p className="text-[9px] font-medium italic text-slate-400">
+            {/* Italicized Footer matching image */}
+            <footer className="text-center w-full pt-4">
+              <p className="text-[10px] font-medium italic text-slate-400">
                 Terima kasih atas kontribusi Anda.
               </p>
             </footer>
