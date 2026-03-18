@@ -14,7 +14,8 @@ import {
   FileCheck,
   CheckCircle2,
   X,
-  Search
+  Search,
+  Eye
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -39,11 +40,13 @@ export default function LaporanKegiatanPage() {
   const [isCreateOpen, setIsCreateOpen] = React.useState(false)
   const [selectedReport, setSelectedReport] = React.useState<any>(null)
   const [searchQuery, setSearchQuery] = React.useState("")
-  const [fileStatus, setFileStatus] = React.useState({
-    absensi: false,
-    spanduk: false,
-    fotoBersama: false,
-    fotoPendukung: false,
+  const [previewImage, setPreviewPreviewImage] = React.useState<{url: string, title: string} | null>(null)
+  
+  const [fileData, setFileData] = React.useState({
+    absensi: "",
+    spanduk: "",
+    fotoBersama: "",
+    fotoPendukung: "",
   })
 
   const firestore = useFirestore()
@@ -57,9 +60,14 @@ export default function LaporanKegiatanPage() {
 
   const { data: reports, isLoading } = useCollection(reportsRef)
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof typeof fileStatus) => {
-    if (e.target.files?.[0]) {
-      setFileStatus(prev => ({ ...prev, [field]: true }))
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof typeof fileData) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setFileData(prev => ({ ...prev, [field]: reader.result as string }))
+      }
+      reader.readAsDataURL(file)
     }
   }
 
@@ -77,17 +85,18 @@ export default function LaporanKegiatanPage() {
       reportDate: formData.get("reportDate") as string || new Date().toISOString(),
       reporterId: user.uid,
       status: "Submitted",
-      absensiFile: (formData.get("absensi") as File)?.name || "",
-      spandukFile: (formData.get("spanduk") as File)?.name || "",
-      fotoBersamaFile: (formData.get("fotoBersama") as File)?.name || "",
-      fotoPendukungFile: (formData.get("fotoPendukung") as File)?.name || "",
+      // Store actual base64 data instead of just file name
+      absensiFile: fileData.absensi,
+      spandukFile: fileData.spanduk,
+      fotoBersamaFile: fileData.fotoBersama,
+      fotoPendukungFile: fileData.fotoPendukung,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     }
 
     addDocumentNonBlocking(collection(firestore, "activity_reports"), data)
     setIsCreateOpen(false)
-    setFileStatus({ absensi: false, spanduk: false, fotoBersama: false, fotoPendukung: false })
+    setFileData({ absensi: "", spanduk: "", fotoBersama: "", fotoPendukung: "" })
     toast({
       title: "Laporan Terkirim",
       description: `Laporan "${title}" telah berhasil disimpan ke sistem.`,
@@ -103,22 +112,24 @@ export default function LaporanKegiatanPage() {
 
   return (
     <div className="space-y-6 md:space-y-8 pb-10 animate-in fade-in duration-500 max-w-full overflow-x-hidden">
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 px-1">
         <h1 className="text-2xl md:text-3xl font-bold text-primary">Laporan Kegiatan</h1>
         <p className="text-xs md:text-sm text-muted-foreground">Arsip digital laporan kegiatan operasional partai.</p>
       </div>
 
-      <Button 
-        className="w-full bg-secondary hover:bg-secondary/90 text-white rounded-full py-6 text-sm font-bold shadow-md md:max-w-xs"
-        onClick={() => {
-          setFileStatus({ absensi: false, spanduk: false, fotoBersama: false, fotoPendukung: false })
-          setIsCreateOpen(true)
-        }}
-      >
-        <Plus className="mr-2 h-4 w-4" /> Buat Laporan Baru
-      </Button>
+      <div className="px-1">
+        <Button 
+          className="w-full bg-secondary hover:bg-secondary/90 text-white rounded-full py-6 text-sm font-bold shadow-md md:max-w-xs h-12"
+          onClick={() => {
+            setFileData({ absensi: "", spanduk: "", fotoBersama: "", fotoPendukung: "" })
+            setIsCreateOpen(true)
+          }}
+        >
+          <Plus className="mr-2 h-4 w-4" /> Buat Laporan Baru
+        </Button>
+      </div>
 
-      <div className="relative">
+      <div className="relative px-1">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input 
           placeholder="Cari judul laporan..." 
@@ -134,7 +145,7 @@ export default function LaporanKegiatanPage() {
           <p className="text-muted-foreground font-bold text-xs uppercase tracking-widest">Memuat arsip...</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-1">
           {filteredReports.map((report) => (
             <Card 
               key={report.id} 
@@ -238,12 +249,20 @@ export default function LaporanKegiatanPage() {
                           <div className="flex flex-col">
                             <span className="text-[10px] font-black text-primary uppercase leading-tight">{item.label}</span>
                             <span className="text-[8px] font-mono text-muted-foreground truncate max-w-[100px] mt-0.5">
-                              {item.file || "KOSONG"}
+                              {item.file ? "BERKAS TERSEDIA" : "KOSONG"}
                             </span>
                           </div>
                         </div>
                         {item.file && (
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600 hover:bg-green-100 rounded-full">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8 text-green-600 hover:bg-green-100 rounded-full"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPreviewPreviewImage({ url: item.file!, title: item.label });
+                            }}
+                          >
                             <ExternalLink className="h-4 w-4" />
                           </Button>
                         )}
@@ -313,13 +332,13 @@ export default function LaporanKegiatanPage() {
                     <div key={item.id} className="space-y-1.5">
                       <Label className="text-[8px] font-black uppercase flex items-center justify-between pl-1">
                         {item.label}
-                        {fileStatus[item.field] && <CheckCircle2 className="h-3 w-3 text-green-500" />}
+                        {fileData[item.field] && <CheckCircle2 className="h-3 w-3 text-green-500" />}
                       </Label>
                       <Input 
                         id={item.id} 
                         name={item.id} 
                         type="file" 
-                        className={cn("h-10 text-[10px] p-2 rounded-xl cursor-pointer bg-white", fileStatus[item.field] && "border-green-500")}
+                        className={cn("h-10 text-[10px] p-2 rounded-xl cursor-pointer bg-white", fileData[item.field] && "border-green-500")}
                         accept="image/*"
                         onChange={(e) => handleFileChange(e, item.field)}
                       />
@@ -329,10 +348,42 @@ export default function LaporanKegiatanPage() {
               </div>
             </div>
             <DialogFooter className="p-8 bg-muted/30 gap-2">
-              <Button type="button" variant="ghost" onClick={() => setIsCreateOpen(false)} className="flex-1 rounded-full font-bold">Batal</Button>
+              <Button type="button" variant="ghost" onClick={() => setIsCreateOpen(false)} className="flex-1 rounded-full font-bold h-12">Batal</Button>
               <Button type="submit" className="flex-1 bg-secondary text-white rounded-full font-black text-xs uppercase shadow-lg h-12">Simpan & Kirim</Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Preview Gambar */}
+      <Dialog open={!!previewImage} onOpenChange={() => setPreviewPreviewImage(null)}>
+        <DialogContent className="max-w-4xl p-0 overflow-hidden border-none rounded-3xl bg-black/90">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Pratinjau Dokumentasi</DialogTitle>
+            <DialogDescription>Melihat foto bukti kegiatan.</DialogDescription>
+          </DialogHeader>
+          <div className="relative flex items-center justify-center p-2 min-h-[300px]">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setPreviewPreviewImage(null)} 
+              className="absolute right-4 top-4 text-white hover:bg-white/20 rounded-full z-50 h-10 w-10"
+            >
+              <X className="h-6 w-6" />
+            </Button>
+            {previewImage && (
+              <img 
+                src={previewImage.url} 
+                alt={previewImage.title} 
+                className="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl" 
+              />
+            )}
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2">
+              <Badge className="bg-white/20 text-white backdrop-blur-md border-none px-4 py-1.5 uppercase font-black text-[10px] tracking-widest">
+                {previewImage?.title}
+              </Badge>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
