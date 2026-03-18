@@ -51,7 +51,7 @@ export interface ActivityReport {
   absensiFile?: string;
   spandukFile?: string;
   fotoBersamaFile?: string;
-  fotoPendukungFile?: string;
+  fotoPendukungFiles?: string[]; // Changed from single string to array
   createdAt: string;
   updatedAt: string;
 }
