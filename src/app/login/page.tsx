@@ -153,7 +153,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-transparent p-4">
       <div className="w-full max-w-md space-y-8 animate-in fade-in zoom-in duration-500">
         <div className="text-center flex flex-col items-center">
-          <Logo iconOnly className="w-20 h-20 mb-6" />
+          <Logo iconOnly className="w-16 h-16 mb-6" />
           <h1 className="text-3xl font-black font-headline text-primary uppercase tracking-tighter">SITU HANURA</h1>
           <div className="mt-2 space-y-1">
             <p className="text-muted-foreground font-medium">Sistem Informasi Terpadu Partai Hanura</p>

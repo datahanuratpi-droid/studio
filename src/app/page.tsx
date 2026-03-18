@@ -24,7 +24,7 @@ export default function RootPage() {
   return (
     <div className="flex h-screen w-full items-center justify-center bg-background">
       <div className="text-center flex flex-col items-center space-y-6">
-        <Logo iconOnly className="w-24 h-24 animate-in zoom-in-50 duration-700" />
+        <Logo iconOnly className="w-20 h-20 animate-in zoom-in-50 duration-700" />
         <div className="space-y-1">
           <p className="text-2xl font-black font-headline text-primary uppercase tracking-tighter">SITU HANURA</p>
           <div className="space-y-1">

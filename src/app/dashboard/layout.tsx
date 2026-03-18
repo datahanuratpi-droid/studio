@@ -241,7 +241,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         {/* Sidebar Header - FIXED */}
         <div className="p-6 pb-4 border-b bg-transparent shrink-0">
           <Link href="/dashboard" className="flex flex-col items-center justify-center gap-1 text-center group">
-            <Logo iconOnly className="w-14 h-14 group-hover:scale-105 transition-transform duration-300" />
+            <Logo iconOnly className="w-12 h-12 group-hover:scale-105 transition-transform duration-300" />
             <div className="flex flex-col items-center mt-2">
               <span className="text-xl font-black text-primary uppercase tracking-tighter leading-none">SITU HANURA</span>
               <div className="flex flex-col items-center leading-none mt-1">
