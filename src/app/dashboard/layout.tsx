@@ -366,64 +366,72 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         </main>
       </div>
 
-      {/* ABOUT DIALOG - MATCHING THE PROVIDED IMAGE */}
+      {/* ABOUT DIALOG - INTERACTIVE & FLOATING */}
       <Dialog open={isAboutOpen} onOpenChange={setIsAboutOpen}>
-        <DialogContent className="w-[95vw] sm:max-w-[380px] p-0 border-none rounded-[2.5rem] overflow-hidden shadow-2xl animate-in zoom-in duration-300 print:hidden bg-white fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]">
+        <DialogContent className="w-[95vw] sm:max-w-[380px] p-0 border-none rounded-[2.5rem] overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] animate-in zoom-in duration-300 print:hidden bg-white fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] focus-visible:outline-none">
           <DialogHeader className="sr-only">
             <DialogTitle>TENTANG APLIKASI</DialogTitle>
             <DialogDescription>Informasi mengenai sistem dan pengembang aplikasi SITU HANURA.</DialogDescription>
           </DialogHeader>
           <div className="relative p-8 pt-14 space-y-8 flex flex-col items-center">
-            {/* Close Button matching image style */}
+            {/* Elegant Close Button */}
             <button 
               onClick={() => setIsAboutOpen(false)} 
-              className="absolute right-6 top-6 h-8 w-8 rounded-full flex items-center justify-center text-primary border border-primary/20 hover:bg-primary/10 transition-colors"
+              className="absolute right-6 top-6 h-9 w-9 rounded-full flex items-center justify-center text-primary/60 border border-primary/10 hover:bg-primary/5 hover:text-primary transition-all duration-300 hover:rotate-90"
             >
-              <X className="h-4 w-4" />
+              <X className="h-5 w-5" />
             </button>
 
             <div className="space-y-6 w-full flex flex-col items-center">
-              {/* Header Title in Primary Color */}
-              <h1 className="text-2xl font-black text-primary uppercase tracking-tight text-center">
-                TENTANG APLIKASI
-              </h1>
+              {/* Header Title with Primary Color Gradient feel */}
+              <div className="relative">
+                <h1 className="text-2xl font-black text-primary uppercase tracking-tight text-center relative z-10">
+                  TENTANG APLIKASI
+                </h1>
+                <div className="absolute -bottom-1 left-0 w-full h-1 bg-primary/10 rounded-full"></div>
+              </div>
               
-              {/* Welcome Description centered */}
-              <div className="text-slate-600 leading-relaxed text-sm font-medium text-center px-2">
+              {/* Welcome Description centered and refined */}
+              <div className="text-slate-600 leading-relaxed text-sm font-medium text-center px-4">
                 <p>
-                  Selamat datang di Aplikasi SITU HANURA versi 2.0. 
-                  Aplikasi ini dikembangkan dan dirancang untuk mempermudah dalam pengecekkan dan penginputan data. 
-                  Aplikasi ini masih perlu pengembangan kedepannya, kritik dan saran sangat diperlukan.
+                  Selamat datang di Aplikasi <span className="text-primary font-bold">SITU HANURA</span> versi 2.0. 
+                  Aplikasi ini dikembangkan dan dirancang untuk mempermudah pengecekkan dan penginputan data. 
+                  Aplikasi ini masih perlu pengembangan kedepannya, kritik dan saran Anda sangat kami hargai.
                 </p>
               </div>
 
-              {/* Yellow Alert Box centered */}
-              <div className="w-full p-4 bg-[#fff9db] border border-[#fff3bf] rounded-2xl">
-                <p className="text-[#e67e22] font-bold text-[11px] leading-relaxed text-center">
-                  - Proses Verifikasi Admin maksimal 1x24jam kerja jika berkas telah lengkap dan jelas terbaca
+              {/* Enhanced Notice Box */}
+              <div className="w-full p-4 bg-[#fffcf0] border border-[#fff3bf] rounded-[1.5rem] shadow-sm flex items-start gap-3">
+                <div className="mt-0.5 p-1 bg-[#fff3bf] rounded-full shrink-0">
+                   <Clock className="h-3.5 w-3.5 text-[#e67e22]" />
+                </div>
+                <p className="text-[#e67e22] font-bold text-[11px] leading-relaxed">
+                  Proses Verifikasi Admin maksimal 1x24jam kerja jika berkas telah lengkap dan jelas terbaca.
                 </p>
               </div>
 
-              {/* Contact Info Section with light blue background */}
-              <div className="w-full p-6 bg-[#f0f7ff] rounded-[2rem] space-y-4">
-                <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">KONTAK & SARAN:</h4>
-                <div className="space-y-3">
-                  <div className="space-y-0.5">
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">EMAIL:</span>
-                    <p className="text-sm font-black text-primary">agussuriyadipunya@gmail.com</p>
+              {/* Contact Info Section with light blue background and refined typography */}
+              <div className="w-full p-6 bg-[#f5faff] rounded-[2rem] border border-blue-100 shadow-inner group transition-colors hover:bg-[#edf5ff]">
+                <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                  <div className="w-4 h-px bg-slate-300"></div> KONTAK & SARAN
+                </h4>
+                <div className="space-y-5">
+                  <div className="group/item cursor-pointer">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5 group-hover/item:text-primary transition-colors">EMAIL:</span>
+                    <p className="text-sm font-black text-slate-700 hover:text-primary transition-colors truncate">agussuriyadipunya@gmail.com</p>
                   </div>
-                  <div className="space-y-0.5">
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">WHATSAPP:</span>
-                    <p className="text-sm font-black text-primary">0817319885</p>
+                  <div className="group/item cursor-pointer">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5 group-hover/item:text-primary transition-colors">WHATSAPP:</span>
+                    <p className="text-sm font-black text-slate-700 hover:text-primary transition-colors">0817319885</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Italicized Footer matching image */}
-            <footer className="text-center w-full pt-4">
+            {/* Refined Italicized Footer */}
+            <footer className="text-center w-full pt-4 opacity-60">
               <p className="text-[11px] font-medium italic text-slate-400">
-                Terima kasih atas kontribusi Anda.
+                Terima kasih atas kontribusi Anda membangun SITU.
               </p>
             </footer>
           </div>
