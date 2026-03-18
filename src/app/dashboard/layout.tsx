@@ -78,7 +78,7 @@ function SidebarItem({ href, icon, label, active, onClick, subItems }: SidebarIt
           <Button
             variant="ghost"
             className={cn(
-              "w-full justify-between px-3 py-2 h-10 font-medium transition-all hover:text-primary",
+              "w-full justify-between px-3 py-2 h-10 font-bold transition-all hover:bg-primary/5 hover:text-primary",
               active && "bg-primary/5 text-primary"
             )}
           >
@@ -89,15 +89,15 @@ function SidebarItem({ href, icon, label, active, onClick, subItems }: SidebarIt
             <ChevronDown className={cn("h-4 w-4 transition-transform duration-300", isOpen && "rotate-180")} />
           </Button>
         </CollapsibleTrigger>
-        <CollapsibleContent className="pl-9 space-y-1 mt-1 animate-in slide-in-from-top-2 duration-200">
+        <CollapsibleContent className="pl-6 space-y-1 mt-1 animate-in slide-in-from-top-2 duration-200">
           {subItems.map((subItem) => (
             <Link key={subItem.href} href={subItem.href} onClick={onClick}>
               <Button
                 variant="ghost"
                 size="sm"
                 className={cn(
-                  "w-full justify-start h-9 text-muted-foreground font-normal hover:text-primary hover:bg-primary/5",
-                  pathname === subItem.href && "text-primary font-medium bg-primary/5"
+                  "w-full justify-start h-9 text-muted-foreground font-medium transition-all hover:text-primary hover:bg-primary/5",
+                  pathname === subItem.href && "bg-primary text-white hover:bg-primary hover:text-white rounded-xl shadow-sm font-bold"
                 )}
               >
                 {subItem.icon}
@@ -115,8 +115,8 @@ function SidebarItem({ href, icon, label, active, onClick, subItems }: SidebarIt
       variant="ghost"
       onClick={onClick}
       className={cn(
-        "w-full justify-start px-3 py-2 h-10 font-medium transition-all hover:text-primary",
-        active && "bg-primary/10 text-primary border-r-2 border-primary rounded-none"
+        "w-full justify-start px-3 py-2 h-10 font-bold transition-all hover:bg-primary/5 hover:text-primary",
+        active && "bg-primary text-white hover:bg-primary hover:text-white rounded-xl shadow-md shadow-primary/20"
       )}
     >
       <div className="flex items-center gap-3">
@@ -242,13 +242,13 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen bg-background text-foreground max-w-full overflow-x-hidden">
       <aside className="w-64 border-r bg-card hidden md:flex flex-col sticky top-0 h-screen z-40 print:hidden shadow-sm">
-        <div className="p-6">
+        <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
           <Link href="/dashboard" className="flex flex-col items-center justify-center gap-1 mb-8 text-center group">
             <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
               <FileText className="h-7 w-7 text-white" />
             </div>
             <div className="flex flex-col items-center mt-2">
-              <span className="text-xl font-bold text-primary">SITU HANURA</span>
+              <span className="text-xl font-bold text-primary uppercase tracking-tighter">SITU HANURA</span>
               <div className="flex flex-col items-center leading-none mt-1">
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
                   {currentDateTime?.date || "..."}
@@ -266,15 +266,15 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 icon={item.icon}
                 label={item.label}
-                active={item.href ? (pathname === item.href || (item.subItems && pathname.startsWith(item.href))) : false}
+                active={item.href ? (pathname === item.href || (item.subItems && pathname.startsWith(item.href))) : (item.label === 'About' && isAboutOpen)}
                 subItems={item.subItems}
                 onClick={item.onClick}
               />
             ))}
           </nav>
         </div>
-        <div className="mt-auto p-6 border-t text-center">
-          <Button variant="ghost" className="w-full justify-start text-destructive hover:bg-destructive/10" onClick={handleLogout}>
+        <div className="mt-auto p-6 border-t text-center shrink-0">
+          <Button variant="ghost" className="w-full justify-start text-destructive font-bold hover:bg-destructive/10" onClick={handleLogout}>
             <LogOut className="mr-3 h-5 w-5" /> Keluar
           </Button>
         </div>
@@ -282,64 +282,70 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
       {isMobileMenuOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 md:hidden print:hidden" onClick={() => setIsMobileMenuOpen(false)}>
-          <div className="w-72 h-full bg-card p-6 shadow-2xl animate-in slide-in-from-left duration-300" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center mb-8">
+          <div className="w-72 h-full bg-card p-6 shadow-2xl animate-in slide-in-from-left duration-300 flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-8 shrink-0">
               <div className="flex flex-col">
                 <span className="text-lg font-bold text-primary">SITU HANURA</span>
                 <span className="text-[10px] text-muted-foreground font-bold uppercase">{currentDateTime?.date} {currentDateTime?.time}</span>
               </div>
-              <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)}><X className="h-5 w-5" /></Button>
+              <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)} className="rounded-full"><X className="h-5 w-5" /></Button>
             </div>
-            <nav className="space-y-1">
+            <nav className="space-y-1 overflow-y-auto custom-scrollbar flex-1 pr-2">
               {menuItems.map((item) => (
                 <SidebarItem 
                   key={item.label}
                   href={item.href}
                   icon={item.icon}
                   label={item.label}
-                  active={item.href ? pathname === item.href : false}
+                  active={item.href ? (pathname === item.href || (item.subItems && pathname.startsWith(item.href))) : false}
+                  subItems={item.subItems}
                   onClick={() => {
                     if (item.onClick) item.onClick()
-                    setIsMobileMenuOpen(false)
+                    if (!item.subItems) setIsMobileMenuOpen(false)
                   }}
                 />
               ))}
             </nav>
+            <div className="mt-auto pt-6 border-t shrink-0">
+               <Button variant="ghost" className="w-full justify-start text-destructive font-bold" onClick={handleLogout}>
+                <LogOut className="mr-3 h-5 w-5" /> Keluar
+              </Button>
+            </div>
           </div>
         </div>
       )}
 
       <div className="flex-1 flex flex-col min-h-screen min-w-0 overflow-x-hidden">
         <header className="h-14 bg-white/80 backdrop-blur-md flex items-center justify-between px-4 md:px-6 sticky top-0 z-30 print:hidden border-b w-full">
-          <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(true)} className="md:hidden h-9 w-9">
-            <Menu className="h-5 w-5" />
+          <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(true)} className="md:hidden h-9 w-9 hover:bg-primary/5">
+            <Menu className="h-5 w-5 text-primary" />
           </Button>
           
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="relative hidden sm:flex h-9 w-9">
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full border-2 border-white"></span>
+            <Button variant="ghost" size="icon" className="relative hidden sm:flex h-9 w-9 hover:bg-primary/5">
+              <Bell className="h-5 w-5 text-muted-foreground" />
+              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full border-2 border-white"></span>
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="p-0.5 rounded-full h-8 w-8 overflow-hidden bg-primary/10">
-                   <div className="w-full h-full flex items-center justify-center text-primary font-bold text-xs uppercase">
+                <Button variant="ghost" className="p-0.5 rounded-full h-9 w-9 overflow-hidden bg-primary/10 hover:bg-primary/20 transition-colors">
+                   <div className="w-full h-full flex items-center justify-center text-primary font-black text-xs uppercase">
                      {profile?.fullName?.charAt(0)}
                    </div>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 rounded-2xl">
-                <DropdownMenuLabel>
+              <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 shadow-xl border-none">
+                <DropdownMenuLabel className="px-3 py-2">
                   <div className="flex flex-col">
-                    <span className="truncate text-sm font-bold">{profile?.fullName}</span>
-                    <span className="text-[10px] text-muted-foreground uppercase">{profile?.role}</span>
+                    <span className="truncate text-sm font-black text-primary uppercase tracking-tight">{profile?.fullName}</span>
+                    <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{profile?.role}</span>
                   </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild className="cursor-pointer hover:text-primary"><Link href="/dashboard/pengaturan"><UserIcon className="mr-2 h-4 w-4" /> Profil</Link></DropdownMenuItem>
-                <DropdownMenuItem asChild className="cursor-pointer hover:text-primary"><Link href="/dashboard/pengaturan"><Settings className="mr-2 h-4 w-4" /> Pengaturan</Link></DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive font-bold cursor-pointer" onClick={handleLogout}>
+                <DropdownMenuSeparator className="mx-2 my-1" />
+                <DropdownMenuItem asChild className="cursor-pointer rounded-xl font-bold text-xs"><Link href="/dashboard/pengaturan"><UserIcon className="mr-2 h-4 w-4" /> Profil Saya</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer rounded-xl font-bold text-xs"><Link href="/dashboard/pengaturan"><Settings className="mr-2 h-4 w-4" /> Pengaturan</Link></DropdownMenuItem>
+                <DropdownMenuSeparator className="mx-2 my-1" />
+                <DropdownMenuItem className="text-destructive font-black text-xs cursor-pointer rounded-xl" onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" /> Keluar
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -377,7 +383,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-0 rounded-3xl overflow-hidden border bg-card">
                 <div className="p-6 md:p-10 space-y-6 flex flex-col justify-center">
                   <h2 className="text-xl font-bold text-primary">Tentang Aplikasi</h2>
-                  <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
+                  <p className="text-muted-foreground leading-relaxed text-sm md:text-base font-medium">
                     Aplikasi ini dibuat dan dikembangkan untuk digunakan di sekretariat dalam pengelolaan data baik laporan maupun surat menyurat.
                   </p>
                   <div className="pt-4 space-y-4">
@@ -387,7 +393,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                       </div>
                       <div>
                         <h4 className="font-bold text-primary text-sm">Kritik & Saran</h4>
-                        <p className="text-xs text-muted-foreground leading-relaxed">
+                        <p className="text-xs text-muted-foreground leading-relaxed font-medium">
                           Aplikasi ini masih perlu banyak pengembangan. Kritik dan saran sangat diharapkan untuk kemajuan sistem ini.
                         </p>
                       </div>
@@ -415,33 +421,33 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                       <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center backdrop-blur-sm">
                         <MapPin className="h-4 w-4" />
                       </div>
-                      <span className="text-xs leading-snug">Jalan Gatot Subroto Km 5 Tanjungpinang</span>
+                      <span className="text-xs leading-snug font-bold">Jalan Gatot Subroto Km 5 Tanjungpinang</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center backdrop-blur-sm">
                         <Heart className="h-4 w-4 fill-white" />
                       </div>
-                      <span className="text-xs leading-tight font-medium">
+                      <span className="text-xs leading-tight font-bold">
                         Dibuat oleh Sekretariat DPC Hanura Kota Tanjungpinang
                       </span>
                     </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-white/70">Hubungi Administrator:</p>
+                  <div className="space-y-4 pt-4">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-white/70">Hubungi Administrator:</p>
                     <div className="grid grid-cols-1 gap-2">
-                      <a href="https://wa.me/62817319885" target="_blank" className="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-all border border-white/10">
+                      <a href="https://wa.me/62817319885" target="_blank" className="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-all border border-white/10 group">
                         <div className="p-1.5 bg-green-500 text-white rounded-lg"><Phone className="h-3.5 w-3.5" /></div>
                         <div className="flex flex-col">
-                          <span className="text-[8px] font-bold text-white/60 uppercase">WhatsApp</span>
-                          <span className="text-xs font-bold text-white">0817 319 885</span>
+                          <span className="text-[8px] font-bold text-white/60 uppercase tracking-widest">WhatsApp</span>
+                          <span className="text-xs font-black text-white group-hover:underline">0817 319 885</span>
                         </div>
                       </a>
-                      <a href="mailto:agussuriyadipunya@gmail.com" className="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-all border border-white/10">
+                      <a href="mailto:agussuriyadipunya@gmail.com" className="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-all border border-white/10 group">
                         <div className="p-1.5 bg-blue-500 text-white rounded-lg"><MailIcon className="h-3.5 w-3.5" /></div>
                         <div className="flex flex-col">
-                          <span className="text-[8px] font-bold text-white/60 uppercase">Email</span>
-                          <span className="text-xs font-bold text-white">agussuriyadipunya@gmail.com</span>
+                          <span className="text-[8px] font-bold text-white/60 uppercase tracking-widest">Email</span>
+                          <span className="text-xs font-black text-white group-hover:underline">agussuriyadipunya@gmail.com</span>
                         </div>
                       </a>
                     </div>
@@ -449,7 +455,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 </div>
               </div>
 
-              <footer className="text-center pt-8 pb-4 text-[9px] font-bold text-muted-foreground border-t uppercase tracking-[0.2em]">
+              <footer className="text-center pt-8 pb-4 text-[9px] font-black text-muted-foreground border-t uppercase tracking-[0.3em]">
                 © 2026 SITU HANURA - DPC Partai Hanura Kota Tanjungpinang
               </footer>
             </div>
