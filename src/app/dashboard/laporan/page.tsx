@@ -85,7 +85,6 @@ export default function LaporanKegiatanPage() {
       reportDate: formData.get("reportDate") as string || new Date().toISOString(),
       reporterId: user.uid,
       status: "Submitted",
-      // Store actual base64 data instead of just file name
       absensiFile: fileData.absensi,
       spandukFile: fileData.spanduk,
       fotoBersamaFile: fileData.fotoBersama,

@@ -389,14 +389,12 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 </p>
               </div>
 
-              {/* Yellow Verification Box */}
               <div className="p-5 bg-[#fff9db] border border-[#fff3bf] rounded-[1.5rem]">
                 <p className="text-[#e67e22] font-bold text-[11px] leading-relaxed text-center">
                   - Proses Verifikasi Admin maksimal 1x24jam kerja jika berkas telah lengkap dan jelas terbaca
                 </p>
               </div>
 
-              {/* Contact Area */}
               <div className="p-8 bg-white rounded-[2.5rem] shadow-sm border border-slate-100 space-y-6">
                 <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">KONTAK & SARAN:</h4>
                 <div className="space-y-4">
