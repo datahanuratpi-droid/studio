@@ -1,9 +1,11 @@
+
 'use client';
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/firebase';
 import { Loader2 } from 'lucide-react';
+import { Logo } from '@/components/logo';
 
 export default function RootPage() {
   const { user, isUserLoading } = useUser();
@@ -21,13 +23,16 @@ export default function RootPage() {
 
   return (
     <div className="flex h-screen w-full items-center justify-center bg-background">
-      <div className="text-center space-y-4">
-        <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto" />
-        <p className="text-lg font-headline font-bold text-primary animate-pulse">SITU HANURA</p>
+      <div className="text-center flex flex-col items-center space-y-6">
+        <Logo iconOnly className="w-24 h-24 animate-in zoom-in-50 duration-700" />
         <div className="space-y-1">
-          <p className="text-sm text-muted-foreground font-medium">Sistem Informasi Terpadu Partai Hanura</p>
-          <p className="text-xs text-muted-foreground/60 uppercase tracking-widest">Kota Tanjungpinang</p>
+          <p className="text-2xl font-black font-headline text-primary uppercase tracking-tighter">SITU HANURA</p>
+          <div className="space-y-1">
+            <p className="text-sm text-muted-foreground font-medium">Sistem Informasi Terpadu Partai Hanura</p>
+            <p className="text-[10px] text-muted-foreground/60 uppercase tracking-[0.3em]">Kota Tanjungpinang</p>
+          </div>
         </div>
+        <Loader2 className="h-8 w-8 animate-spin text-primary opacity-50" />
       </div>
     </div>
   );

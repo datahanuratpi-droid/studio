@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { Mail, Lock, UserPlus, LogIn, FileText, Loader2 } from 'lucide-react';
+import { Mail, Lock, UserPlus, LogIn, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,6 +13,7 @@ import { useAuth, useUser, useFirestore, setDocumentNonBlocking } from '@/fireba
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { doc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
+import { Logo } from '@/components/logo';
 
 export default function LoginPage() {
   const auth = useAuth();
@@ -151,47 +152,45 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-transparent p-4">
       <div className="w-full max-w-md space-y-8 animate-in fade-in zoom-in duration-500">
-        <div className="text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary shadow-xl">
-            <FileText className="h-8 w-8 text-white" />
-          </div>
-          <h1 className="mt-6 text-3xl font-headline font-bold text-primary">SITU HANURA</h1>
+        <div className="text-center flex flex-col items-center">
+          <Logo iconOnly className="w-20 h-20 mb-6" />
+          <h1 className="text-3xl font-black font-headline text-primary uppercase tracking-tighter">SITU HANURA</h1>
           <div className="mt-2 space-y-1">
             <p className="text-muted-foreground font-medium">Sistem Informasi Terpadu Partai Hanura</p>
-            <p className="text-xs text-muted-foreground/60 uppercase tracking-widest text-center">Kota Tanjungpinang</p>
+            <p className="text-[10px] text-muted-foreground/60 uppercase tracking-[0.2em] text-center">Kota Tanjungpinang</p>
           </div>
         </div>
 
         <Tabs defaultValue="login" className="w-full">
           <TabsList className="grid w-full grid-cols-2 bg-white/50 backdrop-blur-md rounded-xl">
-            <TabsTrigger value="login" className="rounded-lg">Masuk</TabsTrigger>
-            <TabsTrigger value="register" className="rounded-lg">Daftar</TabsTrigger>
+            <TabsTrigger value="login" className="rounded-lg font-bold">Masuk</TabsTrigger>
+            <TabsTrigger value="register" className="rounded-lg font-bold">Daftar</TabsTrigger>
           </TabsList>
           
           <TabsContent value="login">
             <Card className="border-none shadow-xl bg-white/80 backdrop-blur-xl rounded-[2rem]">
               <CardHeader>
-                <CardTitle>Selamat Datang Kembali</CardTitle>
+                <CardTitle className="font-black">Selamat Datang Kembali</CardTitle>
                 <CardDescription>Gunakan Username atau Email untuk masuk.</CardDescription>
               </CardHeader>
               <form onSubmit={handleSignIn}>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Username / Email</Label>
+                    <Label htmlFor="email" className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Username / Email</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <Input 
                         id="email" 
                         name="email" 
                         placeholder="Contoh: AGUS" 
-                        className="pl-10 h-11 rounded-xl bg-background/50" 
+                        className="pl-10 h-11 rounded-xl bg-background/50 border-none font-medium" 
                         required 
                         disabled={loading}
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password" title="Password keamanan Anda" className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Password</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <Input 
@@ -199,7 +198,7 @@ export default function LoginPage() {
                         name="password" 
                         type="password" 
                         placeholder="••••••••" 
-                        className="pl-10 h-11 rounded-xl bg-background/50" 
+                        className="pl-10 h-11 rounded-xl bg-background/50 border-none" 
                         required 
                         disabled={loading}
                       />
@@ -207,7 +206,7 @@ export default function LoginPage() {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button type="submit" className="w-full bg-primary text-white h-12 rounded-full font-bold shadow-lg" disabled={loading}>
+                  <Button type="submit" className="w-full bg-primary text-white h-12 rounded-full font-black text-xs uppercase tracking-widest shadow-lg hover:bg-primary/90 transition-all" disabled={loading}>
                     {loading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -228,27 +227,27 @@ export default function LoginPage() {
           <TabsContent value="register">
             <Card className="border-none shadow-xl bg-white/80 backdrop-blur-xl rounded-[2rem]">
               <CardHeader>
-                <CardTitle>Buat Akun Baru</CardTitle>
+                <CardTitle className="font-black">Buat Akun Baru</CardTitle>
                 <CardDescription>Daftarkan diri Anda untuk akses aplikasi SITU HANURA.</CardDescription>
               </CardHeader>
               <form onSubmit={handleSignUp}>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="reg-email">Pilih Username / Email</Label>
+                    <Label htmlFor="reg-email" className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Pilih Username / Email</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <Input 
                         id="reg-email" 
                         name="email" 
                         placeholder="Contoh: AGUS" 
-                        className="pl-10 h-11 rounded-xl bg-background/50" 
+                        className="pl-10 h-11 rounded-xl bg-background/50 border-none font-medium" 
                         required 
                         disabled={loading}
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="reg-password">Password Baru</Label>
+                    <Label htmlFor="reg-password" title="Pilih password minimal 6 karakter" className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Password Baru</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <Input 
@@ -256,7 +255,7 @@ export default function LoginPage() {
                         name="password" 
                         type="password" 
                         placeholder="Minimal 6 karakter" 
-                        className="pl-10 h-11 rounded-xl bg-background/50" 
+                        className="pl-10 h-11 rounded-xl bg-background/50 border-none" 
                         required 
                         disabled={loading}
                       />
@@ -264,7 +263,7 @@ export default function LoginPage() {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button type="submit" className="w-full bg-accent text-white hover:bg-accent/90 h-12 rounded-full font-bold shadow-lg" disabled={loading}>
+                  <Button type="submit" className="w-full bg-secondary text-white hover:bg-secondary/90 h-12 rounded-full font-black text-xs uppercase tracking-widest shadow-lg transition-all" disabled={loading}>
                     {loading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />

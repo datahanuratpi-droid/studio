@@ -1,3 +1,4 @@
+
 'use client'
 
 import * as React from "react"
@@ -50,6 +51,7 @@ import {
 import { useUser, useAuth, useDoc, useFirestore, useMemoFirebase } from "@/firebase"
 import { signOut } from "firebase/auth"
 import { doc } from "firebase/firestore"
+import { Logo } from "@/components/logo"
 
 interface SidebarItemProps {
   href?: string
@@ -239,11 +241,9 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         {/* Sidebar Header - FIXED */}
         <div className="p-6 pb-4 border-b bg-transparent shrink-0">
           <Link href="/dashboard" className="flex flex-col items-center justify-center gap-1 text-center group">
-            <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300">
-              <FileText className="h-7 w-7 text-white" />
-            </div>
+            <Logo iconOnly className="w-14 h-14 group-hover:scale-105 transition-transform duration-300" />
             <div className="flex flex-col items-center mt-2">
-              <span className="text-xl font-black text-primary uppercase tracking-tighter">SITU HANURA</span>
+              <span className="text-xl font-black text-primary uppercase tracking-tighter leading-none">SITU HANURA</span>
               <div className="flex flex-col items-center leading-none mt-1">
                 <span className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">
                   {currentDateTime?.date || "..."}
@@ -284,10 +284,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 md:hidden print:hidden" onClick={() => setIsMobileMenuOpen(false)}>
           <div className="w-[85vw] max-w-[320px] h-full bg-card/95 backdrop-blur-md p-6 shadow-2xl animate-in slide-in-from-left duration-300 flex flex-col" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-8 shrink-0">
-              <div className="flex flex-col">
-                <span className="text-lg font-black text-primary uppercase tracking-tighter">SITU HANURA</span>
-                <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">{currentDateTime?.date}</span>
-              </div>
+              <Logo className="w-auto h-12" />
               <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)} className="rounded-full bg-muted/20"><X className="h-5 w-5 text-primary" /></Button>
             </div>
             <nav className="space-y-1 overflow-y-auto custom-scrollbar flex-1 pr-2">
