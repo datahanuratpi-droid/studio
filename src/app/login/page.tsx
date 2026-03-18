@@ -147,7 +147,7 @@ export default function LoginPage() {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const newUser = userCredential.user;
 
-      const isAdminAgus = emailInput.toUpperCase() === 'AGUS';
+      const isAdminAgus = emailInput.trim().toLowerCase() === 'agus';
       const currentDeviceId = getDeviceId();
 
       const userProfile = {
@@ -205,7 +205,7 @@ export default function LoginPage() {
           <h1 className="text-3xl font-black font-headline text-primary uppercase tracking-tighter">SITU HANURA</h1>
           <div className="mt-2 space-y-1">
             <p className="text-muted-foreground font-medium">Sistem Informasi Terpadu Partai Hanura</p>
-            <p className="text-[10px] text-muted-foreground/60 uppercase tracking-[0.2em] text-center">Kota Tanjungpinang</p>
+            <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em] text-center">Kota Tanjungpinang</p>
           </div>
         </div>
 

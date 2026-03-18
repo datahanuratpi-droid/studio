@@ -29,7 +29,7 @@ export default function RootPage() {
           <p className="text-2xl font-black font-headline text-primary uppercase tracking-tighter">SITU HANURA</p>
           <div className="space-y-1">
             <p className="text-sm text-muted-foreground font-medium">Sistem Informasi Terpadu Partai Hanura</p>
-            <p className="text-[10px] text-muted-foreground/60 uppercase tracking-[0.3em]">Kota Tanjungpinang</p>
+            <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.3em]">Kota Tanjungpinang</p>
           </div>
         </div>
         <Loader2 className="h-8 w-8 animate-spin text-primary opacity-50" />
