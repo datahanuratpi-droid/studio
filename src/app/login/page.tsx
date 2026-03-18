@@ -142,14 +142,14 @@ export default function LoginPage() {
 
   if (isUserLoading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-background">
+      <div className="flex h-screen items-center justify-center bg-transparent">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+    <div className="flex min-h-screen items-center justify-center bg-transparent p-4">
       <div className="w-full max-w-md space-y-8 animate-in fade-in zoom-in duration-500">
         <div className="text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary shadow-xl">
@@ -163,13 +163,13 @@ export default function LoginPage() {
         </div>
 
         <Tabs defaultValue="login" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="login">Masuk</TabsTrigger>
-            <TabsTrigger value="register">Daftar</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 bg-white/50 backdrop-blur-md rounded-xl">
+            <TabsTrigger value="login" className="rounded-lg">Masuk</TabsTrigger>
+            <TabsTrigger value="register" className="rounded-lg">Daftar</TabsTrigger>
           </TabsList>
           
           <TabsContent value="login">
-            <Card className="border-none shadow-xl">
+            <Card className="border-none shadow-xl bg-white/80 backdrop-blur-xl rounded-[2rem]">
               <CardHeader>
                 <CardTitle>Selamat Datang Kembali</CardTitle>
                 <CardDescription>Gunakan Username atau Email untuk masuk.</CardDescription>
@@ -184,7 +184,7 @@ export default function LoginPage() {
                         id="email" 
                         name="email" 
                         placeholder="Contoh: AGUS" 
-                        className="pl-10" 
+                        className="pl-10 h-11 rounded-xl bg-background/50" 
                         required 
                         disabled={loading}
                       />
@@ -199,7 +199,7 @@ export default function LoginPage() {
                         name="password" 
                         type="password" 
                         placeholder="••••••••" 
-                        className="pl-10" 
+                        className="pl-10 h-11 rounded-xl bg-background/50" 
                         required 
                         disabled={loading}
                       />
@@ -207,7 +207,7 @@ export default function LoginPage() {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button type="submit" className="w-full bg-primary text-white" disabled={loading}>
+                  <Button type="submit" className="w-full bg-primary text-white h-12 rounded-full font-bold shadow-lg" disabled={loading}>
                     {loading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -226,7 +226,7 @@ export default function LoginPage() {
           </TabsContent>
 
           <TabsContent value="register">
-            <Card className="border-none shadow-xl">
+            <Card className="border-none shadow-xl bg-white/80 backdrop-blur-xl rounded-[2rem]">
               <CardHeader>
                 <CardTitle>Buat Akun Baru</CardTitle>
                 <CardDescription>Daftarkan diri Anda untuk akses aplikasi SITU HANURA.</CardDescription>
@@ -241,7 +241,7 @@ export default function LoginPage() {
                         id="reg-email" 
                         name="email" 
                         placeholder="Contoh: AGUS" 
-                        className="pl-10" 
+                        className="pl-10 h-11 rounded-xl bg-background/50" 
                         required 
                         disabled={loading}
                       />
@@ -256,7 +256,7 @@ export default function LoginPage() {
                         name="password" 
                         type="password" 
                         placeholder="Minimal 6 karakter" 
-                        className="pl-10" 
+                        className="pl-10 h-11 rounded-xl bg-background/50" 
                         required 
                         disabled={loading}
                       />
@@ -264,7 +264,7 @@ export default function LoginPage() {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button type="submit" className="w-full bg-accent text-white hover:bg-accent/90" disabled={loading}>
+                  <Button type="submit" className="w-full bg-accent text-white hover:bg-accent/90 h-12 rounded-full font-bold shadow-lg" disabled={loading}>
                     {loading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />

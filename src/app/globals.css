@@ -7,7 +7,7 @@
   :root {
     --background: 210 20% 98%;
     --foreground: 209 60% 10%;
-    --card: 0 0% 100%;
+    --card: 0 0% 100% / 0.8;
     --card-foreground: 209 60% 10%;
     --popover: 0 0% 100%;
     --popover-foreground: 209 60% 10%;
@@ -67,7 +67,7 @@
   .dark {
     --background: 209 60% 5%;
     --foreground: 198 21% 94%;
-    --card: 209 60% 10%;
+    --card: 209 60% 10% / 0.8;
     --card-foreground: 198 21% 94%;
     --popover: 209 60% 10%;
     --popover-foreground: 198 21% 94%;
@@ -92,18 +92,24 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-body antialiased;
+    @apply font-body antialiased min-h-screen relative;
+    background-color: #ffd700;
   }
-}
-
-/* Custom Background Gold Wave */
-.bg-mesh {
-  background-color: #ffd700;
-  background-image: url('https://picsum.photos/seed/gold-bg/1920/1080');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
+  
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-image: url('https://picsum.photos/seed/gold-bg/1920/1080');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+  }
 }
 
 /* Custom Scrollbar */

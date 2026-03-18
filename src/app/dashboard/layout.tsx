@@ -1,3 +1,4 @@
+
 'use client'
 
 import * as React from "react"
@@ -185,7 +186,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
   if (isUserLoading || isProfileLoading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-background">
+      <div className="flex h-screen items-center justify-center bg-transparent">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     )
@@ -193,7 +194,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
   if (user && profile && profile.status !== 'Active') {
     return (
-      <div className="flex h-screen flex-col items-center justify-center bg-background p-6 text-center space-y-6">
+      <div className="flex h-screen flex-col items-center justify-center bg-transparent p-6 text-center space-y-6">
         <div className="p-4 bg-amber-100 rounded-full text-amber-600">
           <Clock className="h-12 w-12" />
         </div>
@@ -233,9 +234,9 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   ].filter(item => profile && item.roles.includes(profile.role))
 
   return (
-    <div className="flex h-screen bg-mesh text-foreground max-w-full overflow-hidden">
+    <div className="flex h-screen text-foreground max-w-full overflow-hidden">
       {/* SIDEBAR */}
-      <aside className="w-64 border-r bg-card/80 backdrop-blur-lg hidden md:flex flex-col h-full sticky top-0 z-40 print:hidden shadow-xl">
+      <aside className="w-64 border-r bg-card/40 backdrop-blur-lg hidden md:flex flex-col h-full sticky top-0 z-40 print:hidden shadow-xl">
         {/* Sidebar Header - FIXED */}
         <div className="p-6 pb-4 border-b bg-transparent shrink-0">
           <Link href="/dashboard" className="flex flex-col items-center justify-center gap-1 text-center group">
@@ -367,16 +368,16 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
       {/* ABOUT DIALOG - MATCHING THE PROVIDED IMAGE */}
       <Dialog open={isAboutOpen} onOpenChange={setIsAboutOpen}>
-        <DialogContent className="w-[95vw] sm:max-w-[420px] p-0 border-none rounded-[1.5rem] overflow-hidden shadow-2xl animate-in zoom-in duration-300 print:hidden bg-white">
+        <DialogContent className="w-[95vw] sm:max-w-[380px] p-0 border-none rounded-[2.5rem] overflow-hidden shadow-2xl animate-in zoom-in duration-300 print:hidden bg-white fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]">
           <DialogHeader className="sr-only">
             <DialogTitle>TENTANG APLIKASI</DialogTitle>
             <DialogDescription>Informasi mengenai sistem dan pengembang aplikasi SITU HANURA.</DialogDescription>
           </DialogHeader>
-          <div className="relative p-8 pt-12 space-y-8 flex flex-col items-center">
+          <div className="relative p-8 pt-14 space-y-8 flex flex-col items-center">
             {/* Close Button matching image style */}
             <button 
               onClick={() => setIsAboutOpen(false)} 
-              className="absolute right-4 top-4 h-8 w-8 rounded-full flex items-center justify-center text-primary border border-primary/20 hover:bg-primary/10 transition-colors"
+              className="absolute right-6 top-6 h-8 w-8 rounded-full flex items-center justify-center text-primary border border-primary/20 hover:bg-primary/10 transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
@@ -388,7 +389,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
               </h1>
               
               {/* Welcome Description centered */}
-              <div className="text-slate-600 leading-relaxed text-sm font-medium text-center">
+              <div className="text-slate-600 leading-relaxed text-sm font-medium text-center px-2">
                 <p>
                   Selamat datang di Aplikasi SITU HANURA versi 2.0. 
                   Aplikasi ini dikembangkan dan dirancang untuk mempermudah dalam pengecekkan dan penginputan data. 
@@ -397,15 +398,15 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
               </div>
 
               {/* Yellow Alert Box centered */}
-              <div className="w-full p-4 bg-[#fff9db] border border-[#fff3bf] rounded-xl">
+              <div className="w-full p-4 bg-[#fff9db] border border-[#fff3bf] rounded-2xl">
                 <p className="text-[#e67e22] font-bold text-[11px] leading-relaxed text-center">
                   - Proses Verifikasi Admin maksimal 1x24jam kerja jika berkas telah lengkap dan jelas terbaca
                 </p>
               </div>
 
               {/* Contact Info Section with light blue background */}
-              <div className="w-full p-6 bg-[#f0f7ff] rounded-2xl space-y-4">
-                <h4 className="text-[11px] font-black text-slate-500 uppercase tracking-widest">KONTAK & SARAN:</h4>
+              <div className="w-full p-6 bg-[#f0f7ff] rounded-[2rem] space-y-4">
+                <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">KONTAK & SARAN:</h4>
                 <div className="space-y-3">
                   <div className="space-y-0.5">
                     <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">EMAIL:</span>
@@ -421,7 +422,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
             {/* Italicized Footer matching image */}
             <footer className="text-center w-full pt-4">
-              <p className="text-[10px] font-medium italic text-slate-400">
+              <p className="text-[11px] font-medium italic text-slate-400">
                 Terima kasih atas kontribusi Anda.
               </p>
             </footer>
