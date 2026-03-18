@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -16,7 +17,9 @@ import {
   X,
   Search,
   Eye,
-  Trash2
+  Trash2,
+  Edit,
+  MoreVertical
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -29,17 +32,24 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { useFirestore, useUser, addDocumentNonBlocking, useCollection, useMemoFirebase } from "@/firebase"
-import { collection } from "firebase/firestore"
+import { useFirestore, useUser, addDocumentNonBlocking, deleteDocumentNonBlocking, updateDocumentNonBlocking, useCollection, useMemoFirebase } from "@/firebase"
+import { collection, doc } from "firebase/firestore"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 
 export default function LaporanKegiatanPage() {
   const [isCreateOpen, setIsCreateOpen] = React.useState(false)
   const [selectedReport, setSelectedReport] = React.useState<any>(null)
+  const [editingReport, setEditingReport] = React.useState<any>(null)
   const [searchQuery, setSearchQuery] = React.useState("")
   const [previewImage, setPreviewPreviewImage] = React.useState<{url: string, title: string} | null>(null)
   
@@ -50,7 +60,6 @@ export default function LaporanKegiatanPage() {
     fotoPendukung: "",
   })
 
-  // Refs to clear native file inputs
   const fileInputRefs = {
     absensi: React.useRef<HTMLInputElement>(null),
     spanduk: React.useRef<HTMLInputElement>(null),
@@ -85,10 +94,6 @@ export default function LaporanKegiatanPage() {
     if (fileInputRefs[field].current) {
       fileInputRefs[field].current!.value = ""
     }
-    toast({
-      title: "Berkas Dihapus",
-      description: `Foto telah dihapus dari pilihan.`,
-    })
   }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -104,22 +109,45 @@ export default function LaporanKegiatanPage() {
       description: formData.get("description") as string,
       reportDate: formData.get("reportDate") as string || new Date().toISOString(),
       reporterId: user.uid,
-      status: "Submitted",
+      status: editingReport?.status || "Submitted",
       absensiFile: fileData.absensi,
       spandukFile: fileData.spanduk,
       fotoBersamaFile: fileData.fotoBersama,
       fotoPendukungFile: fileData.fotoPendukung,
-      createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     }
 
-    addDocumentNonBlocking(collection(firestore, "activity_reports"), data)
+    if (editingReport) {
+      updateDocumentNonBlocking(doc(firestore, "activity_reports", editingReport.id), data)
+      toast({ title: "Laporan Diperbarui", description: `Laporan "${title}" telah berhasil diperbarui.` })
+    } else {
+      const newData = { ...data, createdAt: new Date().toISOString() }
+      addDocumentNonBlocking(collection(firestore, "activity_reports"), newData)
+      toast({ title: "Laporan Terkirim", description: `Laporan "${title}" telah berhasil disimpan ke sistem.` })
+    }
+
     setIsCreateOpen(false)
+    setEditingReport(null)
     setFileData({ absensi: "", spanduk: "", fotoBersama: "", fotoPendukung: "" })
-    toast({
-      title: "Laporan Terkirim",
-      description: `Laporan "${title}" telah berhasil disimpan ke sistem.`,
+  }
+
+  const handleDelete = (id: string, title: string) => {
+    if (!firestore) return
+    deleteDocumentNonBlocking(doc(firestore, "activity_reports", id))
+    toast({ title: "Laporan Dihapus", description: `Laporan "${title}" telah dihapus dari sistem.` })
+    if (selectedReport?.id === id) setSelectedReport(null)
+  }
+
+  const handleOpenEdit = (report: any) => {
+    setEditingReport(report)
+    setFileData({
+      absensi: report.absensiFile || "",
+      spanduk: report.spandukFile || "",
+      fotoBersama: report.fotoBersamaFile || "",
+      fotoPendukung: report.fotoPendukungFile || "",
     })
+    setIsCreateOpen(true)
+    setSelectedReport(null)
   }
 
   const filteredReports = React.useMemo(() => {
@@ -140,6 +168,7 @@ export default function LaporanKegiatanPage() {
         <Button 
           className="w-full bg-secondary hover:bg-secondary/90 text-white rounded-full py-6 text-sm font-bold shadow-md md:max-w-xs h-12"
           onClick={() => {
+            setEditingReport(null)
             setFileData({ absensi: "", spanduk: "", fotoBersama: "", fotoPendukung: "" })
             setIsCreateOpen(true)
           }}
@@ -168,7 +197,7 @@ export default function LaporanKegiatanPage() {
           {filteredReports.map((report) => (
             <Card 
               key={report.id} 
-              className="group rounded-[2rem] hover:shadow-xl transition-all cursor-pointer border border-border/50 overflow-hidden bg-white"
+              className="group rounded-[2rem] hover:shadow-xl transition-all cursor-pointer border border-border/50 overflow-hidden bg-white relative"
               onClick={() => setSelectedReport(report)}
             >
               <CardContent className="p-6 flex items-center gap-4">
@@ -180,12 +209,34 @@ export default function LaporanKegiatanPage() {
                     )} />
                   </div>
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 pr-6">
                   <p className="text-sm font-black text-primary truncate uppercase tracking-tight" title={report.title}>{report.title}</p>
                   <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-bold uppercase mt-1">
                     <Calendar className="h-3 w-3" />
                     {new Date(report.reportDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </div>
+                </div>
+                
+                {/* Quick Actions Dropdown */}
+                <div className="absolute top-6 right-4" onClick={(e) => e.stopPropagation()}>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="rounded-2xl p-2 w-40">
+                      <DropdownMenuItem onClick={() => setSelectedReport(report)} className="rounded-xl text-xs font-bold cursor-pointer">
+                        <Eye className="mr-2 h-4 w-4" /> Lihat
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleOpenEdit(report)} className="rounded-xl text-xs font-bold cursor-pointer text-blue-600">
+                        <Edit className="mr-2 h-4 w-4" /> Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDelete(report.id, report.title)} className="rounded-xl text-xs font-bold cursor-pointer text-red-600">
+                        <Trash2 className="mr-2 h-4 w-4" /> Hapus
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </CardContent>
             </Card>
@@ -290,16 +341,34 @@ export default function LaporanKegiatanPage() {
                   </div>
                 </div>
 
-                <div className="pt-6 border-t flex justify-between items-center">
-                  <div className="flex flex-col">
-                    <span className="text-[9px] text-muted-foreground uppercase font-black tracking-[0.2em]">Status</span>
-                    <Badge className={cn("mt-1 font-black text-[9px] uppercase", selectedReport.status === 'Approved' ? "bg-green-500" : "bg-amber-500")}>
-                      {selectedReport.status}
-                    </Badge>
+                <div className="pt-6 border-t flex flex-col sm:flex-row justify-between items-center gap-4">
+                  <div className="flex items-center gap-3 w-full sm:w-auto">
+                    <div className="flex flex-col">
+                      <span className="text-[9px] text-muted-foreground uppercase font-black tracking-[0.2em]">Status</span>
+                      <Badge className={cn("mt-1 font-black text-[9px] uppercase", selectedReport.status === 'Approved' ? "bg-green-500" : "bg-amber-500")}>
+                        {selectedReport.status}
+                      </Badge>
+                    </div>
                   </div>
-                  <Button onClick={() => setSelectedReport(null)} className="rounded-full px-8 bg-primary font-black text-xs uppercase shadow-lg">
-                    Tutup
-                  </Button>
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <Button 
+                      variant="outline" 
+                      className="flex-1 sm:flex-none rounded-full border-blue-200 text-blue-600 hover:bg-blue-50 font-black text-[10px] uppercase tracking-widest px-6"
+                      onClick={() => handleOpenEdit(selectedReport)}
+                    >
+                      <Edit className="mr-2 h-4 w-4" /> Edit Data
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="flex-1 sm:flex-none rounded-full border-red-200 text-red-600 hover:bg-red-50 font-black text-[10px] uppercase tracking-widest px-6"
+                      onClick={() => handleDelete(selectedReport.id, selectedReport.title)}
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" /> Hapus
+                    </Button>
+                    <Button onClick={() => setSelectedReport(null)} className="flex-1 sm:flex-none rounded-full px-8 bg-primary font-black text-[10px] uppercase tracking-widest shadow-lg">
+                      Tutup
+                    </Button>
+                  </div>
                 </div>
               </div>
             </>
@@ -307,39 +376,68 @@ export default function LaporanKegiatanPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Dialog Buat Laporan */}
-      <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+      {/* Dialog Buat/Edit Laporan */}
+      <Dialog open={isCreateOpen} onOpenChange={(open) => {
+        setIsCreateOpen(open)
+        if (!open) setEditingReport(null)
+      }}>
         <DialogContent className="w-[95vw] md:max-w-[600px] max-h-[95vh] overflow-y-auto rounded-[2.5rem] p-0 border-none shadow-2xl">
           <form onSubmit={handleSubmit}>
             <DialogHeader className="p-8 bg-primary text-white">
-              <DialogTitle className="text-2xl font-black uppercase tracking-tight">Buat Laporan</DialogTitle>
+              <DialogTitle className="text-2xl font-black uppercase tracking-tight">
+                {editingReport ? "Edit Laporan" : "Buat Laporan"}
+              </DialogTitle>
               <DialogDescription className="text-white/80 font-medium text-xs">Dokumentasikan kegiatan operasional partai.</DialogDescription>
             </DialogHeader>
             <div className="p-8 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-[9px] font-black uppercase text-muted-foreground tracking-widest">Tanggal</Label>
-                  <Input name="reportDate" type="date" required className="rounded-2xl h-12 font-bold" />
+                  <Input 
+                    name="reportDate" 
+                    type="date" 
+                    required 
+                    defaultValue={editingReport ? editingReport.reportDate.split('T')[0] : ""} 
+                    className="rounded-2xl h-12 font-bold" 
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[9px] font-black uppercase text-muted-foreground tracking-widest">Lokasi</Label>
-                  <Input name="location" placeholder="Lokasi..." required className="rounded-2xl h-12 font-bold uppercase" />
+                  <Input 
+                    name="location" 
+                    placeholder="Lokasi..." 
+                    required 
+                    defaultValue={editingReport?.location}
+                    className="rounded-2xl h-12 font-bold uppercase" 
+                  />
                 </div>
               </div>
               
               <div className="space-y-2">
                 <Label className="text-[9px] font-black uppercase text-muted-foreground tracking-widest">Judul Kegiatan</Label>
-                <Input name="title" placeholder="Contoh: Musyawarah Ranting..." required className="rounded-2xl h-12 font-black uppercase" />
+                <Input 
+                  name="title" 
+                  placeholder="Contoh: Musyawarah Ranting..." 
+                  required 
+                  defaultValue={editingReport?.title}
+                  className="rounded-2xl h-12 font-black uppercase" 
+                />
               </div>
 
               <div className="space-y-2">
                 <Label className="text-[9px] font-black uppercase text-muted-foreground tracking-widest">Deskripsi</Label>
-                <Textarea name="description" placeholder="Detail kegiatan..." className="min-h-[120px] rounded-2xl font-bold uppercase" required />
+                <Textarea 
+                  name="description" 
+                  placeholder="Detail kegiatan..." 
+                  defaultValue={editingReport?.description}
+                  className="min-h-[120px] rounded-2xl font-bold uppercase" 
+                  required 
+                />
               </div>
 
               <div className="space-y-4 p-6 bg-muted/20 rounded-[2rem] border border-dashed">
                 <Label className="text-[9px] font-black uppercase text-primary tracking-widest flex items-center gap-2">
-                  <FileUp className="h-4 w-4" /> Unggah Foto Dokumentasi
+                  <FileUp className="h-4 w-4" /> Foto Dokumentasi
                 </Label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[
@@ -361,7 +459,6 @@ export default function LaporanKegiatanPage() {
                             size="icon" 
                             className="h-6 w-6 text-red-500 hover:bg-red-50 rounded-full"
                             onClick={() => handleRemoveFile(item.field)}
-                            title="Hapus foto"
                           >
                             <Trash2 className="h-3 w-3" />
                           </Button>
@@ -383,7 +480,9 @@ export default function LaporanKegiatanPage() {
             </div>
             <DialogFooter className="p-8 bg-muted/30 gap-2">
               <Button type="button" variant="ghost" onClick={() => setIsCreateOpen(false)} className="flex-1 rounded-full font-bold h-12">Batal</Button>
-              <Button type="submit" className="flex-1 bg-secondary text-white rounded-full font-black text-xs uppercase shadow-lg h-12">Simpan & Kirim</Button>
+              <Button type="submit" className="flex-1 bg-secondary text-white rounded-full font-black text-xs uppercase shadow-lg h-12">
+                {editingReport ? "Simpan Perubahan" : "Simpan & Kirim"}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
