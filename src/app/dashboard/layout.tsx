@@ -362,6 +362,10 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
       <Dialog open={isAboutOpen} onOpenChange={setIsAboutOpen}>
         <DialogContent className="sm:max-w-[420px] p-0 border-none rounded-[2rem] overflow-hidden shadow-2xl animate-in zoom-in duration-300 print:hidden bg-[#f0f4f8]">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Tentang Aplikasi SITU HANURA</DialogTitle>
+            <DialogDescription>Informasi mengenai sistem dan pengembang aplikasi.</DialogDescription>
+          </DialogHeader>
           <div className="relative p-8 pt-12 space-y-8">
             <Button 
               variant="ghost" 

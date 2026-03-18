@@ -188,7 +188,12 @@ export default function LaporanKegiatanPage() {
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
-                <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight leading-tight">{selectedReport.title}</h2>
+                <DialogHeader className="p-0 text-left">
+                  <DialogTitle className="text-xl md:text-2xl font-black uppercase tracking-tight leading-tight">
+                    {selectedReport.title}
+                  </DialogTitle>
+                  <DialogDescription className="sr-only">Rincian lengkap laporan kegiatan operasional.</DialogDescription>
+                </DialogHeader>
                 <div className="flex flex-wrap gap-4 pt-6 text-white/80 text-[10px] font-bold uppercase tracking-widest">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
@@ -217,10 +222,10 @@ export default function LaporanKegiatanPage() {
                   </Label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {[
-                      { label: "Absensi", file: selectedReport.absensiFile },
-                      { label: "Spanduk", file: selectedReport.spandukFile },
+                      { label: "Foto Absensi", file: selectedReport.absensiFile },
+                      { label: "Foto Spanduk", file: selectedReport.spandukFile },
                       { label: "Foto Bersama", file: selectedReport.fotoBersamaFile },
-                      { label: "Pendukung", file: selectedReport.fotoPendukungFile }
+                      { label: "Foto Pendukung", file: selectedReport.fotoPendukungFile }
                     ].map((item, idx) => (
                       <div key={idx} className={cn(
                         "flex items-center justify-between p-4 rounded-2xl border transition-colors",
@@ -303,7 +308,7 @@ export default function LaporanKegiatanPage() {
                     { id: "absensi", label: "1. Foto Absensi", field: "absensi" as const },
                     { id: "spanduk", label: "2. Foto Spanduk", field: "spanduk" as const },
                     { id: "fotoBersama", label: "3. Foto Bersama", field: "fotoBersama" as const },
-                    { id: "fotoPendukung", label: "4. Pendukung", field: "fotoPendukung" as const }
+                    { id: "fotoPendukung", label: "4. Foto Pendukung", field: "fotoPendukung" as const }
                   ].map((item) => (
                     <div key={item.id} className="space-y-1.5">
                       <Label className="text-[8px] font-black uppercase flex items-center justify-between pl-1">
