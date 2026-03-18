@@ -15,7 +15,8 @@ import {
   CheckCircle2,
   X,
   Search,
-  Eye
+  Eye,
+  Trash2
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -49,6 +50,14 @@ export default function LaporanKegiatanPage() {
     fotoPendukung: "",
   })
 
+  // Refs to clear native file inputs
+  const fileInputRefs = {
+    absensi: React.useRef<HTMLInputElement>(null),
+    spanduk: React.useRef<HTMLInputElement>(null),
+    fotoBersama: React.useRef<HTMLInputElement>(null),
+    fotoPendukung: React.useRef<HTMLInputElement>(null),
+  }
+
   const firestore = useFirestore()
   const { user } = useUser()
   const { toast } = useToast()
@@ -69,6 +78,17 @@ export default function LaporanKegiatanPage() {
       }
       reader.readAsDataURL(file)
     }
+  }
+
+  const handleRemoveFile = (field: keyof typeof fileData) => {
+    setFileData(prev => ({ ...prev, [field]: "" }))
+    if (fileInputRefs[field].current) {
+      fileInputRefs[field].current!.value = ""
+    }
+    toast({
+      title: "Berkas Dihapus",
+      description: `Foto telah dihapus dari pilihan.`,
+    })
   }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -329,14 +349,29 @@ export default function LaporanKegiatanPage() {
                     { id: "fotoPendukung", label: "4. Foto Pendukung", field: "fotoPendukung" as const }
                   ].map((item) => (
                     <div key={item.id} className="space-y-1.5">
-                      <Label className="text-[8px] font-black uppercase flex items-center justify-between pl-1">
-                        {item.label}
-                        {fileData[item.field] && <CheckCircle2 className="h-3 w-3 text-green-500" />}
-                      </Label>
+                      <div className="flex items-center justify-between pl-1">
+                        <Label className="text-[8px] font-black uppercase flex items-center gap-1">
+                          {item.label}
+                          {fileData[item.field] && <CheckCircle2 className="h-3 w-3 text-green-500" />}
+                        </Label>
+                        {fileData[item.field] && (
+                          <Button 
+                            type="button" 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-6 w-6 text-red-500 hover:bg-red-50 rounded-full"
+                            onClick={() => handleRemoveFile(item.field)}
+                            title="Hapus foto"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        )}
+                      </div>
                       <Input 
                         id={item.id} 
                         name={item.id} 
                         type="file" 
+                        ref={fileInputRefs[item.field]}
                         className={cn("h-10 text-[10px] p-2 rounded-xl cursor-pointer bg-white", fileData[item.field] && "border-green-500")}
                         accept="image/*"
                         onChange={(e) => handleFileChange(e, item.field)}
