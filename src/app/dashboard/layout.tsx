@@ -361,104 +361,58 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       </div>
 
       <Dialog open={isAboutOpen} onOpenChange={setIsAboutOpen}>
-        <DialogContent className="w-[95vw] md:max-w-4xl p-0 border-none rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in duration-300 print:hidden">
-          <DialogHeader className="sr-only">
-            <DialogTitle>Tentang SITU HANURA</DialogTitle>
-            <DialogDescription>Informasi mengenai Sistem Informasi Terpadu Partai Hanura Kota Tanjungpinang</DialogDescription>
-          </DialogHeader>
-          <div className="max-h-[85vh] overflow-y-auto">
-            <div className="space-y-8 py-8 px-6">
-              <div className="text-center space-y-4">
-                <div className="inline-flex items-center justify-center p-4 bg-primary/10 rounded-2xl mb-2">
-                  <Info className="h-10 w-10 text-primary" />
-                </div>
-                <h1 className="text-2xl md:text-3xl font-bold text-primary leading-tight">
-                  Selamat datang di SITU HANURA
-                </h1>
-                <p className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-widest font-bold">
-                  Sistem Informasi Terpadu Partai Hanura Kota Tanjungpinang
+        <DialogContent className="sm:max-w-[420px] p-0 border-none rounded-[2rem] overflow-hidden shadow-2xl animate-in zoom-in duration-300 print:hidden bg-[#f0f4f8]">
+          <div className="relative p-8 pt-12 space-y-8">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setIsAboutOpen(false)} 
+              className="absolute right-4 top-4 h-10 w-10 rounded-full border-2 border-primary/20 text-primary hover:bg-primary/10"
+            >
+              <X className="h-6 w-6" />
+            </Button>
+
+            <div className="space-y-6">
+              <h1 className="text-2xl md:text-3xl font-black text-primary uppercase tracking-tight text-center sm:text-left">
+                TENTANG APLIKASI
+              </h1>
+              
+              <div className="space-y-4 text-slate-700 leading-relaxed text-sm md:text-base font-medium">
+                <p>
+                  Selamat datang di Aplikasi SITU HANURA versi 2.0. 
+                  Aplikasi ini dikembangkan dan dirancang untuk mempermudah dalam pengecekkan dan penginputan data. 
+                  Aplikasi ini masih perlu pengembangan kedepannya, kritik dan saran sangat diperlukan.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-0 rounded-3xl overflow-hidden border bg-card">
-                <div className="p-6 md:p-10 space-y-6 flex flex-col justify-center">
-                  <h2 className="text-xl font-bold text-primary">Tentang Aplikasi</h2>
-                  <p className="text-muted-foreground leading-relaxed text-sm md:text-base font-medium">
-                    Aplikasi ini dibuat dan dikembangkan untuk digunakan di sekretariat dalam pengelolaan data baik laporan maupun surat menyurat.
-                  </p>
-                  <div className="pt-4 space-y-4">
-                    <div className="flex gap-4 p-4 bg-muted/30 rounded-2xl border border-border/50">
-                      <div className="p-3 bg-white rounded-xl text-primary h-fit shadow-sm">
-                        <MessageSquare className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-primary text-sm">Kritik & Saran</h4>
-                        <p className="text-xs text-muted-foreground leading-relaxed font-medium">
-                          Aplikasi ini masih perlu banyak pengembangan. Kritik dan saran sangat diharapkan untuk kemajuan sistem ini.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-primary p-6 md:p-10 text-white flex flex-col justify-center space-y-6 md:space-y-8">
-                  <div className="space-y-2">
-                    <h3 className="text-sm font-bold uppercase tracking-wider border-b border-white/20 pb-2">Informasi Sistem</h3>
-                    <p className="text-primary-foreground/90 font-medium text-base">
-                      Digitalisasi Administrasi <br />
-                      <span className="font-bold">DPC HANURA KOTA TANJUNGPINANG</span>
-                    </p>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center backdrop-blur-sm">
-                        <Code className="h-4 w-4" />
-                      </div>
-                      <span className="text-xs font-bold tracking-wide">Versi 2.0</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center backdrop-blur-sm">
-                        <MapPin className="h-4 w-4" />
-                      </div>
-                      <span className="text-xs leading-snug font-bold">Jalan Gatot Subroto Km 5 Tanjungpinang</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center backdrop-blur-sm">
-                        <Heart className="h-4 w-4 fill-white" />
-                      </div>
-                      <span className="text-xs leading-tight font-bold">
-                        Dibuat oleh Sekretariat DPC Hanura Kota Tanjungpinang
-                      </span>
-                    </div>
-                  </div>
+              {/* Yellow Verification Box */}
+              <div className="p-4 bg-[#fff9db] border border-[#ffec99] rounded-2xl">
+                <p className="text-[#e67e22] font-bold text-xs leading-relaxed">
+                  - Proses Verifikasi Admin maksimal 1x24jam kerja jika berkas telah lengkap dan jelas terbaca
+                </p>
+              </div>
 
-                  <div className="space-y-4 pt-4">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-white/70">Hubungi Administrator:</p>
-                    <div className="grid grid-cols-1 gap-2">
-                      <a href="https://wa.me/62817319885" target="_blank" className="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-all border border-white/10 group">
-                        <div className="p-1.5 bg-green-500 text-white rounded-lg"><Phone className="h-3.5 w-3.5" /></div>
-                        <div className="flex flex-col">
-                          <span className="text-[8px] font-bold text-white/60 uppercase tracking-widest">WhatsApp</span>
-                          <span className="text-xs font-black text-white group-hover:underline">0817 319 885</span>
-                        </div>
-                      </a>
-                      <a href="mailto:agussuriyadipunya@gmail.com" className="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-all border border-white/10 group">
-                        <div className="p-1.5 bg-blue-500 text-white rounded-lg"><MailIcon className="h-3.5 w-3.5" /></div>
-                        <div className="flex flex-col">
-                          <span className="text-[8px] font-bold text-white/60 uppercase tracking-widest">Email</span>
-                          <span className="text-xs font-black text-white group-hover:underline">agussuriyadipunya@gmail.com</span>
-                        </div>
-                      </a>
-                    </div>
+              {/* Contact Area */}
+              <div className="p-6 bg-white rounded-3xl shadow-sm border border-slate-200 space-y-4">
+                <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Kontak & Saran:</h4>
+                <div className="space-y-3">
+                  <div className="space-y-0.5">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Email:</span>
+                    <p className="text-sm font-black text-primary">agussuriyadipunya@gmail.com</p>
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Whatsapp:</span>
+                    <p className="text-sm font-black text-primary">0817319885</p>
                   </div>
                 </div>
               </div>
-
-              <footer className="text-center pt-8 pb-4 text-[9px] font-black text-muted-foreground border-t uppercase tracking-[0.3em]">
-                © 2026 SITU HANURA - DPC Partai Hanura Kota Tanjungpinang
-              </footer>
             </div>
+
+            <footer className="text-center pt-2">
+              <p className="text-[10px] font-medium italic text-slate-400">
+                Terima kasih atas kontribusi Anda.
+              </p>
+            </footer>
           </div>
         </DialogContent>
       </Dialog>
