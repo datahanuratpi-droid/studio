@@ -549,7 +549,7 @@ export default function LaporanKegiatanPage() {
                 <div className="space-y-4 pt-4 border-t border-muted/50">
                   <div className="flex items-center justify-between">
                     <Label className="text-[10px] font-black uppercase text-primary tracking-widest flex items-center gap-2">
-                      <Layers className="h-4 w-4" /> Dokumentasi Pendukung (Dapat > 1)
+                      <Layers className="h-4 w-4" /> Dokumentasi Pendukung (Dapat &gt; 1)
                     </Label>
                     <Button 
                       type="button" 
