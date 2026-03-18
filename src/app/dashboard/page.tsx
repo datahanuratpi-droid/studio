@@ -36,6 +36,26 @@ import {
 } from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator"
 
+// Custom Female Child Icon
+const GirlIcon = () => (
+  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="7" r="4" />
+    <path d="M12 11c-3.5 0-6 2.5-6 6v2h12v-2c0-3.5-2.5-6-6-6z" />
+    <path d="M9 4.5a2 2 0 0 1 6 0" />
+    <path d="M7 9l-1 2" />
+    <path d="M17 9l1 2" />
+  </svg>
+);
+
+// Custom Male Child Icon
+const BoyIcon = () => (
+  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="7" r="4" />
+    <path d="M12 11c-3.5 0-6 2.5-6 6v2h12v-2c0-3.5-2.5-6-6-6z" />
+    <path d="M10 3.5c1 0 3 0 4 0" />
+  </svg>
+);
+
 export default function DashboardPage() {
   const firestore = useFirestore()
   const [isReniDetailOpen, setIsReniDetailOpen] = React.useState(false)
@@ -139,7 +159,7 @@ export default function DashboardPage() {
                 onClick={() => setIsReniDetailOpen(true)}
               >
                 <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
-                  <UserIcon className="h-10 w-10" />
+                  <GirlIcon />
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Ketua</p>
@@ -153,7 +173,7 @@ export default function DashboardPage() {
                 onClick={() => setIsBeriDetailOpen(true)}
               >
                 <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
-                  <UserIcon className="h-10 w-10" />
+                  <BoyIcon />
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Sekretaris</p>
@@ -167,7 +187,7 @@ export default function DashboardPage() {
                 onClick={() => setIsEndangDetailOpen(true)}
               >
                 <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
-                  <UserIcon className="h-10 w-10" />
+                  <BoyIcon />
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Bendahara</p>
@@ -237,7 +257,7 @@ export default function DashboardPage() {
           <DialogHeader className="p-8 bg-primary text-white text-left relative overflow-hidden">
             <div className="relative z-10 flex items-center gap-4">
               <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
-                <UserIcon className="h-8 w-8 text-white" />
+                <GirlIcon />
               </div>
               <div className="space-y-1">
                 <DialogTitle className="text-2xl font-headline font-bold">RENI, SE</DialogTitle>
@@ -331,7 +351,7 @@ export default function DashboardPage() {
           <DialogHeader className="p-8 bg-primary text-white text-left relative overflow-hidden">
             <div className="relative z-10 flex items-center gap-4">
               <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
-                <UserIcon className="h-8 w-8 text-white" />
+                <BoyIcon />
               </div>
               <div className="space-y-1">
                 <DialogTitle className="text-2xl font-headline font-bold uppercase">BERI KURNIAWAN</DialogTitle>
@@ -425,7 +445,7 @@ export default function DashboardPage() {
           <DialogHeader className="p-8 bg-primary text-white text-left relative overflow-hidden">
             <div className="relative z-10 flex items-center gap-4">
               <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
-                <UserIcon className="h-8 w-8 text-white" />
+                <BoyIcon />
               </div>
               <div className="space-y-1">
                 <DialogTitle className="text-2xl font-headline font-bold uppercase">ENDANG WIRNANTO</DialogTitle>
