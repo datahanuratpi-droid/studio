@@ -1,4 +1,3 @@
-
 'use client'
 
 import * as React from "react"
@@ -286,9 +285,9 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Sidebar Footer - FIXED WITH LOGIN INFO */}
-        <div className="mt-auto p-4 border-t space-y-4 shrink-0 bg-white/50 backdrop-blur-sm">
+        <div className="mt-auto p-6 border-t space-y-4 shrink-0 bg-white/50 backdrop-blur-sm">
           {/* Info Login Section */}
-          <div className="px-2 space-y-3">
+          <div className="space-y-4">
              <div className="space-y-1">
                <div className="flex items-center gap-1.5">
                  <MonitorOff className="h-3 w-3 text-muted-foreground/60" />
@@ -309,7 +308,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                </span>
              </div>
              
-             <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-200">
+             <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200">
                <div className="space-y-1">
                  <div className="flex items-center gap-1">
                    <CalendarIcon className="h-2.5 w-2.5 text-muted-foreground/60" />
@@ -330,10 +329,6 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                </div>
              </div>
           </div>
-          
-          <Button variant="ghost" className="w-full justify-start text-destructive font-black hover:bg-destructive/10 rounded-xl" onClick={handleLogout}>
-            <LogOut className="mr-3 h-5 w-5" /> KELUAR
-          </Button>
         </div>
       </aside>
 
