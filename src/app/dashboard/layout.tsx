@@ -361,27 +361,27 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       </div>
 
       <Dialog open={isAboutOpen} onOpenChange={setIsAboutOpen}>
-        <DialogContent className="sm:max-w-[420px] p-0 border-none rounded-[2rem] overflow-hidden shadow-2xl animate-in zoom-in duration-300 print:hidden bg-[#f0f4f8]">
+        <DialogContent className="w-[90vw] sm:max-w-[380px] p-0 border-none rounded-[2.5rem] overflow-hidden shadow-2xl animate-in zoom-in duration-300 print:hidden bg-[#f8f9fb]">
           <DialogHeader className="sr-only">
             <DialogTitle>Tentang Aplikasi SITU HANURA</DialogTitle>
             <DialogDescription>Informasi mengenai sistem dan pengembang aplikasi.</DialogDescription>
           </DialogHeader>
-          <div className="relative p-8 pt-12 space-y-8">
+          <div className="relative p-8 pt-14 space-y-8 flex flex-col items-center">
             <Button 
               variant="ghost" 
               size="icon" 
               onClick={() => setIsAboutOpen(false)} 
-              className="absolute right-4 top-4 h-10 w-10 rounded-full border-2 border-primary/20 text-primary hover:bg-primary/10"
+              className="absolute right-6 top-6 h-10 w-10 rounded-full bg-primary/5 text-primary hover:bg-primary/10 transition-colors shadow-sm"
             >
-              <X className="h-6 w-6" />
+              <X className="h-5 w-5" />
             </Button>
 
-            <div className="space-y-6">
-              <h1 className="text-2xl md:text-3xl font-black text-primary uppercase tracking-tight text-center sm:text-left">
+            <div className="space-y-6 w-full">
+              <h1 className="text-2xl md:text-3xl font-black text-primary uppercase tracking-tight text-center">
                 TENTANG APLIKASI
               </h1>
               
-              <div className="space-y-4 text-slate-700 leading-relaxed text-sm md:text-base font-medium">
+              <div className="text-slate-600 leading-relaxed text-sm font-medium text-center px-2">
                 <p>
                   Selamat datang di Aplikasi SITU HANURA versi 2.0. 
                   Aplikasi ini dikembangkan dan dirancang untuk mempermudah dalam pengecekkan dan penginputan data. 
@@ -390,21 +390,21 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
               </div>
 
               {/* Yellow Verification Box */}
-              <div className="p-4 bg-[#fff9db] border border-[#ffec99] rounded-2xl">
-                <p className="text-[#e67e22] font-bold text-xs leading-relaxed">
+              <div className="p-5 bg-[#fff9db] border border-[#fff3bf] rounded-[1.5rem]">
+                <p className="text-[#e67e22] font-bold text-[11px] leading-relaxed text-center">
                   - Proses Verifikasi Admin maksimal 1x24jam kerja jika berkas telah lengkap dan jelas terbaca
                 </p>
               </div>
 
               {/* Contact Area */}
-              <div className="p-6 bg-white rounded-3xl shadow-sm border border-slate-200 space-y-4">
-                <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Kontak & Saran:</h4>
-                <div className="space-y-3">
-                  <div className="space-y-0.5">
+              <div className="p-8 bg-white rounded-[2.5rem] shadow-sm border border-slate-100 space-y-6">
+                <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">KONTAK & SARAN:</h4>
+                <div className="space-y-4">
+                  <div className="space-y-1">
                     <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Email:</span>
                     <p className="text-sm font-black text-primary">agussuriyadipunya@gmail.com</p>
                   </div>
-                  <div className="space-y-0.5">
+                  <div className="space-y-1">
                     <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Whatsapp:</span>
                     <p className="text-sm font-black text-primary">0817319885</p>
                   </div>
@@ -412,8 +412,8 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
               </div>
             </div>
 
-            <footer className="text-center pt-2">
-              <p className="text-[10px] font-medium italic text-slate-400">
+            <footer className="text-center w-full pt-4 pb-2">
+              <p className="text-[9px] font-medium italic text-slate-400">
                 Terima kasih atas kontribusi Anda.
               </p>
             </footer>
