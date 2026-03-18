@@ -18,6 +18,12 @@
       "description": "Photo of Reni, SE - Ketua DPC Hanura",
       "imageUrl": "https://picsum.photos/seed/reni/400/500",
       "imageHint": "woman yellow jacket"
+    },
+    {
+      "id": "main-app-bg",
+      "description": "Gold abstract waves background",
+      "imageUrl": "https://picsum.photos/seed/gold-bg/1920/1080",
+      "imageHint": "gold wave"
     }
   ]
 }

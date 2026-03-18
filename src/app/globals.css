@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -95,15 +96,14 @@
   }
 }
 
-/* Custom Background Mesh */
+/* Custom Background Gold Wave */
 .bg-mesh {
-  background-color: hsl(var(--background));
-  background-image: 
-    radial-gradient(at 0% 0%, hsla(var(--primary), 0.05) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, hsla(var(--secondary), 0.03) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, hsla(var(--primary), 0.05) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, hsla(var(--secondary), 0.03) 0px, transparent 50%);
+  background-color: #ffd700;
+  background-image: url('https://picsum.photos/seed/gold-bg/1920/1080');
+  background-size: cover;
+  background-position: center;
   background-attachment: fixed;
+  background-repeat: no-repeat;
 }
 
 /* Custom Scrollbar */
